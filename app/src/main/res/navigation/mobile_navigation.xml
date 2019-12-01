@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_allfiles">
+
+    <fragment
+        android:id="@+id/nav_allfiles"
+        android:name="io.github.kraowx.shibbyapp.ui.allfiles.AllFilesFragment"
+        android:label="@string/menu_allfiles"
+        tools:layout="@layout/fragment_allfiles" />
+
+    <fragment
+        android:id="@+id/nav_tags"
+        android:name="io.github.kraowx.shibbyapp.ui.tags.TagsFragment"
+        android:label="@string/menu_tags"
+        tools:layout="@layout/fragment_tags" />
+
+    <fragment
+        android:id="@+id/nav_series"
+        android:name="io.github.kraowx.shibbyapp.ui.series.SeriesFragment"
+        android:label="@string/menu_series"
+        tools:layout="@layout/fragment_series" />
+
+    <fragment
+        android:id="@+id/nav_downloads"
+        android:name="io.github.kraowx.shibbyapp.ui.downloads.DownloadsFragment"
+        android:label="@string/menu_downloads"
+        tools:layout="@layout/fragment_downloads" />
+
+    <fragment
+        android:id="@+id/nav_favorites"
+        android:name="io.github.kraowx.shibbyapp.ui.favorites.FavoritesFragment"
+        android:label="@string/menu_favorites"
+        tools:layout="@layout/fragment_favorites" />
+
+    <fragment
+        android:id="@+id/nav_playlists"
+        android:name="io.github.kraowx.shibbyapp.ui.playlists.PlaylistsFragment"
+        android:label="@string/menu_playlists"
+        tools:layout="@layout/fragment_playlists" />
+</navigation>

@@ -1,0 +1,143 @@
+package io.github.kraowx.shibbyapp.ui.downloads;
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SearchView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.R;
+import io.github.kraowx.shibbyapp.models.ShibbyFile;
+import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.DataManager;
+
+public class DownloadsFragment extends Fragment
+        implements ShibbyFileAdapter.ItemClickListener, SearchView.OnQueryTextListener
+{
+    private RecyclerView list;
+    private ShibbyFileAdapter listAdapter;
+    private LinearLayoutManager listLayoutManager;
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState)
+    {
+        final View root = inflater.inflate(R.layout.fragment_downloads, container, false);
+        final DataManager dataManager = new DataManager((MainActivity)getActivity());
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                List<ShibbyFile> allFiles = dataManager.getFiles();
+                List<ShibbyFile> downloadedFiles = AudioDownloadManager
+                        .getDownloadedFiles((MainActivity) getActivity(), allFiles);
+                initializeList(root, downloadedFiles);
+            }
+        }.start();
+//        new Timer().scheduleAtFixedRate(new TimerTask()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                if (!dataManager.needsUpdate())
+//                {
+//                    List<ShibbyFile> allFiles = dataManager.getFiles();
+//                    List<ShibbyFile> downloadedFiles = AudioDownloadManager
+//                            .getDownloadedFiles((MainActivity)getActivity(), allFiles);
+//                    initializeList(root, downloadedFiles);
+//                    this.cancel();
+//                }
+//                else
+//                {
+//                    List<ShibbyFile> allFiles = dataManager.getFiles();
+//                    List<ShibbyFile> downloadedFiles = AudioDownloadManager
+//                            .getDownloadedFiles((MainActivity)getActivity(), allFiles);
+//                    initializeList(root, downloadedFiles);
+//                    this.cancel();
+//                }
+//            }
+//        }, 0, 1000);
+
+        FloatingActionButton fabAddPlaylist =
+                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
+        fabAddPlaylist.hide();
+
+        new Timer().scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                SearchView searchView = ((MainActivity)getActivity()).getSearchView();
+                if (searchView != null)
+                {
+                    searchView.setOnQueryTextListener(DownloadsFragment.this);
+                    this.cancel();
+                }
+            }
+        }, 0, 1000);
+        return root;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String text)
+    {
+        listAdapter.filterDisplayItems(text);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String text)
+    {
+        return false;
+    }
+
+    @Override
+    public void onItemClick(View view, int position)
+    {
+        createFileInfoDialog(listAdapter.getItem(position));
+    }
+
+    private void initializeList(View root, final List<ShibbyFile> files)
+    {
+        list = root.findViewById(R.id.listDownloads);
+        list.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                listLayoutManager = new LinearLayoutManager(getContext());
+                list.setLayoutManager(listLayoutManager);
+                listAdapter = new ShibbyFileAdapter(getContext(),
+                        files, ((MainActivity)getActivity()));
+                list.setAdapter(listAdapter);
+                listAdapter.setClickListener(DownloadsFragment.this);
+            }
+        });
+    }
+
+    private void createFileInfoDialog(ShibbyFile file)
+    {
+        final Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.file_info_dialog);
+        dialog.setTitle("File Info");
+        TextView title = dialog.findViewById(R.id.txtTitle);
+        title.setText(file.getName());
+        TextView description = dialog.findViewById(R.id.txtDescription);
+        description.setText(file.getDescription());
+        dialog.show();
+    }
+}

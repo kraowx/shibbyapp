@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_allfiles"
+            android:icon="@drawable/ic_menu_file"
+            android:title="@string/menu_allfiles" />
+        <item
+            android:id="@+id/nav_tags"
+            android:icon="@drawable/ic_menu_tag"
+            android:title="@string/menu_tags" />
+        <item
+            android:id="@+id/nav_series"
+            android:icon="@drawable/ic_menu_series"
+            android:title="@string/menu_series" />
+    </group>
+
+    <item android:title="Your Stuff">
+        <menu>
+            <item
+                android:id="@+id/nav_downloads"
+                android:icon="@drawable/ic_menu_save_alt"
+                android:title="@string/menu_downloads" />
+            <item
+                android:id="@+id/nav_favorites"
+                android:icon="@drawable/ic_menu_star"
+                android:title="@string/menu_favorites" />
+            <item
+                android:id="@+id/nav_playlists"
+                android:icon="@drawable/ic_menu_playlist"
+                android:title="@string/menu_playlists" />
+        </menu>
+    </item>
+
+</menu>
