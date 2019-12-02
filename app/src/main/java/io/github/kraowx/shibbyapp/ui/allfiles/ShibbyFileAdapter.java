@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,7 +53,12 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     {
         ShibbyFile file = mData.get(position);
         holder.txtFileName.setText(file.getName());
-        if (AudioDownloadManager.fileIsDownloaded(mainActivity, file))
+        if (mainActivity.getDownloadManager().isDownloadingFile(file))
+        {
+            holder.btnDownload.setColorFilter(ContextCompat
+                    .getColor(mainActivity, R.color.redAccent));
+        }
+        else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.colorAccent));
@@ -134,9 +140,23 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                     final ShibbyFile file = getItem(getAdapterPosition());
                     if (!AudioDownloadManager.fileIsDownloaded(mainActivity, file))
                     {
-                        AudioDownloadManager.downloadFile(mainActivity, file);
+                        mainActivity.getDownloadManager().downloadFile(file, btnDownload);
                         btnDownload.setColorFilter(ContextCompat
-                                .getColor(mainActivity, R.color.colorAccent));
+                                .getColor(mainActivity, R.color.redAccent));
+                    }
+                    else if (mainActivity.getDownloadManager().isDownloadingFile(file))
+                    {
+                        if (mainActivity.getDownloadManager().cancelDownload(file))
+                        {
+                            btnDownload.setColorFilter(null);
+                            Toast.makeText(mainActivity, "Download cancelled",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        else
+                        {
+                            Toast.makeText(mainActivity, "Failed to cancel download",
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                     else
                     {

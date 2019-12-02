@@ -1,7 +1,9 @@
 package io.github.kraowx.shibbyapp.audio;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -128,7 +130,7 @@ public class AudioPlayerDialog extends Dialog
             @Override
             public void run()
             {
-                title.setText(file.getName());
+                title.setText(file != null ? file.getName() : "No file selected");
             }
         });
         txtElapsedTime.post(new Runnable()
@@ -168,7 +170,8 @@ public class AudioPlayerDialog extends Dialog
                 }
             });
         }
-        fileDownloaded = AudioDownloadManager.fileIsDownloaded(mainActivity, file);
+        fileDownloaded = file != null ? AudioDownloadManager
+                .fileIsDownloaded(mainActivity, file) : false;
         if (fileDownloaded)
         {
             btnDownload.post(new Runnable()
@@ -178,6 +181,18 @@ public class AudioPlayerDialog extends Dialog
                 {
                     btnDownload.setColorFilter(ContextCompat.getColor(
                             getContext(), R.color.colorAccent));
+                }
+            });
+        }
+        else if (mainActivity.getDownloadManager().isDownloadingFile(file))
+        {
+            btnDownload.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    btnDownload.setColorFilter(ContextCompat.getColor(
+                            getContext(), R.color.redAccent));
                 }
             });
         }
@@ -192,7 +207,14 @@ public class AudioPlayerDialog extends Dialog
                 }
             });
         }
-        audioPlayer = new AudioPlayer(progressDialog, fileDownloaded);
+        if (file != null)
+        {
+            audioPlayer = new AudioPlayer(progressDialog, fileDownloaded);
+        }
+        else
+        {
+            audioPlayer = null;
+        }
     }
 
     private void initUI()
@@ -212,7 +234,45 @@ public class AudioPlayerDialog extends Dialog
             {
                 if (activeFile != null)
                 {
-                    AudioDownloadManager.downloadFile(mainActivity, activeFile);
+                    if (!AudioDownloadManager.fileIsDownloaded(mainActivity, activeFile))
+                    {
+                        mainActivity.getDownloadManager().downloadFile(activeFile, btnDownload);
+                        btnDownload.setColorFilter(ContextCompat.getColor(
+                                getContext(), R.color.redAccent));
+                    }
+                    else if (mainActivity.getDownloadManager().isDownloadingFile(activeFile))
+                    {
+                        if (mainActivity.getDownloadManager().cancelDownload(activeFile))
+                        {
+                            btnDownload.setColorFilter(null);
+                            Toast.makeText(mainActivity, "Download cancelled",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        else
+                        {
+                            Toast.makeText(mainActivity, "Failed to cancel download",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else
+                    {
+                        new AlertDialog.Builder(mainActivity)
+                                .setTitle("Delete download")
+                                .setMessage("Are you sure you want to delete this file?")
+                                .setPositiveButton(android.R.string.yes,
+                                        new DialogInterface.OnClickListener()
+                                        {
+                                            public void onClick(DialogInterface dialog, int which)
+                                            {
+                                                AudioDownloadManager.deleteFile(mainActivity, activeFile);
+                                                btnDownload.setColorFilter(null);
+                                                loadFile(null);
+                                            }
+                                        })
+                                .setNegativeButton(android.R.string.no, null)
+                                .setIcon(R.drawable.ic_warning)
+                                .show();
+                    }
                 }
                 else
                 {

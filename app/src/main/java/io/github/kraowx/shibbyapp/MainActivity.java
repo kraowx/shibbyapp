@@ -34,6 +34,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
+import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 
 public class MainActivity extends AppCompatActivity
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity
     private static MainActivity mContext;
     private AppBarConfiguration mAppBarConfiguration;
     private AudioController audioController;
+    private AudioDownloadManager downloadManager;
     private SearchView searchView;
 
     public static Context getContext()
@@ -51,6 +53,11 @@ public class MainActivity extends AppCompatActivity
     public AudioController getAudioController()
     {
         return audioController;
+    }
+
+    public AudioDownloadManager getDownloadManager()
+    {
+        return downloadManager;
     }
 
     public SearchView getSearchView()
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         audioController = new AudioController(this);
+        downloadManager = new AudioDownloadManager(this);
 
         FloatingActionButton fab = findViewById(R.id.fabAudioController);
         fab.setOnClickListener(new View.OnClickListener()

@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#210067</color>
     <color name="colorAccent">#1B70D8</color>
     <color name="colorAccentLight">#587BCB</color>
-    <color name="yellowAccent">#FFEB3B</color>
+    <color name="redAccent">#F44336</color>
     <!--original styles
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
