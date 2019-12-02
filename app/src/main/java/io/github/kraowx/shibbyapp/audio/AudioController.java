@@ -21,9 +21,9 @@ public class AudioController
         dialog.loadFile(file);
     }
 
-    public void setQueue(List<ShibbyFile> queue)
+    public void setQueue(List<ShibbyFile> queue, boolean isPlaylist)
     {
-        dialog.setQueue(queue);
+        dialog.setQueue(queue, isPlaylist);
     }
 
     public boolean isVisible()

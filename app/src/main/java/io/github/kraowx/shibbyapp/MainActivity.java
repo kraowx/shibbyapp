@@ -26,10 +26,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -103,7 +105,12 @@ public class MainActivity extends AppCompatActivity
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        new DataManager(this).loadAllData();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean updateBackground = prefs.getBoolean("updateBackground", true);
+        if (updateBackground)
+        {
+            new DataManager(this).loadAllData();
+        }
     }
 
     @Override
@@ -143,8 +150,21 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(MainActivity.this);
         final SharedPreferences.Editor editor = prefs.edit();
+        boolean updateBackground = prefs.getBoolean("updateBackground", true);
         boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+        int autoplay = prefs.getInt("autoplay", 1);
         String server = prefs.getString("server", "shibbyserver.ddns.net:2012");
+        Switch switchUpdateBackground = dialog.findViewById(R.id.switchUpdateBackground);
+        switchUpdateBackground.setChecked(updateBackground);
+        switchUpdateBackground.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                editor.putBoolean("updateBackground", isChecked);
+                editor.commit();
+            }
+        });
         Switch switchDarkMode = dialog.findViewById(R.id.switchDarkMode);
         switchDarkMode.setChecked(darkModeEnabled);
         switchDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
@@ -158,6 +178,22 @@ public class MainActivity extends AppCompatActivity
         });
         final EditText txtServer = dialog.findViewById(R.id.txtServer);
         txtServer.setText(server);
+        Spinner spinnerAutoplay = dialog.findViewById(R.id.spinnerAutoplay);
+        spinnerAutoplay.setSelection(autoplay);
+        spinnerAutoplay.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id)
+            {
+                editor.putInt("autoplay", position);
+                editor.commit();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
         Button btnApplyChanges = dialog.findViewById(R.id.btnApplyChanges);
         btnApplyChanges.setOnClickListener(new View.OnClickListener()
         {

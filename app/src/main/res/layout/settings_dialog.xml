@@ -46,6 +46,13 @@
         android:layout_height="wrap_content"
         android:text="Dark Theme" />
 
+    <Spinner
+        android:id="@+id/spinnerAutoplay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/autoPlayItems"
+        android:spinnerMode="dropdown" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

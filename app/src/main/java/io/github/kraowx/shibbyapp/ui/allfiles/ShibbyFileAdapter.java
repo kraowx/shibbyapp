@@ -127,7 +127,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                     AudioController audioController = mainActivity.getAudioController();
                     ShibbyFile file = getItem(getAdapterPosition());
                     audioController.loadFile(file);
-                    audioController.setQueue(mData);
+                    audioController.setQueue(mData, false);
                     audioController.setVisible(true);
                 }
             });

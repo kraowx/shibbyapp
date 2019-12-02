@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -23,7 +25,8 @@ import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 
 public class AudioPlayerDialog extends Dialog
 {
-    private boolean fileDownloaded, seeking;
+    private boolean fileDownloaded,
+            seeking, queueIsPlaylist;
     private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
     private AudioPlayer audioPlayer;
@@ -44,9 +47,10 @@ public class AudioPlayerDialog extends Dialog
         initUI();
     }
 
-    public void setQueue(List<ShibbyFile> queue)
+    public void setQueue(List<ShibbyFile> queue, boolean isPlaylist)
     {
         this.queue = queue;
+        queueIsPlaylist = isPlaylist;
     }
 
     public void startTimer()
@@ -76,7 +80,8 @@ public class AudioPlayerDialog extends Dialog
                     {
                         // there is a file next in the queue
                         if (progressBar.getProgress()+1000 >= audioPlayer.getFileDuration() &&
-                                queue.indexOf(activeFile) < queue.size()-1)
+                                queue != null && queue.indexOf(activeFile) < queue.size()-1 &&
+                                autoplayAllowed())
                         {
                             mainActivity.runOnUiThread(new Runnable()
                             {
@@ -287,30 +292,39 @@ public class AudioPlayerDialog extends Dialog
             @Override
             public void onClick(View view)
             {
-                int index = queue.indexOf(activeFile);
-                if (index > 0)
+                if (queue != null)
                 {
-                    boolean isPlaying = audioPlayer.isPlaying();
-                    ShibbyFile newFile = queue.get(index - 1);
-                    loadFile(newFile);
-                    if (isPlaying)
+                    int index = queue.indexOf(activeFile);
+                    if (index > 0)
                     {
-                        playAudio();
-                        btnPlayPause.post(new Runnable()
+                        boolean isPlaying = audioPlayer.isPlaying();
+                        ShibbyFile newFile = queue.get(index - 1);
+                        loadFile(newFile);
+                        if (isPlaying)
                         {
-                            @Override
-                            public void run()
+                            playAudio();
+                            btnPlayPause.post(new Runnable()
                             {
-                                btnPlayPause.setImageResource(
-                                        R.drawable.ic_pause_circle);
-                            }
-                        });
+                                @Override
+                                public void run()
+                                {
+                                    btnPlayPause.setImageResource(
+                                            R.drawable.ic_pause_circle);
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
+                        Toast.makeText(getContext(),
+                                "Beginning of playlist reached",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
                 else
                 {
                     Toast.makeText(getContext(),
-                            "Beginning of playlist reached",
+                            "No queue selected",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -342,30 +356,39 @@ public class AudioPlayerDialog extends Dialog
             @Override
             public void onClick(View view)
             {
-                int index = queue.indexOf(activeFile);
-                if (index < queue.size()-1)
+                if (queue != null)
                 {
-                    boolean isPlaying = audioPlayer.isPlaying();
-                    ShibbyFile newFile = queue.get(index + 1);
-                    loadFile(newFile);
-                    if (isPlaying)
+                    int index = queue.indexOf(activeFile);
+                    if (index < queue.size() - 1)
                     {
-                        playAudio();
-                        btnPlayPause.post(new Runnable()
+                        boolean isPlaying = audioPlayer.isPlaying();
+                        ShibbyFile newFile = queue.get(index + 1);
+                        loadFile(newFile);
+                        if (isPlaying)
                         {
-                            @Override
-                            public void run()
+                            playAudio();
+                            btnPlayPause.post(new Runnable()
                             {
-                                btnPlayPause.setImageResource(
-                                        R.drawable.ic_pause_circle);
-                            }
-                        });
+                                @Override
+                                public void run()
+                                {
+                                    btnPlayPause.setImageResource(
+                                            R.drawable.ic_pause_circle);
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
+                        Toast.makeText(getContext(),
+                                "End of playlist reached",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
                 else
                 {
                     Toast.makeText(getContext(),
-                            "End of playlist reached",
+                            "No queue selected",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -461,6 +484,14 @@ public class AudioPlayerDialog extends Dialog
         {
             audioPlayer.execute(AudioPlayerDialog.this.activeFile.getLink());
         }
+    }
+
+    private boolean autoplayAllowed()
+    {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(mainActivity);
+        int autoplay = prefs.getInt("autoplay", 1);
+        return autoplay == 0 || (autoplay == 1 && queueIsPlaylist);
     }
 
     private String formatTime(int time)

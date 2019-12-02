@@ -110,7 +110,7 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                     AudioController audioController = mainActivity.getAudioController();
                     ShibbyFile file = getItem(getAdapterPosition());
                     audioController.loadFile(file);
-                    audioController.setQueue(mData);
+                    audioController.setQueue(mData, true);
                     audioController.setVisible(true);
                 }
             });
