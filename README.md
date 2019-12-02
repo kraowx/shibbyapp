@@ -13,3 +13,10 @@ Note that default server is currently offline. For now, you must host your own s
 - Search by tag
 - Search by file
 - Search by series
+
+## Planned Features
+- Notification with media controls (play/pause, next, previous)
+- Dark mode
+- Play-once button in the audio player to play the selected song only once, even if there are queued songs
+
+Feel free to suggest anything else you feel might improve the app!
