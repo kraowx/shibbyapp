@@ -45,7 +45,7 @@
             android:padding="5dp"
             android:scaleX="1.5"
             android:scaleY="1.5"
-            app:srcCompat="@drawable/ic_menu_save_alt" />
+            app:srcCompat="@drawable/ic_get_app" />
 
         <ImageButton
             android:id="@+id/btnRemoveFromPlaylist"
