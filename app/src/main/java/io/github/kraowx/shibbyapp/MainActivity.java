@@ -35,6 +35,7 @@ import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.net.Request;
@@ -73,6 +74,18 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        boolean darkModeEnabled = prefs.getBoolean(
+                "darkMode", false);
+        if (darkModeEnabled)
+        {
+            setTheme(R.style.AppThemeDark);
+        }
+        else
+        {
+            setTheme(R.style.AppTheme);
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -109,8 +122,8 @@ public class MainActivity extends AppCompatActivity
                 this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean updateBackground = prefs.getBoolean("updateBackground", true);
+        boolean updateBackground = prefs.getBoolean(
+                "updateBackground", true);
         if (updateBackground)
         {
             new Thread()
@@ -186,8 +199,19 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
+                if (isChecked)
+                {
+                    setTheme(R.style.AppTheme);
+                }
+                else
+                {
+                    setTheme(R.style.AppThemeDark);
+                }
                 editor.putBoolean("darkMode", isChecked);
                 editor.commit();
+                Toast.makeText(dialog.getContext(),
+                        "Relaunch the app for the change to take effect",
+                        Toast.LENGTH_LONG).show();
             }
         });
         final EditText txtServer = dialog.findViewById(R.id.txtServer);

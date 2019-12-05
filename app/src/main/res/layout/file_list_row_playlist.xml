@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:layout_weight="0.1"
+            android:layout_weight="0"
             android:background="@drawable/btn_ripple"
             app:srcCompat="@drawable/ic_play_arrow_large" />
 
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:layout_weight="0.1"
+            android:layout_weight="0"
             android:background="@drawable/btn_ripple"
             app:srcCompat="@drawable/ic_get_app_large" />
 
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:layout_weight="0.1"
+            android:layout_weight="0"
             android:background="@drawable/btn_ripple"
             app:srcCompat="@drawable/ic_close_large" />
 

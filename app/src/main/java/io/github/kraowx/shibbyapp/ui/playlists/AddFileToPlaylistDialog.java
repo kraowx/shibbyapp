@@ -37,8 +37,7 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
         this.mainActivity = mainActivity;
         this.showDeleteButton = showDeleteButton;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.fragment_playlists);
-        setTitle("Select a playlist");
+        setContentView(R.layout.playlist_list);
         initializeList(PlaylistManager.getPlaylists(mainActivity));
     }
 
@@ -58,7 +57,7 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
 
     private void initializeList(List<String> playlists)
     {
-        list = findViewById(R.id.listPlaylists);
+        list = findViewById(R.id.list);
         list.setHasFixedSize(true);
         listLayoutManager = new LinearLayoutManager(getContext());
         list.setLayoutManager(listLayoutManager);
