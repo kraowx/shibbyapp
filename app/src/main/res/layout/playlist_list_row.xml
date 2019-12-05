@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="fill_horizontal|center_vertical"
             android:gravity="right"
+            android:paddingRight="5dp"
             android:text="file count"
             android:textSize="16sp" />
 
@@ -38,9 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_ripple"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            app:srcCompat="@drawable/ic_close" />
+            app:srcCompat="@drawable/ic_close_large" />
     </LinearLayout>
 
 </LinearLayout>

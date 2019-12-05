@@ -28,34 +28,28 @@
             android:id="@+id/btnPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="right"
             android:layout_weight="0.1"
             android:background="@drawable/btn_ripple"
-            android:padding="5dp"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            app:srcCompat="@drawable/ic_play_arrow" />
+            app:srcCompat="@drawable/ic_play_arrow_large" />
 
         <ImageButton
             android:id="@+id/btnDownload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="right"
             android:layout_weight="0.1"
             android:background="@drawable/btn_ripple"
-            android:padding="5dp"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            app:srcCompat="@drawable/ic_get_app" />
+            app:srcCompat="@drawable/ic_get_app_large" />
 
         <ImageButton
             android:id="@+id/btnAddToPlaylist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="right"
             android:layout_weight="0.1"
             android:background="@drawable/btn_ripple"
-            android:padding="5dp"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            app:srcCompat="@drawable/ic_add" />
+            app:srcCompat="@drawable/ic_add_large" />
 
     </LinearLayout>
 
