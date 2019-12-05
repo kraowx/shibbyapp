@@ -4,7 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,18 +16,21 @@ public class ShibbyFile
 {
     private String name, id, link, description;
     private List<String> tags;
+    private Map<String, String> extraData;
 
     public ShibbyFile(String name, String link, String description)
     {
-        init(name, null, link, description);
+        init(name, null, link, description, null);
     }
 
-    public ShibbyFile(String name, String id, String link, String description)
+    public ShibbyFile(String name, String id, String link,
+                      String description, Map<String, String> extraData)
     {
-        init(name, id, link, description);
+        init(name, id, link, description, extraData);
     }
 
-    private void init(String name, String id, String link, String description)
+    private void init(String name, String id, String link,
+                      String description, Map<String, String> extraData)
     {
         this.name = name;
         if (id == null && name != null)
@@ -34,6 +40,8 @@ public class ShibbyFile
         this.link = link;
         this.description = description;
         tags = getTagsFromName();
+        this.extraData = extraData != null ? extraData :
+                new HashMap<String, String>();
     }
 
     public static ShibbyFile fromJSON(String jsonStr)
@@ -49,10 +57,18 @@ public class ShibbyFile
             }
             file.link = json.getString("link");
             file.description = json.getString("description");
+            file.extraData = new HashMap<String, String>();
+            JSONObject extras = json.getJSONObject("extras");
+            Iterator<String> it = extras.keys();
+            while (it.hasNext())
+            {
+                String key = it.next();
+                file.extraData.put(key, extras.getString(key));
+            }
         }
         catch (JSONException je)
         {
-            je.printStackTrace();
+            //je.printStackTrace();
         }
         return file;
     }
@@ -70,6 +86,12 @@ public class ShibbyFile
             json.put("id", id);
             json.put("link", link);
             json.put("description", description);
+            JSONObject extras = new JSONObject();
+            for (String key : extraData.keySet())
+            {
+                extras.put(key, extraData.get(key));
+            }
+            json.put("extras", extras);
         }
         catch (JSONException je)
         {
@@ -130,6 +152,16 @@ public class ShibbyFile
     public void setTags(List<String> tags)
     {
         this.tags = tags;
+    }
+
+    public Map<String, String> getExtras()
+    {
+        return extraData;
+    }
+
+    public void setExtras(Map<String, String> extras)
+    {
+        extraData = extras;
     }
 
     private List<String> getTagsFromName()

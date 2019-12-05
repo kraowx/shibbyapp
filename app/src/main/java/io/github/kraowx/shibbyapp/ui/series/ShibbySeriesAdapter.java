@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.kraowx.shibbyapp.R;
+import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 
 public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapter.ViewHolder>
@@ -106,6 +107,11 @@ public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapte
     void removeItem(ShibbyFileArray item)
     {
         mData.remove(item);
+    }
+
+    void setData(List<ShibbyFileArray> files)
+    {
+        mData = files;
     }
 
     // allows clicks events to be caught

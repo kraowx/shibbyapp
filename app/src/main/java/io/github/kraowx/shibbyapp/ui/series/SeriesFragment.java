@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -20,13 +21,16 @@ import java.util.TimerTask;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
+import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
 
 public class SeriesFragment extends Fragment
-        implements ShibbySeriesAdapter.ItemClickListener, SearchView.OnQueryTextListener
+        implements ShibbySeriesAdapter.ItemClickListener,
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener
 {
     private RecyclerView list;
+    private SwipeRefreshLayout refreshLayout;
     private ShibbySeriesAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
 
@@ -40,6 +44,13 @@ public class SeriesFragment extends Fragment
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
         fabAddPlaylist.hide();
+
+        refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
 
         new Timer().scheduleAtFixedRate(new TimerTask()
         {
@@ -55,6 +66,22 @@ public class SeriesFragment extends Fragment
             }
         }, 0, 1000);
         return root;
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                new DataManager((MainActivity)getActivity())
+                        .requestData(Request.series());
+                updateList();
+                refreshLayout.setRefreshing(false);
+            }
+        }.start();
     }
 
     @Override
@@ -91,6 +118,20 @@ public class SeriesFragment extends Fragment
                 listAdapter = new ShibbySeriesAdapter(getContext(), series);
                 list.setAdapter(listAdapter);
                 listAdapter.setClickListener(SeriesFragment.this);
+            }
+        });
+    }
+
+    private void updateList()
+    {
+        DataManager dataManager = new DataManager((MainActivity)getActivity());
+        listAdapter.setData(dataManager.getSeries());
+        list.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                listAdapter.notifyDataSetChanged();
             }
         });
     }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -22,13 +23,16 @@ import java.util.TimerTask;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
+import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 
 public class DownloadsFragment extends Fragment
-        implements ShibbyFileAdapter.ItemClickListener, SearchView.OnQueryTextListener
+        implements ShibbyFileAdapter.ItemClickListener,
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener
 {
     private RecyclerView list;
+    private SwipeRefreshLayout refreshLayout;
     private ShibbyFileAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
 
@@ -48,33 +52,18 @@ public class DownloadsFragment extends Fragment
                 initializeList(root, downloadedFiles);
             }
         }.start();
-//        new Timer().scheduleAtFixedRate(new TimerTask()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                if (!dataManager.needsUpdate())
-//                {
-//                    List<ShibbyFile> allFiles = dataManager.getFiles();
-//                    List<ShibbyFile> downloadedFiles = AudioDownloadManager
-//                            .getDownloadedFiles((MainActivity)getActivity(), allFiles);
-//                    initializeList(root, downloadedFiles);
-//                    this.cancel();
-//                }
-//                else
-//                {
-//                    List<ShibbyFile> allFiles = dataManager.getFiles();
-//                    List<ShibbyFile> downloadedFiles = AudioDownloadManager
-//                            .getDownloadedFiles((MainActivity)getActivity(), allFiles);
-//                    initializeList(root, downloadedFiles);
-//                    this.cancel();
-//                }
-//            }
-//        }, 0, 1000);
 
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
         fabAddPlaylist.hide();
+
+        refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+        refreshLayout.setRefreshing(true);
 
         new Timer().scheduleAtFixedRate(new TimerTask()
         {
@@ -90,6 +79,22 @@ public class DownloadsFragment extends Fragment
             }
         }, 0, 1000);
         return root;
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                new DataManager((MainActivity)getActivity())
+                        .requestData(Request.files());
+                updateList();
+                refreshLayout.setRefreshing(false);
+            }
+        }.start();
     }
 
     @Override
@@ -125,6 +130,28 @@ public class DownloadsFragment extends Fragment
                         files, ((MainActivity)getActivity()));
                 list.setAdapter(listAdapter);
                 listAdapter.setClickListener(DownloadsFragment.this);
+                refreshLayout.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
+    }
+
+    private void updateList()
+    {
+        DataManager dataManager = new DataManager((MainActivity)getActivity());
+        listAdapter.setData(dataManager.getFiles());
+        list.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                listAdapter.notifyDataSetChanged();
             }
         });
     }

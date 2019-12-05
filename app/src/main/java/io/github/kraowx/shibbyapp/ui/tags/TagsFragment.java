@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -20,13 +21,16 @@ import java.util.TimerTask;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
+import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
 
 public class TagsFragment extends Fragment
-        implements ShibbyTagAdapter.ItemClickListener, SearchView.OnQueryTextListener
+        implements ShibbyTagAdapter.ItemClickListener,
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener
 {
     private RecyclerView list;
+    private SwipeRefreshLayout refreshLayout;
     private ShibbyTagAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
 
@@ -35,28 +39,27 @@ public class TagsFragment extends Fragment
     {
         final View root = inflater.inflate(R.layout.fragment_tags, container, false);
         final DataManager dataManager = new DataManager((MainActivity)getActivity());
-        new Timer().scheduleAtFixedRate(new TimerTask()
+        new Thread()
         {
             @Override
             public void run()
             {
-                if (!dataManager.needsUpdate())
-                {
-                    initializeList(root, dataManager.getTags());
-                    this.cancel();
-                }
-                else
-                {
-                    initializeList(root, dataManager.getTags());
-                    this.cancel();
-                }
+                initializeList(root, dataManager.getTags());
             }
-        }, 0, 1000);
+        }.start();
 
 
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
         fabAddPlaylist.hide();
+
+        refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+        refreshLayout.setRefreshing(true);
 
         new Timer().scheduleAtFixedRate(new TimerTask()
         {
@@ -72,6 +75,22 @@ public class TagsFragment extends Fragment
             }
         }, 0, 1000);
         return root;
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                new DataManager((MainActivity)getActivity())
+                        .requestData(Request.tags());
+                updateList();
+                refreshLayout.setRefreshing(false);
+            }
+        }.start();
     }
 
     @Override
@@ -108,6 +127,28 @@ public class TagsFragment extends Fragment
                 listAdapter = new ShibbyTagAdapter(getContext(), tags);
                 list.setAdapter(listAdapter);
                 listAdapter.setClickListener(TagsFragment.this);
+                refreshLayout.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
+    }
+
+    private void updateList()
+    {
+        DataManager dataManager = new DataManager((MainActivity)getActivity());
+        listAdapter.setData(dataManager.getTags());
+        list.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                listAdapter.notifyDataSetChanged();
             }
         });
     }

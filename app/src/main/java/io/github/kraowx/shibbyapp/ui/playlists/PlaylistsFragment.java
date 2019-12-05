@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -26,6 +27,7 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
+import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
 
@@ -92,7 +94,7 @@ public class PlaylistsFragment extends Fragment
         List<ShibbyFile> files = PlaylistManager.getFilesFromPlaylist(
                 (MainActivity)getActivity(), playlistName);
         ShibbyFileArray fileArray = new ShibbyFileArray(playlistName,
-                files.toArray(new ShibbyFile[]{}));
+                files.toArray(new ShibbyFile[]{}), null);
         ShibbyFileArrayDialog dialog = new ShibbyFileArrayDialog(
                 getContext(), fileArray, (MainActivity)getActivity(), playlistName);
     }

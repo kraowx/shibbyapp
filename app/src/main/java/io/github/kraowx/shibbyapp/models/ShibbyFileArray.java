@@ -1,7 +1,10 @@
 package io.github.kraowx.shibbyapp.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,18 +14,21 @@ public class ShibbyFileArray
 {
     private String name;
     private List<ShibbyFile> files;
+    private Map<String, String> extraData;
 
     public ShibbyFileArray(String name)
     {
-        init(name, null);
+        init(name, null, null);
     }
 
-    public ShibbyFileArray(String name, ShibbyFile[] files)
+    public ShibbyFileArray(String name, ShibbyFile[] files,
+                           Map<String, String> extraData)
     {
-        init(name, files);
+        init(name, files, extraData);
     }
 
-    private void init(String name, ShibbyFile[] files)
+    private void init(String name, ShibbyFile[] files,
+                      Map<String, String> extraData)
     {
         this.name = name;
         this.files = new ArrayList<ShibbyFile>();
@@ -33,11 +39,14 @@ public class ShibbyFileArray
                 this.files.add(file);
             }
         }
+        this.extraData = extraData != null ? extraData :
+                new HashMap<String, String>();
     }
 
     public static ShibbyFileArray fromJSON(String jsonStr)
     {
-        ShibbyFileArray arr = new ShibbyFileArray(null, null);
+        ShibbyFileArray arr = new ShibbyFileArray(null,
+                null, null);
         try
         {
             JSONObject json = new JSONObject(jsonStr);
@@ -46,7 +55,16 @@ public class ShibbyFileArray
             arr.files = new ArrayList<ShibbyFile>();
             for (int i = 0; i < filesArr.length(); i++)
             {
-                arr.files.add(ShibbyFile.fromJSON(filesArr.getJSONObject(i).toString()));
+                arr.files.add(ShibbyFile.fromJSON(
+                        filesArr.getJSONObject(i).toString()));
+            }
+            arr.extraData = new HashMap<String, String>();
+            JSONObject extras = new JSONObject();
+            Iterator<String> it = extras.keys();
+            while (it.hasNext())
+            {
+                String key = it.next();
+                arr.extraData.put(key, extras.getString(key));
             }
         }
         catch (JSONException je)
@@ -69,6 +87,12 @@ public class ShibbyFileArray
                 arr.put(file.toJSON());
             }
             json.put("files", arr);
+            JSONObject extras = new JSONObject();
+            for (String key : extraData.keySet())
+            {
+                extras.put(key, extraData.get(key));
+            }
+            json.put("extras", extras);
         }
         catch (JSONException je)
         {

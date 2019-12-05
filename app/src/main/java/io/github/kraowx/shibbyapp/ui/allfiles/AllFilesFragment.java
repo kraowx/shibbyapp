@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -23,12 +24,15 @@ import java.util.TimerTask;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
+import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 
 public class AllFilesFragment extends Fragment
-        implements ShibbyFileAdapter.ItemClickListener, SearchView.OnQueryTextListener
+        implements ShibbyFileAdapter.ItemClickListener,
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener
 {
     private RecyclerView list;
+    private SwipeRefreshLayout refreshLayout;
     private ShibbyFileAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
 
@@ -54,7 +58,6 @@ public class AllFilesFragment extends Fragment
                 {
                     if (!dataManager.needsUpdate())
                     {
-                        System.out.println("INITIALIZING LIST");
                         initializeList(root, dataManager.getFiles());
                         ((MainActivity)getActivity()).runOnUiThread(new Runnable()
                         {
@@ -77,6 +80,13 @@ public class AllFilesFragment extends Fragment
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
         fabAddPlaylist.hide();
 
+        refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
         new Timer().scheduleAtFixedRate(new TimerTask()
         {
             @Override
@@ -91,6 +101,22 @@ public class AllFilesFragment extends Fragment
             }
         }, 0, 1000);
         return root;
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                new DataManager((MainActivity)getActivity())
+                        .requestData(Request.files());
+                updateList();
+                refreshLayout.setRefreshing(false);
+            }
+        }.start();
     }
 
     @Override
@@ -120,17 +146,26 @@ public class AllFilesFragment extends Fragment
             @Override
             public void run()
             {
-//                files.add(new ShibbyFile("file1", "link1", "description1"));
-//                files.add(new ShibbyFile("file2", "link2", "description2"));
-//                files.add(new ShibbyFile("file3", "link3", "description3"));
-//                files.add(new ShibbyFile("file4", "link4", "description4"));
-//                files.add(new ShibbyFile("file5", "link5", "description5"));
                 listLayoutManager = new LinearLayoutManager(getContext());
                 list.setLayoutManager(listLayoutManager);
                 listAdapter = new ShibbyFileAdapter(getContext(),
                         files, ((MainActivity)getActivity()));
                 list.setAdapter(listAdapter);
                 listAdapter.setClickListener(AllFilesFragment.this);
+            }
+        });
+    }
+
+    private void updateList()
+    {
+        DataManager dataManager = new DataManager((MainActivity)getActivity());
+        listAdapter.setData(dataManager.getFiles());
+        list.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                listAdapter.notifyDataSetChanged();
             }
         });
     }

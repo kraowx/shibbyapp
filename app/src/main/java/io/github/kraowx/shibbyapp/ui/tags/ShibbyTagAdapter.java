@@ -111,6 +111,11 @@ public class ShibbyTagAdapter extends RecyclerView.Adapter<ShibbyTagAdapter.View
         mData.remove(item);
     }
 
+    void setData(List<ShibbyFileArray> files)
+    {
+        mData = files;
+    }
+
     // allows clicks events to be caught
     void setClickListener(ItemClickListener itemClickListener)
     {

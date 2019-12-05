@@ -208,6 +208,11 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         mData.remove(item);
     }
 
+    void setData(List<ShibbyFile> files)
+    {
+        mData = files;
+    }
+
     // allows clicks events to be caught
     void setClickListener(ItemClickListener itemClickListener)
     {

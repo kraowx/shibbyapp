@@ -36,6 +36,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
+import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 
@@ -109,7 +110,15 @@ public class MainActivity extends AppCompatActivity
         boolean updateBackground = prefs.getBoolean("updateBackground", true);
         if (updateBackground)
         {
-            new DataManager(this).loadAllData();
+            new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    new DataManager(MainActivity.this)
+                            .requestData(Request.all());
+                }
+            }.start();
         }
     }
 
