@@ -41,7 +41,6 @@ public class DataManager
     {
         long lastUpdate = prefs.getLong("lastUpdate", 0);
         long currentTime = Calendar.getInstance().getTime().getTime();
-        System.out.println(currentTime-lastUpdate);
         if (currentTime-lastUpdate > MAX_UPDATE_TIME)
         {
             return true;
@@ -55,7 +54,6 @@ public class DataManager
         JSONArray filesjson = null;
         try
         {
-            System.out.println(prefs.getString("files", "*******NO VALUE********"));
             filesjson = new JSONArray(prefs.getString("files", ""));
         }
         catch (JSONException je)
@@ -81,7 +79,47 @@ public class DataManager
 
     public List<ShibbyFileArray> getTags()
     {
-        return getShibbyArray("tags");
+        List<ShibbyFileArray> arr = new ArrayList<ShibbyFileArray>();
+        JSONArray filesjson = null;
+        try
+        {
+            filesjson = new JSONArray(prefs.getString("tags", ""));
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        if (filesjson != null)
+        {
+            List<ShibbyFile> files = getFiles();
+            for (int i = 0; i < filesjson.length(); i++)
+            {
+                try
+                {
+                    JSONObject tagjson = filesjson.getJSONObject(i);
+                    String tagname = tagjson.getString("name");
+                    JSONArray tagfiles = tagjson.getJSONArray("files");
+                    List<ShibbyFile> taglist = new ArrayList<ShibbyFile>();
+                    for (int j = 0; j < tagfiles.length(); j++)
+                    {
+                        for (ShibbyFile file : files)
+                        {
+                            if (file.getId().equals(tagfiles.getString(j)))
+                            {
+                                taglist.add(file);
+                            }
+                        }
+                    }
+                    arr.add(new ShibbyFileArray(tagname, taglist.toArray(
+                            new ShibbyFile[]{}), null));
+                }
+                catch (JSONException je)
+                {
+                    je.printStackTrace();
+                }
+            }
+        }
+        return arr;
     }
 
     public List<ShibbyFileArray> getSeries()
@@ -95,7 +133,6 @@ public class DataManager
         JSONArray filesjson = null;
         try
         {
-            System.out.println(prefs.getString(key, "*******NO VALUE********"));
             filesjson = new JSONArray(prefs.getString(key, ""));
         }
         catch (JSONException je)
