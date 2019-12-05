@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
         this.file = file;
         this.mainActivity = mainActivity;
         this.showDeleteButton = showDeleteButton;
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.fragment_playlists);
         setTitle("Select a playlist");
         initializeList(PlaylistManager.getPlaylists(mainActivity));

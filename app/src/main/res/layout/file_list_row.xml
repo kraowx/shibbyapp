@@ -8,14 +8,6 @@
     android:orientation="horizontal"
     android:padding="10dp">
 
-    <TextView
-        android:id="@+id/itemName"
-        android:layout_width="245dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="filename"
-        android:textSize="24sp" />
-
     <LinearLayout
         android:id="@+id/li2"
         android:layout_width="match_parent"
@@ -23,11 +15,19 @@
         android:gravity="right"
         android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="filename"
+            android:textSize="24sp" />
+
         <ImageButton
             android:id="@+id/btnPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
             android:layout_weight="0.1"
             android:background="@drawable/btn_ripple"
             android:padding="5dp"
@@ -39,7 +39,6 @@
             android:id="@+id/btnDownload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
             android:layout_weight="0.1"
             android:background="@drawable/btn_ripple"
             android:padding="5dp"
@@ -51,7 +50,6 @@
             android:id="@+id/btnAddToPlaylist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
             android:layout_weight="0.1"
             android:background="@drawable/btn_ripple"
             android:padding="5dp"

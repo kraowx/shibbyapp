@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -102,8 +103,10 @@ public class MainActivity extends AppCompatActivity
                 R.id.nav_downloads, R.id.nav_favorites, R.id.nav_playlists)
                 .setDrawerLayout(drawer)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavController navController = Navigation.findNavController(
+                this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(
+                this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -146,7 +149,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onSupportNavigateUp()
     {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(
+                this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
@@ -154,6 +158,7 @@ public class MainActivity extends AppCompatActivity
     private void showSettingsDialog()
     {
         final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.settings_dialog);
         dialog.setTitle("Settings");
         SharedPreferences prefs = PreferenceManager

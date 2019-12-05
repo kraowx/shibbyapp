@@ -3,6 +3,7 @@ package io.github.kraowx.shibbyapp.ui.allfiles;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         this.fileArray = fileArray;
         this.mainActivity = mainActivity;
         this.playlistName = playlistName;
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.array_info_dialog);
         setTitle(fileArray.getName());
         initializeList();

@@ -13,7 +13,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:paddingRight="50dp"
         android:text="arrayName"
         android:textSize="24sp" />
 
@@ -28,6 +27,7 @@
             android:id="@+id/txtFileCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center_vertical"
             android:layout_weight="1"
             android:gravity="right"
             android:text="file count"

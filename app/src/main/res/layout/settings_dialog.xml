@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:orientation="vertical"
     android:padding="20dp">
 
@@ -29,6 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Server"
+                android:singleLine="true"
                 android:text="shibbyserver.ddns.net:2012" />
         </com.google.android.material.textfield.TextInputLayout>
 
