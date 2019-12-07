@@ -10,13 +10,19 @@ Note that default server is currently offline. For now, you must host your own s
 - Built-in audio player to either stream or play downloaded files
 - Customizable playlists
 - Loopable audio
+- Autoplay
 - Search by tag
 - Search by file
 - Search by series
+- Light and dark themes
+
+## Permissions
+This app uses the "Storage" (WRITE_EXTERNAL_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is inaccessable the user (without root access).
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
-- Dark mode
-- Play-once button in the audio player to play the selected song only once, even if there are queued songs
+- File metadata that gives more information about a file other than its name and description
+- Ability to reorder items in a playlist
+- Import/export audio files buttons
 
 Feel free to suggest anything else you feel might improve the app!
