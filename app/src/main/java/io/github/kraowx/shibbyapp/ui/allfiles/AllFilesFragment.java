@@ -145,7 +145,14 @@ public class AllFilesFragment extends Fragment
                 new DataManager((MainActivity)getActivity())
                         .requestData(Request.files());
                 updateList();
-                refreshLayout.setRefreshing(false);
+                refreshLayout.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
             }
         }.start();
     }
