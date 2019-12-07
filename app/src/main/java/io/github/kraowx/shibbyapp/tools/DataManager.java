@@ -12,7 +12,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -175,7 +177,9 @@ public class DataManager
             }
             if (!hostname.isEmpty() && port != -1)
             {
-                Socket socket = new Socket(hostname, port);
+                InetSocketAddress addr = new InetSocketAddress(hostname, port);
+                Socket socket = new Socket();
+                socket.connect(addr, 5000);
                 PrintWriter writer =
                         new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader reader =
@@ -220,6 +224,11 @@ public class DataManager
             {
                 showToast("Server is invalid");
             }
+        }
+        catch (SocketTimeoutException ste)
+        {
+            ste.printStackTrace();
+            showToast("Timed out while connecting to server");
         }
         catch (IOException ioe)
         {

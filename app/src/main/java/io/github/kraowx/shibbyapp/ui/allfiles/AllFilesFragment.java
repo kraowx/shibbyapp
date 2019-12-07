@@ -2,7 +2,9 @@ package io.github.kraowx.shibbyapp.ui.allfiles;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,9 +45,45 @@ public class AllFilesFragment extends Fragment
         final ProgressDialog progressDialog = new ProgressDialog((MainActivity)getActivity());
         final DataManager dataManager = new DataManager((MainActivity)getActivity());
         final List<ShibbyFile> files = dataManager.getFiles();
+
+        refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
         if (files.size() > 0)
         {
-            initializeList(root, files);
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences((MainActivity)getActivity());
+            boolean updateStartup = prefs.getBoolean(
+                    "updateStartup", true);
+            if (updateStartup)
+            {
+                refreshLayout.setRefreshing(true);
+                new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        dataManager.requestData(Request.all());
+                        ((MainActivity)getActivity()).runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                initializeList(root, dataManager.getFiles());
+                            }
+                        });
+                        refreshLayout.setRefreshing(false);
+                    }
+                }.start();
+            }
+            else
+            {
+                initializeList(root, files);
+            }
         }
         else
         {
@@ -79,13 +117,6 @@ public class AllFilesFragment extends Fragment
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
         fabAddPlaylist.hide();
-
-        refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_blue_dark);
 
         new Timer().scheduleAtFixedRate(new TimerTask()
         {

@@ -37,10 +37,10 @@
     </LinearLayout>
 
     <Switch
-        android:id="@+id/switchUpdateBackground"
+        android:id="@+id/switchUpdateOnStartup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Update files in background" />
+        android:text="Update on startup" />
 
     <Switch
         android:id="@+id/switchDarkMode"

@@ -121,21 +121,6 @@ public class MainActivity extends AppCompatActivity
         NavigationUI.setupActionBarWithNavController(
                 this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-        boolean updateBackground = prefs.getBoolean(
-                "updateBackground", true);
-        if (updateBackground)
-        {
-            new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    new DataManager(MainActivity.this)
-                            .requestData(Request.all());
-                }
-            }.start();
-        }
     }
 
     @Override
@@ -177,18 +162,18 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(MainActivity.this);
         final SharedPreferences.Editor editor = prefs.edit();
-        boolean updateBackground = prefs.getBoolean("updateBackground", true);
+        boolean updateStartup = prefs.getBoolean("updateStartup", true);
         boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
         int autoplay = prefs.getInt("autoplay", 1);
         String server = prefs.getString("server", "shibbyserver.ddns.net:2012");
-        Switch switchUpdateBackground = dialog.findViewById(R.id.switchUpdateBackground);
-        switchUpdateBackground.setChecked(updateBackground);
+        Switch switchUpdateBackground = dialog.findViewById(R.id.switchUpdateOnStartup);
+        switchUpdateBackground.setChecked(updateStartup);
         switchUpdateBackground.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                editor.putBoolean("updateBackground", isChecked);
+                editor.putBoolean("updateStartup", isChecked);
                 editor.commit();
             }
         });
