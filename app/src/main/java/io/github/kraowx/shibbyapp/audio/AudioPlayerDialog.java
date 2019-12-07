@@ -32,6 +32,7 @@ public class AudioPlayerDialog extends Dialog
     private List<ShibbyFile> queue;
     private AudioPlayer audioPlayer;
     private Timer timer;
+    private SharedPreferences prefs;
 
     private TextView title, txtElapsedTime, txtRemainingTime;
     private ImageButton btnRewind, btnPlayPause, btnFastForward,
@@ -46,6 +47,7 @@ public class AudioPlayerDialog extends Dialog
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.audio_player_dialog);
         this.mainActivity = mainActivity;
+        prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         initUI();
     }
 
@@ -251,7 +253,17 @@ public class AudioPlayerDialog extends Dialog
                     {
                         if (mainActivity.getDownloadManager().cancelDownload(activeFile))
                         {
-                            btnDownload.setColorFilter(null);
+                            boolean darkModeEnabled = prefs
+                                    .getBoolean("darkMode", false);
+                            if (darkModeEnabled)
+                            {
+                                btnDownload.setColorFilter(ContextCompat
+                                        .getColor(mainActivity, R.color.grayLight));
+                            }
+                            else
+                            {
+                                btnDownload.setColorFilter(null);
+                            }
                             Toast.makeText(mainActivity, "Download cancelled",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -272,7 +284,17 @@ public class AudioPlayerDialog extends Dialog
                                             public void onClick(DialogInterface dialog, int which)
                                             {
                                                 AudioDownloadManager.deleteFile(mainActivity, activeFile);
-                                                btnDownload.setColorFilter(null);
+                                                boolean darkModeEnabled = prefs
+                                                        .getBoolean("darkMode", false);
+                                                if (darkModeEnabled)
+                                                {
+                                                    btnDownload.setColorFilter(ContextCompat
+                                                            .getColor(mainActivity, R.color.grayLight));
+                                                }
+                                                else
+                                                {
+                                                    btnDownload.setColorFilter(null);
+                                                }
                                                 loadFile(null);
                                             }
                                         })
@@ -406,7 +428,17 @@ public class AudioPlayerDialog extends Dialog
                     boolean looping = audioPlayer.isLooping();
                     if (looping)
                     {
-                        btnRepeat.setColorFilter(null);
+                        boolean darkModeEnabled = prefs
+                                .getBoolean("darkMode", false);
+                        if (darkModeEnabled)
+                        {
+                            btnRepeat.setColorFilter(ContextCompat
+                                    .getColor(mainActivity, R.color.grayLight));
+                        }
+                        else
+                        {
+                            btnRepeat.setColorFilter(null);
+                        }
                     }
                     else
                     {
@@ -427,17 +459,19 @@ public class AudioPlayerDialog extends Dialog
             {
                 if (audioPlayer != null && audioPlayer.getFileDuration() > 0)
                 {
+                    int duration = audioPlayer.getFileDuration();
+                    String progressTime = formatTime(progress);
+                    String remainingTime = formatTime(duration-progress);
+                    String remainingTimeSeeking = formatTime(duration-audioPlayer.getPosition());
                     if (seeking)
                     {
-                        txtElapsedTime.setText(formatTime(progress));
-                        txtRemainingTime.setText(formatTime(
-                                audioPlayer.getFileDuration()-progress));
+                        txtElapsedTime.setText(progressTime);
+                        txtRemainingTime.setText(remainingTime);
                     }
                     else
                     {
-                        txtElapsedTime.setText(formatTime(progress));
-                        txtRemainingTime.setText(formatTime(
-                                audioPlayer.getFileDuration() - audioPlayer.getPosition()));
+                        txtElapsedTime.setText(progressTime);
+                        txtRemainingTime.setText(remainingTimeSeeking);
                     }
                 }
             }
@@ -461,6 +495,18 @@ public class AudioPlayerDialog extends Dialog
         });
         txtElapsedTime = findViewById(R.id.txtElapsedTime);
         txtRemainingTime = findViewById(R.id.txtRemainingTime);
+        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+        if (darkModeEnabled)
+        {
+            btnDownload.setColorFilter(ContextCompat
+                    .getColor(mainActivity, R.color.grayLight));
+            btnRewind.setColorFilter(ContextCompat
+                    .getColor(mainActivity, R.color.grayLight));
+            btnFastForward.setColorFilter(ContextCompat
+                    .getColor(mainActivity, R.color.grayLight));
+            btnRepeat.setColorFilter(ContextCompat
+                    .getColor(mainActivity, R.color.grayLight));
+        }
     }
 
     private void playAudio()
