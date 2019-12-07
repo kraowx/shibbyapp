@@ -3,6 +3,8 @@ package io.github.kraowx.shibbyapp.ui.allfiles;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context context;
+    private SharedPreferences prefs;
 
     ShibbyFileAdapter(Context context, List<ShibbyFile> data,
                       MainActivity mainActivity)
@@ -39,6 +42,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         this.mData = data;
         mDataOrig = (List<ShibbyFile>)((ArrayList<ShibbyFile>)mData).clone();
         this.mainActivity = mainActivity;
+        prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
     }
 
     @Override
@@ -65,7 +69,17 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         }
         else
         {
-            holder.btnDownload.setColorFilter(null);
+            boolean darkModeEnabled = prefs
+                    .getBoolean("darkMode", false);
+            if (darkModeEnabled)
+            {
+                holder.btnDownload.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+            }
+            else
+            {
+                holder.btnDownload.setColorFilter(null);
+            }
         }
     }
 
@@ -100,7 +114,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         TextView txtFileName;
-        ImageButton btnPlay, btnDownload, btnToggleFavorite;
+        ImageButton btnPlay, btnDownload, btnAddToPlaylist;
 
         ViewHolder(View itemView)
         {
@@ -148,7 +162,17 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                     {
                         if (mainActivity.getDownloadManager().cancelDownload(file))
                         {
-                            btnDownload.setColorFilter(null);
+                            boolean darkModeEnabled = prefs
+                                    .getBoolean("darkMode", false);
+                            if (darkModeEnabled)
+                            {
+                                btnDownload.setColorFilter(ContextCompat
+                                        .getColor(mainActivity, R.color.grayLight));
+                            }
+                            else
+                            {
+                                btnDownload.setColorFilter(null);
+                            }
                             Toast.makeText(mainActivity, "Download cancelled",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -169,7 +193,17 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                                     public void onClick(DialogInterface dialog, int which)
                                     {
                                         AudioDownloadManager.deleteFile(mainActivity, file);
-                                        btnDownload.setColorFilter(null);
+                                        boolean darkModeEnabled = prefs
+                                                .getBoolean("darkMode", false);
+                                        if (darkModeEnabled)
+                                        {
+                                            btnDownload.setColorFilter(ContextCompat
+                                                    .getColor(mainActivity, R.color.grayLight));
+                                        }
+                                        else
+                                        {
+                                            btnDownload.setColorFilter(null);
+                                        }
                                     }
                                 })
                                 .setNegativeButton(android.R.string.no, null)
@@ -178,8 +212,8 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                     }
                 }
             });
-            btnToggleFavorite = view.findViewById(R.id.btnAddToPlaylist);
-            btnToggleFavorite.setOnClickListener(new View.OnClickListener()
+            btnAddToPlaylist = view.findViewById(R.id.btnAddToPlaylist);
+            btnAddToPlaylist.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View view)
@@ -188,6 +222,16 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                     showAddFileToPlaylistDialog(file);
                 }
             });
+            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+            if (darkModeEnabled)
+            {
+                btnPlay.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+                btnDownload.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+                btnAddToPlaylist.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+            }
         }
     }
 

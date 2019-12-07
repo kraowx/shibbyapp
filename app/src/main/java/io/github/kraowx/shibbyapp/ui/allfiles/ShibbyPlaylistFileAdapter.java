@@ -3,6 +3,8 @@ package io.github.kraowx.shibbyapp.ui.allfiles;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context context;
+    private SharedPreferences prefs;
 
     ShibbyPlaylistFileAdapter(Context context, String playlistName, List<ShibbyFile> data,
                               MainActivity mainActivity)
@@ -40,6 +43,7 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
         this.playlistName = playlistName;
         this.mData = data;
         this.mainActivity = mainActivity;
+        prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
     }
 
     @Override
@@ -67,7 +71,17 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
         }
         else
         {
-            holder.btnDownload.setColorFilter(null);
+            boolean darkModeEnabled = prefs
+                    .getBoolean("darkMode", false);
+            if (darkModeEnabled)
+            {
+                holder.btnDownload.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+            }
+            else
+            {
+                holder.btnDownload.setColorFilter(null);
+            }
         }
     }
 
@@ -131,7 +145,17 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                     {
                         if (mainActivity.getDownloadManager().cancelDownload(file))
                         {
-                            btnDownload.setColorFilter(null);
+                            boolean darkModeEnabled = prefs
+                                    .getBoolean("darkMode", false);
+                            if (darkModeEnabled)
+                            {
+                                btnDownload.setColorFilter(ContextCompat
+                                        .getColor(mainActivity, R.color.grayLight));
+                            }
+                            else
+                            {
+                                btnDownload.setColorFilter(null);
+                            }
                             Toast.makeText(mainActivity, "Download cancelled",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -151,7 +175,17 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                                     public void onClick(DialogInterface dialog, int which)
                                     {
                                         AudioDownloadManager.deleteFile(mainActivity, file);
-                                        btnDownload.setColorFilter(null);
+                                        boolean darkModeEnabled = prefs
+                                                .getBoolean("darkMode", false);
+                                        if (darkModeEnabled)
+                                        {
+                                            btnDownload.setColorFilter(ContextCompat
+                                                    .getColor(mainActivity, R.color.grayLight));
+                                        }
+                                        else
+                                        {
+                                            btnDownload.setColorFilter(null);
+                                        }
                                     }
                                 })
                                 .setNegativeButton(android.R.string.no, null)
@@ -169,6 +203,16 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                     showRemoveFileFromPlaylistDialog();
                 }
             });
+            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+            if (darkModeEnabled)
+            {
+                btnPlay.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+                btnDownload.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+                btnRemoveFromPlaylist.setColorFilter(ContextCompat
+                        .getColor(mainActivity, R.color.grayLight));
+            }
         }
 
         private void showRemoveFileFromPlaylistDialog()
