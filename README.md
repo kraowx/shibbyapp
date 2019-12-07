@@ -17,7 +17,7 @@ Note that default server is currently offline. For now, you must host your own s
 - Light and dark themes
 
 ## Permissions
-This app uses the "Storage" (WRITE_EXTERNAL_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is inaccessable the user (without root access).
+This app uses the "Storage" (WRITE_EXTERNAL_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user.
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
@@ -26,3 +26,8 @@ This app uses the "Storage" (WRITE_EXTERNAL_STORAGE) permission in order to save
 - Import/export audio files buttons
 
 Feel free to suggest anything else you feel might improve the app!
+
+## Importing Files
+I am planning to add a feature for this soon that will allow you to import pre-existing shibbyfiles OR your own modified files into the app.
+
+For advanced users, you can manually import pre-existing shibbyfiles into the app by renaming the files to their SHA256 equivalent and then placing them in "/storage/self/primary/Android/data/io.github.kraowx.shibbyapp/files/audio" on your Android device. You can even modify the audio data if you want as long as the name of the file is *exactly* the same as how it appears on soundgasm. I have written some bash scripts to assist with this process. First run [this](https://gist.github.com/kraowx/4c1506f4dbb643f49203669756168413) script in a new directory which will automatically download all of Shibby's files from soundgasm, and then run [this](https://gist.github.com/kraowx/24104f038b9fee14a1466367381d465b) script in the same directory which will rename each file to its SHA256 hash equivalent.
