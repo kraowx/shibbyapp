@@ -89,10 +89,15 @@ public class DownloadsFragment extends Fragment
             @Override
             public void run()
             {
-                new DataManager((MainActivity)getActivity())
-                        .requestData(Request.files());
                 updateList();
-                refreshLayout.setRefreshing(false);
+                refreshLayout.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
             }
         }.start();
     }
@@ -144,8 +149,12 @@ public class DownloadsFragment extends Fragment
 
     private void updateList()
     {
-        DataManager dataManager = new DataManager((MainActivity)getActivity());
-        listAdapter.setData(dataManager.getFiles());
+        List<ShibbyFile> allFiles = new DataManager(
+                (MainActivity)getActivity()).getFiles();
+        List<ShibbyFile> downloadedFiles = AudioDownloadManager
+                .getDownloadedFiles((MainActivity)
+                        getActivity(), allFiles);
+        listAdapter.setData(downloadedFiles);
         list.post(new Runnable()
         {
             @Override

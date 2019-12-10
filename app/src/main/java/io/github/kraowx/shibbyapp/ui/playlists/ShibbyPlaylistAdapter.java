@@ -167,7 +167,7 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         {
             final String playlistName = getItem(getAdapterPosition());
             new AlertDialog.Builder(context)
-                    .setTitle("Delete download")
+                    .setTitle("Delete playlist")
                     .setMessage("Are you sure you want to delete " +
                             "the playlist \"" + playlistName + "\"?")
                     .setPositiveButton(android.R.string.yes,

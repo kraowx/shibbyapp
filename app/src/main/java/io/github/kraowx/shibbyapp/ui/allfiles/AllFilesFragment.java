@@ -57,10 +57,14 @@ public class AllFilesFragment extends Fragment
         {
             SharedPreferences prefs = PreferenceManager
                     .getDefaultSharedPreferences((MainActivity)getActivity());
+            SharedPreferences.Editor editor = prefs.edit();
             boolean updateStartup = prefs.getBoolean(
                     "updateStartup", true);
-            if (updateStartup)
+            boolean isStartup = prefs.getBoolean("isStartup", true);
+            if (updateStartup && isStartup)
             {
+                editor.putBoolean("isStartup", false);
+                editor.commit();
                 refreshLayout.setRefreshing(true);
                 new Thread()
                 {
@@ -74,9 +78,9 @@ public class AllFilesFragment extends Fragment
                             public void run()
                             {
                                 initializeList(root, dataManager.getFiles());
+                                refreshLayout.setRefreshing(false);
                             }
                         });
-                        refreshLayout.setRefreshing(false);
                     }
                 }.start();
             }
@@ -94,9 +98,10 @@ public class AllFilesFragment extends Fragment
                 @Override
                 public void run()
                 {
-                    if (!dataManager.needsUpdate())
+                    List<ShibbyFile> files = dataManager.getFiles();
+                    if (files.size() > 0)
                     {
-                        initializeList(root, dataManager.getFiles());
+                        initializeList(root, files);
                         ((MainActivity)getActivity()).runOnUiThread(new Runnable()
                         {
                             @Override
@@ -110,8 +115,12 @@ public class AllFilesFragment extends Fragment
                         });
                         this.cancel();
                     }
+                    else
+                    {
+                        dataManager.requestData(Request.all());
+                    }
                 }
-            }, 0, 1000);
+            }, 0, 5000);
         }
 
         FloatingActionButton fabAddPlaylist =

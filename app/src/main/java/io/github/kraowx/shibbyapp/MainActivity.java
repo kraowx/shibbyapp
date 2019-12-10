@@ -107,6 +107,10 @@ public class MainActivity extends AppCompatActivity
 
         setVersionOnUI();
 
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("isStartup", true);
+        editor.commit();
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

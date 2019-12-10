@@ -79,7 +79,14 @@ public class SeriesFragment extends Fragment
                 new DataManager((MainActivity)getActivity())
                         .requestData(Request.series());
                 updateList();
-                refreshLayout.setRefreshing(false);
+                refreshLayout.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
             }
         }.start();
     }

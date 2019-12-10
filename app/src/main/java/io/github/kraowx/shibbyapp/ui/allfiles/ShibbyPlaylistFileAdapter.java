@@ -170,7 +170,8 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                         new AlertDialog.Builder(context)
                                 .setTitle("Delete download")
                                 .setMessage("Are you sure you want to delete this file?")
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
+                                .setPositiveButton(android.R.string.yes,
+                                        new DialogInterface.OnClickListener()
                                 {
                                     public void onClick(DialogInterface dialog, int which)
                                     {
@@ -218,7 +219,7 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
         private void showRemoveFileFromPlaylistDialog()
         {
             new AlertDialog.Builder(context)
-                    .setTitle("Delete download")
+                    .setTitle("Remove file")
                     .setMessage("Are you sure you want to remove " +
                             "this file from the playlist?")
                     .setPositiveButton(android.R.string.yes,

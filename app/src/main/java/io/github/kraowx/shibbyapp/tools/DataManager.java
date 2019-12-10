@@ -39,6 +39,7 @@ public class DataManager
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
     }
 
+    @Deprecated
     public boolean needsUpdate()
     {
         long lastUpdate = prefs.getLong("lastUpdate", 0);
