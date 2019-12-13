@@ -51,13 +51,65 @@ public class DataManager
         return false;
     }
 
+    public List<ShibbyFile> getUserFiles()
+    {
+        List<ShibbyFile> files = new ArrayList<ShibbyFile>();
+        JSONArray userFiles;
+        try
+        {
+            userFiles = new JSONArray(prefs.getString("userFiles", "[]"));
+            for (int i = 0; i < userFiles.length(); i++)
+            {
+                JSONObject json = userFiles.getJSONObject(i);
+                ShibbyFile file = ShibbyFile.fromJSON(json.toString());
+                JSONArray tagsJson = json.getJSONArray("tags");
+                List<String> tags = new ArrayList<String>();
+                for (int j = 0; j < tagsJson.length(); j++)
+                {
+                    tags.add(tagsJson.getString(j));
+                }
+                file.setTags(tags);
+                files.add(file);
+            }
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        return files;
+    }
+
+    public boolean addUserFile(ShibbyFile file)
+    {
+        List<ShibbyFile> userFiles = getUserFiles();
+        if (!listHasFile(userFiles, file))
+        {
+            JSONArray arr;
+            try
+            {
+                arr = new JSONArray(prefs.getString("userFiles", "[]"));
+                JSONObject fileJson = file.toJSON();
+                arr.put(fileJson);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("userFiles", arr.toString());
+                editor.commit();
+                return true;
+            }
+            catch (JSONException je)
+            {
+                je.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     public List<ShibbyFile> getFiles()
     {
         List<ShibbyFile> files = new ArrayList<ShibbyFile>();
         JSONArray filesjson = null;
         try
         {
-            filesjson = new JSONArray(prefs.getString("files", ""));
+            filesjson = new JSONArray(prefs.getString("files", "[]"));
         }
         catch (JSONException je)
         {
@@ -76,6 +128,11 @@ public class DataManager
                     je.printStackTrace();
                 }
             }
+        }
+        List<ShibbyFile> userFiles = getUserFiles();
+        for (ShibbyFile file : userFiles)
+        {
+            files.add(file);
         }
         return files;
     }
@@ -333,6 +390,20 @@ public class DataManager
             je.printStackTrace();
         }
         return modified;
+    }
+
+    private boolean listHasFile(List<ShibbyFile> list, ShibbyFile file)
+    {
+        String id = file.getId();
+        for (ShibbyFile fileX : list)
+        {
+            String idX = fileX.getId();
+            if (idX != null && id != null && id.equals(idX))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void showToast(final String message)

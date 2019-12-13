@@ -1,5 +1,6 @@
 package io.github.kraowx.shibbyapp;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -44,6 +46,7 @@ import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
+import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -132,6 +135,26 @@ public class MainActivity extends AppCompatActivity
         NavigationUI.setupWithNavController(navigationView, navController);
 
         checkForUpdate();
+
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                1);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults)
+    {
+        if (requestCode == 1)
+        {
+            if (grantResults.length == 0 || (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_DENIED))
+            {
+                Toast.makeText(MainActivity.this,
+                        "Importing files has been disabled",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -149,6 +172,9 @@ public class MainActivity extends AppCompatActivity
         {
             case R.id.action_settings:
                 showSettingsDialog();
+                return true;
+            case R.id.action_import:
+                showImportFileDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -266,6 +292,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
         dialog.show();
+    }
+
+    private void showImportFileDialog()
+    {
+        ImportFileDialog importDialog = new ImportFileDialog(this);
     }
 
     private void setVersionOnUI()

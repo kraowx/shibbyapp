@@ -3,6 +3,7 @@ package io.github.kraowx.shibbyapp.audio;
 import android.app.ProgressDialog;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 class AudioPlayer extends AsyncTask<String, Void, Boolean>
@@ -14,6 +15,7 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded)
     {
         this.progressDialog = progressDialog;
+        this.fileDownloaded = fileDownloaded;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
     }
