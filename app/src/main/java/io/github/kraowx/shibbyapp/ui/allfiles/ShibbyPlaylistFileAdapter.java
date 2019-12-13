@@ -49,7 +49,8 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        View view = mInflater.inflate(R.layout.file_list_row_playlist, parent, false);
+        View view = mInflater.inflate(
+                R.layout.file_list_row_playlist, parent, false);
         return new ViewHolder(view);
     }
 
@@ -110,7 +111,10 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
         @Override
         public void onClick(View view)
         {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (mClickListener != null)
+            {
+                mClickListener.onItemClick(view, getAdapterPosition());
+            }
         }
 
         private void initializeButtons(View view)

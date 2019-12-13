@@ -219,16 +219,17 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     public void filterDisplayItems(String text)
     {
         mData.clear();
-        if(text.isEmpty())
+        if (text.isEmpty())
         {
             mData.addAll(mDataOrig);
         }
         else
         {
             text = text.toLowerCase();
-            for(ShibbyFile file : mDataOrig)
+            for (ShibbyFile file : mDataOrig)
             {
-                if(file.getName().toLowerCase().contains(text))
+                if (file.getName().toLowerCase().contains(text) ||
+                        file.matchesTag(text))
                 {
                     mData.add(file);
                 }

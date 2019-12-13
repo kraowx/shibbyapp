@@ -239,7 +239,7 @@ public class AllFilesFragment extends Fragment
             tagsStr += tags.get(i);
             if (i < tags.size()-1)
             {
-                tagsStr += ", ";
+                tagsStr += "  |  ";
             }
         }
         return tagsStr + "\n";

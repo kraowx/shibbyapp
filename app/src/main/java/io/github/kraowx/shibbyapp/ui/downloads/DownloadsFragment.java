@@ -187,7 +187,7 @@ public class DownloadsFragment extends Fragment
             tagsStr += tags.get(i);
             if (i < tags.size()-1)
             {
-                tagsStr += ", ";
+                tagsStr += "  |  ";
             }
         }
         return tagsStr + "\n";

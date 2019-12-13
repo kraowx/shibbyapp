@@ -76,16 +76,16 @@ public class ShibbyTagAdapter extends RecyclerView.Adapter<ShibbyTagAdapter.View
     public void filterDisplayItems(String text)
     {
         mData.clear();
-        if(text.isEmpty())
+        if (text.isEmpty())
         {
             mData.addAll(mDataOrig);
         }
         else
         {
             text = text.toLowerCase();
-            for(ShibbyFileArray fileArr : mDataOrig)
+            for (ShibbyFileArray fileArr : mDataOrig)
             {
-                if(fileArr.getName().toLowerCase().contains(text))
+                if (fileArr.getName().toLowerCase().contains(text))
                 {
                     mData.add(fileArr);
                 }

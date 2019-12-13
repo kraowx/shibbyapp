@@ -193,6 +193,18 @@ public class ShibbyFile
         this.tags = tags;
     }
 
+    public boolean matchesTag(String search)
+    {
+        for (String tag : tags)
+        {
+            if (tag.toLowerCase().contains(search))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, String> getExtras()
     {
         return extraData;

@@ -107,7 +107,7 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
             tagsStr += tags.get(i);
             if (i < tags.size()-1)
             {
-                tagsStr += ", ";
+                tagsStr += "  |  ";
             }
         }
         return tagsStr + "\n";

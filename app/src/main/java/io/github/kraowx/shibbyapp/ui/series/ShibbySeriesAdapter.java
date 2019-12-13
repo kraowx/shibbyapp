@@ -81,9 +81,9 @@ public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapte
         else
         {
             text = text.toLowerCase();
-            for(ShibbyFileArray fileArr : mDataOrig)
+            for (ShibbyFileArray fileArr : mDataOrig)
             {
-                if(fileArr.getName().toLowerCase().contains(text))
+                if (fileArr.getName().toLowerCase().contains(text))
                 {
                     mData.add(fileArr);
                 }
