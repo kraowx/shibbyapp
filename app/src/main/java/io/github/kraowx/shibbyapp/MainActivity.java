@@ -41,9 +41,14 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.HttpRequest;
+import io.github.kraowx.shibbyapp.tools.UpdateManager;
+import io.github.kraowx.shibbyapp.tools.Version;
 
 public class MainActivity extends AppCompatActivity
 {
+    private static final boolean IS_PRE_RELEASE = false;
+
     private static MainActivity mContext;
     private AppBarConfiguration mAppBarConfiguration;
     private AudioController audioController;
@@ -125,6 +130,8 @@ public class MainActivity extends AppCompatActivity
         NavigationUI.setupActionBarWithNavController(
                 this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        checkForUpdate();
     }
 
     @Override
@@ -155,6 +162,33 @@ public class MainActivity extends AppCompatActivity
                 this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private void checkForUpdate()
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    UpdateManager manager = new UpdateManager();
+                    if (manager.updateAvailable(MainActivity.this, getVersion()))
+                    {
+                        manager.showUpdateMessage(MainActivity.this);
+                    }
+                }
+                catch (HttpRequest.HttpRequestException hre)
+                {
+                    /*
+                     * If the server cannot be reached, ignore it (don't notify the user).
+                     * The user will be notified about an update the next time they
+                     * connect to the network and open the application.
+                     */
+                }
+            }
+        }).start();
     }
 
     private void showSettingsDialog()
@@ -236,19 +270,30 @@ public class MainActivity extends AppCompatActivity
 
     private void setVersionOnUI()
     {
-        String version = "";
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView txtVersion = (TextView)hView.findViewById(R.id.txtVersion);
+        txtVersion.setText(getVersionName());
+    }
+
+    private Version getVersion()
+    {
+        //System.out.println(new Version(getVersionName(), IS_PRE_RELEASE).getName());
+        return new Version(getVersionName(), IS_PRE_RELEASE);
+    }
+
+    private String getVersionName()
+    {
         try
         {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = "v" + pInfo.versionName;
+            PackageInfo pInfo = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0);
+            return "v" + pInfo.versionName;
         }
         catch (PackageManager.NameNotFoundException nnfe)
         {
             nnfe.printStackTrace();
         }
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View hView =  navigationView.getHeaderView(0);
-        TextView txtVersion = (TextView)hView.findViewById(R.id.txtVersion);
-        txtVersion.setText(version);
+        return "";
     }
 }
