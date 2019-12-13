@@ -20,7 +20,7 @@ public class UpdateManager
         Version latest = new Version(null, false);
         try
         {
-            String host = context.getString(R.string.version_host);
+            String host = context.getString(R.string.version_host) + "/releases";
             json = new JSONArray(HttpRequest.get(host).body());
             if (json.length() == 0)
             {

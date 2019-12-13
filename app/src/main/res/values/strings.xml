@@ -5,7 +5,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="version_host">https://api.github.com/repos/kraowx</string>
+    <string name="version_host">https://api.github.com/repos/kraowx/shibbyapp</string>
     <string name="github_repo">https://github.com/kraowx/shibbyapp/releases</string>
 
     <string name="menu_allfiles">All Files</string>
