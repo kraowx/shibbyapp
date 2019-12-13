@@ -39,7 +39,6 @@ public class ShibbyTagAdapter extends RecyclerView.Adapter<ShibbyTagAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         ShibbyFileArray filearr = mData.get(position);
-        System.out.println(filearr.getFileCount());
         holder.txtName.setText(filearr.getName());
         holder.txtFileCount.setText(filearr.getFileCount() + " files");
     }

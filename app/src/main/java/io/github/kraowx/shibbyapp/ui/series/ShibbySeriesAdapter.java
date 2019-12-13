@@ -40,7 +40,6 @@ public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapte
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         ShibbyFileArray filearr = mData.get(position);
-        System.out.println(filearr.getFileCount());
         holder.txtName.setText(filearr.getName());
         holder.txtFileCount.setText(filearr.getFileCount() + " files");
     }

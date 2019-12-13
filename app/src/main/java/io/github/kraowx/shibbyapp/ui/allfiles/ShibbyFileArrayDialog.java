@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
@@ -89,9 +91,25 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         dialog.setContentView(R.layout.file_info_dialog);
         dialog.setTitle("File Info");
         TextView title = dialog.findViewById(R.id.txtTitle);
-        title.setText(file.getName());
+        title.setText(file.getShortName());
+        TextView tags = dialog.findViewById(R.id.txtTags);
+        tags.setText(getTagsString(file.getTags()));
         TextView description = dialog.findViewById(R.id.txtDescription);
         description.setText(file.getDescription());
         dialog.show();
+    }
+
+    private String getTagsString(List<String> tags)
+    {
+        String tagsStr = "";
+        for (int i = 0; i < tags.size(); i++)
+        {
+            tagsStr += tags.get(i);
+            if (i < tags.size()-1)
+            {
+                tagsStr += ", ";
+            }
+        }
+        return tagsStr + "\n";
     }
 }

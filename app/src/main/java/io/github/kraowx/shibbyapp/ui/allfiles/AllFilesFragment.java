@@ -223,9 +223,25 @@ public class AllFilesFragment extends Fragment
         dialog.setContentView(R.layout.file_info_dialog);
         dialog.setTitle("File Info");
         TextView title = dialog.findViewById(R.id.txtTitle);
-        title.setText(file.getName());
+        title.setText(file.getShortName());
+        TextView tags = dialog.findViewById(R.id.txtTags);
+        tags.setText(getTagsString(file.getTags()));
         TextView description = dialog.findViewById(R.id.txtDescription);
         description.setText(file.getDescription());
         dialog.show();
+    }
+
+    private String getTagsString(List<String> tags)
+    {
+        String tagsStr = "";
+        for (int i = 0; i < tags.size(); i++)
+        {
+            tagsStr += tags.get(i);
+            if (i < tags.size()-1)
+            {
+                tagsStr += ", ";
+            }
+        }
+        return tagsStr + "\n";
     }
 }

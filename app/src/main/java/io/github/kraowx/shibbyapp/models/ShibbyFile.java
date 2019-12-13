@@ -9,37 +9,46 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ShibbyFile
 {
-    private String name, id, link, description;
+    private String name, shortName, id, link, description;
     private List<String> tags;
     private Map<String, String> extraData;
 
     public ShibbyFile(String name, String link, String description)
     {
-        init(name, null, link, description, null);
+        init(name, null, null, link, description, null);
     }
 
-    public ShibbyFile(String name, String id, String link,
+    public ShibbyFile(String name, String shortName, String id, String link,
                       String description, Map<String, String> extraData)
     {
-        init(name, id, link, description, extraData);
+        init(name, shortName, id, link, description, extraData);
     }
 
-    private void init(String name, String id, String link,
+    private void init(String name, String shortName, String id, String link,
                       String description, Map<String, String> extraData)
     {
         this.name = name;
+        if (shortName != null)
+        {
+            this.shortName = shortName;
+        }
+        else
+        {
+            this.shortName = getShortName(name);
+        }
         if (id == null && name != null)
         {
             createIdFromName();
         }
         this.link = link;
         this.description = description;
-        tags = getTagsFromName();
+        this.tags = getTagsFromName();
         this.extraData = extraData != null ? extraData :
                 new HashMap<String, String>();
     }
@@ -51,10 +60,23 @@ public class ShibbyFile
         {
             JSONObject json = new JSONObject(jsonStr);
             file.name = json.getString("name");
+            if (!json.has("shortName"))
+            {
+                file.shortName = file.getShortName(file.name);
+            }
+            else
+            {
+                file.shortName = json.getString("shortName");
+            }
             if (!json.has("id") && file.name != null)
             {
                 file.createIdFromName();
             }
+            else
+            {
+                file.id = json.getString("id");
+            }
+            file.tags = file.getTagsFromName();
             file.link = json.getString("link");
             file.description = json.getString("description");
             file.extraData = new HashMap<String, String>();
@@ -79,11 +101,18 @@ public class ShibbyFile
         try
         {
             json.put("name", name);
+            json.put("shortName", shortName);
             if (id == null)
             {
                 createIdFromName();
             }
             json.put("id", id);
+            JSONArray tagsJson = new JSONArray();
+            for (String tag : tags)
+            {
+                tagsJson.put(tag);
+            }
+            json.put("tags", tagsJson);
             json.put("link", link);
             json.put("description", description);
             JSONObject extras = new JSONObject();
@@ -108,6 +137,16 @@ public class ShibbyFile
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getShortName()
+    {
+        return shortName;
+    }
+
+    public void setShortName(String shortName)
+    {
+        this.shortName = shortName;
     }
 
     public String getId()
@@ -193,6 +232,55 @@ public class ShibbyFile
         return tags;
     }
 
+    private String getShortName(String name)
+    {
+        String tags = "";
+        if (name != null)
+        {
+            char[] chars = name.toCharArray();
+            boolean in = true;
+            char c;
+            for (int i = 0; i < chars.length; i++)
+            {
+                c = chars[i];
+                if (c == '[')
+                {
+                    if (in && i != 0)
+                    {
+                        tags = "";
+                        break;
+                    }
+                    in = true;
+                }
+                else if (c == ']' || c == ')')
+                {
+                    in = false;
+                }
+                else if (!in && c != ' ')
+                {
+                    name = name.substring(i, name.length() - 1);
+                    break;
+                }
+                tags += c;
+            }
+            if (!tags.endsWith(" "))
+            {
+                tags += " ";
+            }
+            if (!tags.contains("[") && !tags.contains("]"))
+            {
+                tags = "";
+            }
+            // Remove right tags
+            int rightIndex = name.indexOf('[');
+            if (rightIndex != -1)
+            {
+                name = name.substring(0, rightIndex);
+            }
+        }
+        return tags + name;
+    }
+
     private void createIdFromName()
     {
         try
@@ -203,7 +291,7 @@ public class ShibbyFile
 
             for (int i = 0; i < hash.length; i++)
             {
-                String hex = Integer.toHexString(0xff & hash[i]);
+                String hex = Integer.toHexString(0xFF & hash[i]);
                 if (hex.length() == 1)
                 {
                     hexString.append('0');
@@ -223,6 +311,6 @@ public class ShibbyFile
     @Override
     public String toString()
     {
-        return name;
+        return shortName;
     }
 }

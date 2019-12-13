@@ -58,7 +58,7 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         ShibbyFile file = mData.get(position);
-        holder.txtFileName.setText(file.getName());
+        holder.txtFileName.setText(file.getShortName());
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
             holder.btnDownload.setColorFilter(ContextCompat
