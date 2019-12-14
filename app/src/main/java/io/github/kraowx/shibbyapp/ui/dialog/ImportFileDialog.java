@@ -79,7 +79,7 @@ public class ImportFileDialog extends Dialog
                     String[] tagsArr = tags.split(",");
                     for (String tag : tagsArr)
                     {
-                        tagsList.add(tag);
+                        tagsList.add(tag.trim());
                     }
                     ShibbyFile file = new ShibbyFile(name,
                             selectedFile.getAbsolutePath(), desc);
