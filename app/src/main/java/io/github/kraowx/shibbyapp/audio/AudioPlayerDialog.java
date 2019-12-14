@@ -34,7 +34,7 @@ public class AudioPlayerDialog extends Dialog
     private Timer timer;
     private SharedPreferences prefs;
 
-    private TextView title, txtElapsedTime, txtRemainingTime;
+    private TextView txtTitle, txtTags, txtElapsedTime, txtRemainingTime;
     private ImageButton btnRewind, btnPlayPause, btnFastForward,
             btnDownload, btnRepeat;
     private SeekBar progressBar;
@@ -134,12 +134,33 @@ public class AudioPlayerDialog extends Dialog
     public void loadFile(final ShibbyFile file)
     {
         this.activeFile = file;
-        title.post(new Runnable()
+        txtTitle.post(new Runnable()
         {
             @Override
             public void run()
             {
-                title.setText(file != null ? file.getName() : "No file selected");
+                txtTitle.setText(file != null ?
+                        file.getShortName() : "No file selected");
+                if (file != null)
+                {
+                    txtTags.setVisibility(View.VISIBLE);
+                    List<String> tags = file.getTags();
+                    String tagsStr = "";
+                    for (int i = 0; i < tags.size(); i++)
+                    {
+                        tagsStr += tags.get(i);
+                        if (i < tags.size() - 1)
+                        {
+                            tagsStr += "  |  ";
+                        }
+                    }
+                    txtTags.setText(file != null ?
+                            tagsStr : "");
+                }
+                else
+                {
+                    txtTags.setVisibility(View.GONE);
+                }
             }
         });
         txtElapsedTime.post(new Runnable()
@@ -230,10 +251,13 @@ public class AudioPlayerDialog extends Dialog
     {
         progressDialog = new ProgressDialog(getContext());
 
-        title = findViewById(R.id.txtAudioTitle);
+        txtTitle = findViewById(R.id.txtAudioTitle);
+        txtTags = findViewById(R.id.txtTags);
         if (activeFile == null)
         {
-            title.setText("No file selected");
+            txtTitle.setText("No file selected");
+            txtTags.setVisibility(View.GONE);
+            txtTags.setText("");
         }
         btnDownload = findViewById(R.id.btnPlayerDownload);
         btnDownload.setOnClickListener(new View.OnClickListener()
