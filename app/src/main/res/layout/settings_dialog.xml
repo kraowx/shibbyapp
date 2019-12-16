@@ -43,6 +43,12 @@
         android:text="Update on startup" />
 
     <Switch
+        android:id="@+id/switchDisplayLongNames"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Display long file names" />
+
+    <Switch
         android:id="@+id/switchDarkMode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

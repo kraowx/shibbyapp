@@ -56,7 +56,10 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         ShibbyFile file = mData.get(position);
-        holder.txtFileName.setText(file.getShortName());
+        boolean displayLongNames = prefs.getBoolean(
+                "displayLongNames", false);
+        holder.txtFileName.setText(displayLongNames ?
+                file.getName() : file.getShortName());
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
             holder.btnDownload.setColorFilter(ContextCompat

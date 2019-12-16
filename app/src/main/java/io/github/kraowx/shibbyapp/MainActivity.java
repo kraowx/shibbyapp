@@ -40,9 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
-import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
-import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
@@ -227,6 +225,7 @@ public class MainActivity extends AppCompatActivity
                 .getDefaultSharedPreferences(MainActivity.this);
         final SharedPreferences.Editor editor = prefs.edit();
         boolean updateStartup = prefs.getBoolean("updateStartup", true);
+        boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
         boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
         int autoplay = prefs.getInt("autoplay", 1);
         String server = prefs.getString("server", "shibbyserver.ddns.net:2012");
@@ -239,6 +238,20 @@ public class MainActivity extends AppCompatActivity
             {
                 editor.putBoolean("updateStartup", isChecked);
                 editor.commit();
+            }
+        });
+        Switch switchDisplayLongNames = dialog.findViewById(R.id.switchDisplayLongNames);
+        switchDisplayLongNames.setChecked(displayLongNames);
+        switchDisplayLongNames.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                editor.putBoolean("displayLongNames", isChecked);
+                editor.commit();
+                Toast.makeText(dialog.getContext(),
+                        "Relaunch the app for the change to take effect",
+                        Toast.LENGTH_LONG).show();
             }
         });
         Switch switchDarkMode = dialog.findViewById(R.id.switchDarkMode);

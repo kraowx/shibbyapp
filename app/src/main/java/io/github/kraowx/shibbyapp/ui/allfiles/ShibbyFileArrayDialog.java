@@ -2,6 +2,8 @@ package io.github.kraowx.shibbyapp.ui.allfiles;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -91,7 +93,12 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         dialog.setContentView(R.layout.file_info_dialog);
         dialog.setTitle("File Info");
         TextView title = dialog.findViewById(R.id.txtTitle);
-        title.setText(file.getShortName());
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(mainActivity);
+        boolean displayLongNames = prefs.getBoolean(
+                "displayLongNames", false);
+        title.setText(displayLongNames ?
+                file.getName() : file.getShortName());
         TextView tags = dialog.findViewById(R.id.txtTags);
         tags.setText(getTagsString(file.getTags()));
         TextView description = dialog.findViewById(R.id.txtDescription);

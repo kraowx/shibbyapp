@@ -140,7 +140,7 @@ public class AudioPlayerDialog extends Dialog
             public void run()
             {
                 txtTitle.setText(file != null ?
-                        file.getShortName() : "No file selected");
+                        getFileName(file) : "No file selected");
                 if (file != null)
                 {
                     txtTags.setVisibility(View.VISIBLE);
@@ -560,10 +560,14 @@ public class AudioPlayerDialog extends Dialog
 
     private boolean autoplayAllowed()
     {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(mainActivity);
         int autoplay = prefs.getInt("autoplay", 1);
         return autoplay == 0 || (autoplay == 1 && queueIsPlaylist);
+    }
+    
+    private String getFileName(ShibbyFile file)
+    {
+        boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
+        return displayLongNames ? file.getName() : file.getShortName();
     }
 
     private String formatTime(int time)

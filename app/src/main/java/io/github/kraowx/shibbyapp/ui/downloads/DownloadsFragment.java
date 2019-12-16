@@ -1,7 +1,9 @@
 package io.github.kraowx.shibbyapp.ui.downloads;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,7 +173,12 @@ public class DownloadsFragment extends Fragment
         dialog.setContentView(R.layout.file_info_dialog);
         dialog.setTitle("File Info");
         TextView title = dialog.findViewById(R.id.txtTitle);
-        title.setText(file.getShortName());
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences((MainActivity)getActivity());
+        boolean displayLongNames = prefs.getBoolean(
+                "displayLongNames", false);
+        title.setText(displayLongNames ?
+                file.getName() : file.getShortName());
         TextView tags = dialog.findViewById(R.id.txtTags);
         tags.setText(getTagsString(file.getTags()));
         TextView description = dialog.findViewById(R.id.txtDescription);
