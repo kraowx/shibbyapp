@@ -45,6 +45,7 @@ import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.SettingsDialog;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -217,94 +218,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showSettingsDialog()
     {
-        final Dialog dialog = new Dialog(getContext());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.settings_dialog);
-        dialog.setTitle("Settings");
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(MainActivity.this);
-        final SharedPreferences.Editor editor = prefs.edit();
-        boolean updateStartup = prefs.getBoolean("updateStartup", true);
-        boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
-        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
-        int autoplay = prefs.getInt("autoplay", 1);
-        String server = prefs.getString("server", "shibbyserver.ddns.net:2012");
-        Switch switchUpdateBackground = dialog.findViewById(R.id.switchUpdateOnStartup);
-        switchUpdateBackground.setChecked(updateStartup);
-        switchUpdateBackground.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                editor.putBoolean("updateStartup", isChecked);
-                editor.commit();
-            }
-        });
-        Switch switchDisplayLongNames = dialog.findViewById(R.id.switchDisplayLongNames);
-        switchDisplayLongNames.setChecked(displayLongNames);
-        switchDisplayLongNames.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                editor.putBoolean("displayLongNames", isChecked);
-                editor.commit();
-                Toast.makeText(dialog.getContext(),
-                        "Relaunch the app for the change to take effect",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        Switch switchDarkMode = dialog.findViewById(R.id.switchDarkMode);
-        switchDarkMode.setChecked(darkModeEnabled);
-        switchDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (isChecked)
-                {
-                    setTheme(R.style.AppTheme);
-                }
-                else
-                {
-                    setTheme(R.style.AppThemeDark);
-                }
-                editor.putBoolean("darkMode", isChecked);
-                editor.commit();
-                Toast.makeText(dialog.getContext(),
-                        "Relaunch the app for the change to take effect",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        final EditText txtServer = dialog.findViewById(R.id.txtServer);
-        txtServer.setText(server);
-        Spinner spinnerAutoplay = dialog.findViewById(R.id.spinnerAutoplay);
-        spinnerAutoplay.setSelection(autoplay);
-        spinnerAutoplay.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id)
-            {
-                editor.putInt("autoplay", position);
-                editor.commit();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-        Button btnApplyChanges = dialog.findViewById(R.id.btnApplyChanges);
-        btnApplyChanges.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                editor.putString("server", txtServer.getText().toString());
-                editor.commit();
-            }
-        });
-        dialog.show();
+        SettingsDialog dialog = new SettingsDialog(this);
     }
 
     private void showImportFileDialog()
@@ -315,7 +229,7 @@ public class MainActivity extends AppCompatActivity
     private void setVersionOnUI()
     {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View hView =  navigationView.getHeaderView(0);
+        View hView = navigationView.getHeaderView(0);
         TextView txtVersion = (TextView)hView.findViewById(R.id.txtVersion);
         txtVersion.setText(getVersionName());
     }
