@@ -256,62 +256,52 @@ public class MainActivity extends AppCompatActivity
     
     private void exportAllData()
     {
-        int permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission == PackageManager.PERMISSION_GRANTED)
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        JSONObject data = new JSONObject();
+        try
         {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-            JSONObject data = new JSONObject();
+            JSONArray playlistNames = new JSONArray(
+                    prefs.getString("playlists", "[]"));
+            data.put("playlists", playlistNames);
+            JSONArray userFiles = new JSONArray(
+                    prefs.getString("userFiles", "[]"));
+            data.put("userFiles", userFiles);
+            for (int i = 0; i < playlistNames.length(); i++)
+            {
+                JSONArray playlistData = new JSONArray(
+                        prefs.getString("playlist" +
+                                playlistNames.get(i), "[]"));
+                data.put("playlist" + playlistNames.get(i),
+                        playlistData);
+            }
+            Date time = Calendar.getInstance().getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("ddMMYYYY");
+            File dir = new File(Environment.getExternalStorageDirectory()
+                    .getAbsolutePath() + "/ShibbyApp");
+            File out = new File(dir.getAbsolutePath() +
+                    "/export" + sdf.format(time) + ".json");
+            BufferedWriter writer = null;
             try
             {
-                JSONArray playlistNames = new JSONArray(
-                        prefs.getString("playlists", "[]"));
-                data.put("playlists", playlistNames);
-                JSONArray userFiles = new JSONArray(
-                        prefs.getString("userFiles", "[]"));
-                data.put("userFiles", userFiles);
-                for (int i = 0; i < playlistNames.length(); i++)
-                {
-                    JSONArray playlistData = new JSONArray(
-                            prefs.getString("playlist" +
-                                    playlistNames.get(i), "[]"));
-                    data.put("playlist" + playlistNames.get(i),
-                            playlistData);
-                }
-                Date time = Calendar.getInstance().getTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("ddMMYYYY");
-                File dir = new File(Environment.getExternalStorageDirectory()
-                        .getAbsolutePath() + "/ShibbyApp");
-                File out = new File(dir.getAbsolutePath() +
-                        "/export" + sdf.format(time) + ".json");
-                System.out.println(out.getAbsolutePath());
-                BufferedWriter writer = null;
-                try
-                {
-                    System.out.println(dir.mkdir());
-                    out.createNewFile();
-                    writer = new BufferedWriter(new FileWriter(out));
-                    writer.write(data.toString());
-                    writer.close();
-                    Toast.makeText(this, "Exported data to \"" +
-                            out.getAbsolutePath() + "\"", Toast.LENGTH_LONG).show();
-                }
-                catch (IOException ioe)
-                {
-                    ioe.printStackTrace();
-                }
+                out.createNewFile();
+                writer = new BufferedWriter(new FileWriter(out));
+                writer.write(data.toString());
+                writer.close();
+                Toast.makeText(this, "Exported data to \"" +
+                        out.getAbsolutePath() + "\"", Toast.LENGTH_LONG).show();
             }
-            catch (JSONException je)
+            catch (IOException ioe)
             {
-                je.printStackTrace();
+                ioe.printStackTrace();
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        2);
             }
         }
-        else
+        catch (JSONException je)
         {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    2);
+            je.printStackTrace();
         }
     }
 
