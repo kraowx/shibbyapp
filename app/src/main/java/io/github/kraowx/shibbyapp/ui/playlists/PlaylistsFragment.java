@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -24,19 +25,23 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.OnStartDragListener;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
+import io.github.kraowx.shibbyapp.ui.SimpleItemTouchHelperCallback;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
 
 public class PlaylistsFragment extends Fragment
-        implements ShibbyPlaylistAdapter.ItemClickListener, SearchView.OnQueryTextListener
+        implements ShibbyPlaylistAdapter.ItemClickListener,
+        SearchView.OnQueryTextListener, OnStartDragListener
 {
     private RecyclerView list;
     private ShibbyPlaylistAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
+    private ItemTouchHelper mItemTouchHelper;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -73,6 +78,12 @@ public class PlaylistsFragment extends Fragment
         }, 0, 1000);
         return root;
     }
+    
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder)
+    {
+        mItemTouchHelper.startDrag(viewHolder);
+    }
 
     @Override
     public boolean onQueryTextChange(String text)
@@ -107,12 +118,19 @@ public class PlaylistsFragment extends Fragment
             @Override
             public void run()
             {
+                SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback(null);
+                mItemTouchHelper = new ItemTouchHelper(callback);
+                
                 listLayoutManager = new LinearLayoutManager(getContext());
                 list.setLayoutManager(listLayoutManager);
                 listAdapter = new ShibbyPlaylistAdapter(getContext(),
-                        playlists, ((MainActivity)getActivity()), true);
+                        playlists, ((MainActivity)getActivity()),
+                        mItemTouchHelper, true);
                 list.setAdapter(listAdapter);
                 listAdapter.setClickListener(PlaylistsFragment.this);
+                
+                callback.setAdapter(listAdapter);
+                mItemTouchHelper.attachToRecyclerView(list);
             }
         });
     }

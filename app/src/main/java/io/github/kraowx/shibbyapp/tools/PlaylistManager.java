@@ -184,6 +184,36 @@ public class PlaylistManager
         }
         return false;
     }
+    
+    public static void setPlaylistNameData(Context context, List<String> data)
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        JSONArray arr = new JSONArray();
+        for (String playlist : data)
+        {
+            arr.put(playlist);
+        }
+        editor.putString("playlists", arr.toString());
+        editor.commit();
+    }
+    
+    public static void setPlaylistFileData(Context context, String playlistName,
+                                           List<ShibbyFile> fileData)
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        JSONArray arr = new JSONArray();
+        for (ShibbyFile file : fileData)
+        {
+            JSONObject fileJson = file.toJSON();
+            arr.put(fileJson);
+        }
+        editor.putString("playlist" + playlistName, arr.toString());
+        editor.commit();
+    }
 
     private static boolean listHasFile(List<ShibbyFile> list, ShibbyFile file)
     {

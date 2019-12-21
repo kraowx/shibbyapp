@@ -9,6 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
+import io.github.kraowx.shibbyapp.ui.SimpleItemTouchHelperCallback;
 
 public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.ItemClickListener,
         ShibbyPlaylistFileAdapter.ItemClickListener
@@ -28,6 +30,7 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
     private ShibbyFileAdapter listAdapter;
     private ShibbyPlaylistFileAdapter listAdapterPlaylists;
     private LinearLayoutManager listLayoutManager;
+    private ItemTouchHelper mItemTouchHelper;
     private ShibbyFileArray fileArray;
     private MainActivity mainActivity;
 
@@ -72,10 +75,16 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         list.setLayoutManager(listLayoutManager);
         if (playlistName != null)
         {
+            SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback(null);
+            mItemTouchHelper = new ItemTouchHelper(callback);
+            
             listAdapterPlaylists = new ShibbyPlaylistFileAdapter(getContext(),
-                    playlistName, fileArray.getFiles(), mainActivity);
+                    playlistName, fileArray.getFiles(), mainActivity, mItemTouchHelper);
             list.setAdapter(listAdapterPlaylists);
             listAdapterPlaylists.setClickListener(ShibbyFileArrayDialog.this);
+    
+            callback.setAdapter(listAdapterPlaylists);
+            mItemTouchHelper.attachToRecyclerView(list);
         }
         else
         {

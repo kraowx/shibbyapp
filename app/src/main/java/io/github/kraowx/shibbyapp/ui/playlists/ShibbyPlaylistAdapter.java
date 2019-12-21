@@ -6,23 +6,31 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MotionEventCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.OnStartDragListener;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
+import io.github.kraowx.shibbyapp.ui.ItemTouchHelperAdapter;
 
 public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAdapter.ViewHolder>
+    implements ItemTouchHelperAdapter
 {
     private boolean showDeleteButton;
 
@@ -30,19 +38,32 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
     private MainActivity mainActivity;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private ItemTouchHelper itemTouchHelper;
     private Context context;
     private SharedPreferences prefs;
 
     ShibbyPlaylistAdapter(Context context, List<String> data,
-                          MainActivity mainActivity, boolean showDeleteButton)
+                          MainActivity mainActivity,
+                          ItemTouchHelper itemTouchHelper,
+                          boolean showDeleteButton)
     {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         mDataOrig = (List<String>)((ArrayList<String>)mData).clone();
         this.mainActivity = mainActivity;
+        this.itemTouchHelper = itemTouchHelper;
         this.showDeleteButton = showDeleteButton;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+    }
+    
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition)
+    {
+        Collections.swap(mData, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        PlaylistManager.setPlaylistNameData(mainActivity, mData);
+        return true;
     }
 
     @Override
@@ -63,7 +84,7 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position)
+    public void onBindViewHolder(final ViewHolder holder, int position)
     {
         String playlist = mData.get(position);
         holder.txtPlaylistName.setText(playlist);
@@ -75,6 +96,19 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         else
         {
             holder.txtFileCount.setText(fileCount + " files");
+        }
+        
+        if (itemTouchHelper != null)
+        {
+            holder.layout.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View v)
+                {
+                    itemTouchHelper.startDrag(holder);
+                    return true;
+                }
+            });
         }
     }
 
@@ -105,17 +139,18 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         notifyDataSetChanged();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         TextView txtPlaylistName, txtFileCount;
         ImageButton btnDeletePlaylist;
+        LinearLayout layout;
 
         ViewHolder(View itemView)
         {
             super(itemView);
             txtPlaylistName = itemView.findViewById(R.id.arrayName);
             txtFileCount = itemView.findViewById(R.id.txtFileCount);
+            layout = (LinearLayout)itemView;
             if (showDeleteButton)
             {
                 btnDeletePlaylist = itemView.findViewById(R.id.btnDeletePlaylist);

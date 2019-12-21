@@ -9,12 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
@@ -23,8 +26,11 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
+import io.github.kraowx.shibbyapp.ui.ItemTouchHelperAdapter;
 
-public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlaylistFileAdapter.ViewHolder>
+public class ShibbyPlaylistFileAdapter
+        extends RecyclerView.Adapter<ShibbyPlaylistFileAdapter.ViewHolder>
+        implements ItemTouchHelperAdapter
 {
     private String playlistName;
 
@@ -32,18 +38,30 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
     private MainActivity mainActivity;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private ItemTouchHelper itemTouchHelper;
     private Context context;
     private SharedPreferences prefs;
 
     ShibbyPlaylistFileAdapter(Context context, String playlistName, List<ShibbyFile> data,
-                              MainActivity mainActivity)
+                              MainActivity mainActivity, ItemTouchHelper itemTouchHelper)
     {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.playlistName = playlistName;
         this.mData = data;
         this.mainActivity = mainActivity;
+        this.itemTouchHelper = itemTouchHelper;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+    }
+    
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition)
+    {
+        Collections.swap(mData, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        PlaylistManager.setPlaylistFileData(mainActivity,
+                playlistName, mData);
+        return true;
     }
 
     @Override
@@ -53,10 +71,9 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                 R.layout.file_list_row_playlist, parent, false);
         return new ViewHolder(view);
     }
-
-    // binds the data to the TextView in each row
+    
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position)
+    public void onBindViewHolder(final ViewHolder holder, int position)
     {
         ShibbyFile file = mData.get(position);
         boolean displayLongNames = prefs.getBoolean(
@@ -87,26 +104,39 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                 holder.btnDownload.setColorFilter(null);
             }
         }
+    
+        if (itemTouchHelper != null)
+        {
+            holder.layout.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View v)
+                {
+                    itemTouchHelper.startDrag(holder);
+                    return true;
+                }
+            });
+        }
     }
-
-    // total number of rows
+    
     @Override
     public int getItemCount()
     {
         return mData.size();
     }
 
-
-    // stores and recycles views as they are scrolled off screen
+    
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         TextView txtFileName;
         ImageButton btnPlay, btnDownload, btnRemoveFromPlaylist;
+        LinearLayout layout;
 
         ViewHolder(View itemView)
         {
             super(itemView);
             txtFileName = itemView.findViewById(R.id.itemName);
+            layout = (LinearLayout)itemView;
             itemView.setOnClickListener(this);
             initializeButtons(itemView);
         }
@@ -243,8 +273,7 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
                     .show();
         }
     }
-
-    // convenience method for getting data at click position
+    
     ShibbyFile getItem(int id)
     {
         return mData.get(id);
@@ -259,14 +288,12 @@ public class ShibbyPlaylistFileAdapter extends RecyclerView.Adapter<ShibbyPlayli
     {
         mData.remove(item);
     }
-
-    // allows clicks events to be caught
+    
     void setClickListener(ItemClickListener itemClickListener)
     {
         this.mClickListener = itemClickListener;
     }
-
-    // parent activity will implement this method to respond to click events
+    
     public interface ItemClickListener
     {
         void onItemClick(View view, int position);

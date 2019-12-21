@@ -62,7 +62,7 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
         listLayoutManager = new LinearLayoutManager(getContext());
         list.setLayoutManager(listLayoutManager);
         listAdapter = new ShibbyPlaylistAdapter(getContext(),
-                playlists, mainActivity, showDeleteButton);
+                playlists, mainActivity, null, showDeleteButton);
         list.setAdapter(listAdapter);
         listAdapter.addItem("Create New Playlist");
         listAdapter.setClickListener(AddFileToPlaylistDialog.this);
