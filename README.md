@@ -16,6 +16,8 @@ Note that default server is currently offline. For now, you must host your own s
 - Search by series
 - Light and dark themes
 
+## [Showcase](https://ibb.co/album/gDq3aa)
+
 ## Permissions
 This app uses the "Storage" (WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user. Permission to read from the device's external storage is only requested for the "import file" feature, which requires listing the device's directories.
 
