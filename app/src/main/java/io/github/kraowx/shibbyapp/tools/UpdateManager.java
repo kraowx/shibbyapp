@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,19 +44,44 @@ public class UpdateManager
             @Override
             public void run()
             {
-                new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark)
-                        .setTitle("Update")
-                        .setMessage("An update is available! Would you like to download it now?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
-                        {
-                            public void onClick(DialogInterface dialog, int which)
+                SharedPreferences prefs = PreferenceManager
+                        .getDefaultSharedPreferences(mainActivity);
+                boolean darkModeEnabled = prefs.getBoolean(
+                        "darkMode", false);
+                if (darkModeEnabled)
+                {
+                    new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark)
+                            .setTitle("Update")
+                            .setMessage("An update is available! Would you like to download it now?")
+                            .setPositiveButton(android.R.string.yes,
+                                    new DialogInterface.OnClickListener()
                             {
-                                update(mainActivity);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null)
-                        .setIcon(R.drawable.ic_update)
-                        .show();
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    update(mainActivity);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null)
+                            .setIcon(R.drawable.ic_update)
+                            .show();
+                }
+                else
+                {
+                    new AlertDialog.Builder(mainActivity)
+                            .setTitle("Update")
+                            .setMessage("An update is available! Would you like to download it now?")
+                            .setPositiveButton(android.R.string.yes,
+                                    new DialogInterface.OnClickListener()
+                                    {
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            update(mainActivity);
+                                        }
+                                    })
+                            .setNegativeButton(android.R.string.no, null)
+                            .setIcon(R.drawable.ic_update)
+                            .show();
+                }
             }
         });
     }
