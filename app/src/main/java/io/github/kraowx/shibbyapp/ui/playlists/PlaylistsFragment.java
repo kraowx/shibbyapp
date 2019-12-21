@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -25,14 +24,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import io.github.kraowx.shibbyapp.MainActivity;
-import io.github.kraowx.shibbyapp.OnStartDragListener;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
-import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
-import io.github.kraowx.shibbyapp.ui.SimpleItemTouchHelperCallback;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
+import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.OnStartDragListener;
+import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCallback;
 
 public class PlaylistsFragment extends Fragment
         implements ShibbyPlaylistAdapter.ItemClickListener,

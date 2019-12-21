@@ -26,7 +26,7 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
-import io.github.kraowx.shibbyapp.ui.ItemTouchHelperAdapter;
+import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.ItemTouchHelperAdapter;
 
 public class ShibbyPlaylistFileAdapter
         extends RecyclerView.Adapter<ShibbyPlaylistFileAdapter.ViewHolder>

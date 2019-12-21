@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MotionEventCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,10 +22,9 @@ import java.util.Collections;
 import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
-import io.github.kraowx.shibbyapp.OnStartDragListener;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
-import io.github.kraowx.shibbyapp.ui.ItemTouchHelperAdapter;
+import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.ItemTouchHelperAdapter;
 
 public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAdapter.ViewHolder>
     implements ItemTouchHelperAdapter

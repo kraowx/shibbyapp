@@ -1,4 +1,4 @@
-package io.github.kraowx.shibbyapp.ui;
+package io.github.kraowx.shibbyapp.ui.playlists.itemtouch;
 
 import android.graphics.Canvas;
 

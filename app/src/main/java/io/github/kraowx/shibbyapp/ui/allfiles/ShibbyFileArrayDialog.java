@@ -19,7 +19,7 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
-import io.github.kraowx.shibbyapp.ui.SimpleItemTouchHelperCallback;
+import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCallback;
 
 public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.ItemClickListener,
         ShibbyPlaylistFileAdapter.ItemClickListener

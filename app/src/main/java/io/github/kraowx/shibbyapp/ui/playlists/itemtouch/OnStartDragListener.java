@@ -1,4 +1,4 @@
-package io.github.kraowx.shibbyapp;
+package io.github.kraowx.shibbyapp.ui.playlists.itemtouch;
 
 import androidx.recyclerview.widget.RecyclerView;
 
