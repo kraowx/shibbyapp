@@ -97,6 +97,11 @@ public class ImportFileDialog extends Dialog
                                 Toast.LENGTH_LONG).show();
                     }
                 }
+                else
+                {
+                    Toast.makeText(mainActivity, "You must first select a file",
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
         show();

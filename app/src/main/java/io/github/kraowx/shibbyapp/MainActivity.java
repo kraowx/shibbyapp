@@ -1,7 +1,6 @@
 package io.github.kraowx.shibbyapp;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -10,11 +9,13 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -28,22 +29,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.SearchView;
-import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
+import io.github.kraowx.shibbyapp.ui.dialog.ImportAppDataDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.SettingsDialog;
 
@@ -150,7 +157,17 @@ public class MainActivity extends AppCompatActivity
                     grantResults[0] == PackageManager.PERMISSION_DENIED))
             {
                 Toast.makeText(MainActivity.this,
-                        "Importing files has been disabled",
+                        "Import files feature has been disabled",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == 2)
+        {
+            if (grantResults.length == 0 || (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_DENIED))
+            {
+                Toast.makeText(MainActivity.this,
+                        "This feature requires the storage permission",
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -174,6 +191,12 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.action_import:
                 showImportFileDialog();
+                return true;
+            case R.id.action_export_appdata:
+                exportAllData();
+                return true;
+            case R.id.action_import_appdata:
+                showImportAppDataDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -224,6 +247,72 @@ public class MainActivity extends AppCompatActivity
     private void showImportFileDialog()
     {
         ImportFileDialog importDialog = new ImportFileDialog(this);
+    }
+    
+    private void showImportAppDataDialog()
+    {
+        ImportAppDataDialog importAppDataDialog = new ImportAppDataDialog(this);
+    }
+    
+    private void exportAllData()
+    {
+        int permission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission == PackageManager.PERMISSION_GRANTED)
+        {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(this);
+            JSONObject data = new JSONObject();
+            try
+            {
+                JSONArray playlistNames = new JSONArray(
+                        prefs.getString("playlists", "[]"));
+                data.put("playlists", playlistNames);
+                JSONArray userFiles = new JSONArray(
+                        prefs.getString("userFiles", "[]"));
+                data.put("userFiles", userFiles);
+                for (int i = 0; i < playlistNames.length(); i++)
+                {
+                    JSONArray playlistData = new JSONArray(
+                            prefs.getString("playlist" +
+                                    playlistNames.get(i), "[]"));
+                    data.put("playlist" + playlistNames.get(i),
+                            playlistData);
+                }
+                Date time = Calendar.getInstance().getTime();
+                SimpleDateFormat sdf = new SimpleDateFormat("ddMMYYYY");
+                File dir = new File(Environment.getExternalStorageDirectory()
+                        .getAbsolutePath() + "/ShibbyApp");
+                File out = new File(dir.getAbsolutePath() +
+                        "/export" + sdf.format(time) + ".json");
+                System.out.println(out.getAbsolutePath());
+                BufferedWriter writer = null;
+                try
+                {
+                    System.out.println(dir.mkdir());
+                    out.createNewFile();
+                    writer = new BufferedWriter(new FileWriter(out));
+                    writer.write(data.toString());
+                    writer.close();
+                    Toast.makeText(this, "Exported data to \"" +
+                            out.getAbsolutePath() + "\"", Toast.LENGTH_LONG).show();
+                }
+                catch (IOException ioe)
+                {
+                    ioe.printStackTrace();
+                }
+            }
+            catch (JSONException je)
+            {
+                je.printStackTrace();
+            }
+        }
+        else
+        {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    2);
+        }
     }
 
     private void setVersionOnUI()

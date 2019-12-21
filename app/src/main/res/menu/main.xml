@@ -5,6 +5,12 @@
         android:id="@+id/action_import"
         android:title="Import File" />
     <item
+        android:id="@+id/action_export_appdata"
+        android:title="Export App Data" />
+    <item
+        android:id="@+id/action_import_appdata"
+        android:title="Import App Data" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
