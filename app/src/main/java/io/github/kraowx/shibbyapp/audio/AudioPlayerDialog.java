@@ -27,7 +27,8 @@ import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 public class AudioPlayerDialog extends Dialog
 {
     private boolean fileDownloaded,
-            seeking, queueIsPlaylist;
+            seeking, queueIsPlaylist,
+            repeating;
     private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
     private AudioPlayer audioPlayer;
@@ -240,6 +241,7 @@ public class AudioPlayerDialog extends Dialog
         if (file != null)
         {
             audioPlayer = new AudioPlayer(progressDialog, fileDownloaded);
+            audioPlayer.setLooping(repeating);
         }
         else
         {
@@ -470,6 +472,7 @@ public class AudioPlayerDialog extends Dialog
                                 R.color.colorAccent));
                     }
                     audioPlayer.setLooping(!looping);
+                    repeating = !looping;
                 }
             }
         });
@@ -572,7 +575,7 @@ public class AudioPlayerDialog extends Dialog
 
     private String formatTime(int time)
     {
-        int hours   = (int)((time / (1000*60*60)) % 24);
+        int hours = (int)((time / (1000*60*60)) % 24);
         int minutes = (int)((time / (1000*60)) % 60);
         int seconds = (int)(time / 1000) % 60;
         String hoursStr = String.format("%02d", hours);
