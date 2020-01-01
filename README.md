@@ -23,6 +23,8 @@ This app uses the "Storage" (WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE) p
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
+- **Support for Patreon-only released files**
+    - Note that a valid Patreon account will be required with an active pledge to Shibby. This will *not* be a method to obtain these files for free
 - File metadata that gives more information about a file other than its name and description
 - Import/export audio files buttons
 
