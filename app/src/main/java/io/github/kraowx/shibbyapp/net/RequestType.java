@@ -2,5 +2,6 @@ package io.github.kraowx.shibbyapp.net;
 
 public enum RequestType
 {
-    ALL, FILES, TAGS, SERIES
+    VERSION, VERIFY_PATREON_ACCOUNT,
+    ALL, FILES, TAGS, SERIES, PATREON_FILES
 }

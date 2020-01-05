@@ -240,7 +240,7 @@ public class AudioPlayerDialog extends Dialog
         }
         if (file != null)
         {
-            audioPlayer = new AudioPlayer(progressDialog, fileDownloaded);
+            audioPlayer = new AudioPlayer(progressDialog, fileDownloaded, mainActivity);
             audioPlayer.setLooping(repeating);
         }
         else

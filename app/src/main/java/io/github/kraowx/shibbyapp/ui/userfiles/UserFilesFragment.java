@@ -1,4 +1,4 @@
-package io.github.kraowx.shibbyapp.ui.favorites;
+package io.github.kraowx.shibbyapp.ui.userfiles;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,12 +13,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 
-public class FavoritesFragment extends Fragment
+public class UserFilesFragment extends Fragment
 {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        View root = inflater.inflate(R.layout.fragment_favorites, container, false);
+        View root = inflater.inflate(R.layout.fragment_userfiles, container, false);
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
         fabAddPlaylist.hide();

@@ -6,16 +6,25 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.tools.HttpRequest;
+
 class AudioPlayer extends AsyncTask<String, Void, Boolean>
 {
     private boolean initialized, fileDownloaded;
     private MediaPlayer mediaPlayer;
     private ProgressDialog progressDialog;
+    private MainActivity mainActivity;
 
-    public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded)
+    public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded, MainActivity mainActivity)
     {
         this.progressDialog = progressDialog;
         this.fileDownloaded = fileDownloaded;
+        this.mainActivity = mainActivity;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
     }
@@ -103,7 +112,11 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
 
         try
         {
-            mediaPlayer.setDataSource(strings[0]);
+            //mediaPlayer.setDataSource(strings[0]);
+            String cookie = mainActivity.getPatreonSessionManager().getCookie();
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Cookie", cookie);
+            mediaPlayer.setDataSource(mainActivity, Uri.parse(strings[0]), headers);
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
             {
                 @Override

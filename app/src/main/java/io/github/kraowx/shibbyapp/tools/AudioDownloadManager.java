@@ -88,6 +88,69 @@ public class AudioDownloadManager
         Toast.makeText(mainActivity, "Downloading file...",
                 Toast.LENGTH_LONG).show();
     }
+    
+    public void patreonLogin(String email, String password)
+    {
+        System.out.println("starting request");
+        HttpRequest req = HttpRequest.post("https://api.patreon.com/login");
+        req.header("Connection", "keep-alive");
+        req.header("Upgrade-Insecure-Requests", 1);
+        req.userAgent("Mozilla/5.0 (Linux; <Android Version>; <Build Tag etc.>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev>");
+//        req.userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36");
+        req.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        req.header("Accept-Language", "en-US,en;q=0.9");
+        req.send("{\"data\":{\"email\":\"" + email + "\"," +
+                "\"password\":\"" + password + "\"}}");
+        System.out.println(req.body());
+        System.out.println(req.headers());
+        List<String> cookies = req.headers().get("Set-Cookie");
+        String cookiestr = "";
+        for (int i = 0; i < cookies.size(); i++)
+        {
+            cookiestr += cookies.get(i);
+            if (i < cookies.size()-1)
+            {
+                cookiestr += "; ";
+            }
+        }
+        System.out.println(cookiestr);
+        
+        
+        
+        req = req.get("https://api.patreon.com/current_user");
+        req.header("Connection", "keep-alive");
+        req.header("Upgrade-Insecure-Requests", 1);
+        req.userAgent("Mozilla/5.0 (Linux; <Android Version>; <Build Tag etc.>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev>");
+//        req.userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36");
+        req.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        req.header("Accept-Language", "en-US,en;q=0.9");
+        req.header("Cookie", cookiestr);
+        System.out.println(req.body());
+    
+        
+        String link = "http://patreon.com/file?h=29364945&i=4334926";
+        Uri uri = Uri.parse(link);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.addRequestHeader("Cookie", cookiestr);
+        request.setTitle("test");
+        request.setDescription("Downloading file");
+        request.setNotificationVisibility(
+                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(mainActivity,
+                "/", "testdownload.mp3");
+        long id = downloadManager.enqueue(request);
+        System.out.println(id);
+        mainActivity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Toast.makeText(mainActivity, "Downloading file...",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+        
+    }
 
     public boolean cancelDownload(ShibbyFile file)
     {

@@ -6,10 +6,17 @@ import org.json.JSONObject;
 public class Request
 {
     private RequestType reqType;
+    private JSONObject data;
 
     public Request(RequestType reqType)
     {
         this.reqType = reqType;
+    }
+    
+    public Request(RequestType reqType, JSONObject data)
+    {
+        this.reqType = reqType;
+        this.data = data;
     }
 
     public static Request fromJSON(String json)
@@ -21,6 +28,10 @@ public class Request
             if (obj.has("type"))
             {
                 req.reqType = formatRequestType(obj.getString("type"));
+            }
+            if (obj.has("data"))
+            {
+                req.data = obj.getJSONObject("data");
             }
         }
         catch (JSONException je)
@@ -49,6 +60,21 @@ public class Request
     {
         return new Request(RequestType.SERIES);
     }
+    
+    public static Request patreonFiles(String email, String password)
+    {
+        JSONObject obj = new JSONObject();
+        try
+        {
+            obj.put("email", email);
+            obj.put("password", password);
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        return new Request(RequestType.PATREON_FILES, obj);
+    }
 
     public JSONObject toJSON()
     {
@@ -56,6 +82,10 @@ public class Request
         try
         {
             json.put("type", reqType.toString());
+            if (data != null)
+            {
+                json.put("data", data.toString());
+            }
         }
         catch (JSONException je)
         {
@@ -67,6 +97,11 @@ public class Request
     public RequestType getType()
     {
         return reqType;
+    }
+    
+    public JSONObject getData()
+    {
+        return data;
     }
 
     private static RequestType formatRequestType(String requestStr)

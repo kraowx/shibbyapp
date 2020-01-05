@@ -16,6 +16,10 @@
             android:id="@+id/nav_series"
             android:icon="@drawable/ic_menu_series"
             android:title="@string/menu_series" />
+        <item
+            android:id="@+id/nav_patreonfiles"
+            android:icon="@drawable/ic_patreon_mark"
+            android:title="@string/menu_patreonfiles" />
     </group>
 
     <item android:title="Your Stuff">
@@ -25,9 +29,9 @@
                 android:icon="@drawable/ic_get_app"
                 android:title="@string/menu_downloads" />
             <item
-                android:id="@+id/nav_favorites"
-                android:icon="@drawable/ic_menu_star"
-                android:title="@string/menu_favorites" />
+                android:id="@+id/nav_userfiles"
+                android:icon="@drawable/ic_person"
+                android:title="@string/menu_userfiles" />
             <item
                 android:id="@+id/nav_playlists"
                 android:icon="@drawable/ic_menu_playlist"

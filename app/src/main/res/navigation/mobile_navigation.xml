@@ -24,16 +24,21 @@
         tools:layout="@layout/fragment_series" />
 
     <fragment
+        android:id="@+id/nav_patreonfiles"
+        android:name="io.github.kraowx.shibbyapp.ui.patreonfiles.PatreonFilesFragment"
+        tools:layout="@layout/fragment_patreonfiles" />
+
+    <fragment
         android:id="@+id/nav_downloads"
         android:name="io.github.kraowx.shibbyapp.ui.downloads.DownloadsFragment"
         android:label="@string/menu_downloads"
         tools:layout="@layout/fragment_downloads" />
 
     <fragment
-        android:id="@+id/nav_favorites"
-        android:name="io.github.kraowx.shibbyapp.ui.favorites.FavoritesFragment"
-        android:label="@string/menu_favorites"
-        tools:layout="@layout/fragment_favorites" />
+        android:id="@+id/nav_userfiles"
+        android:name="io.github.kraowx.shibbyapp.ui.userfiles.UserFilesFragment"
+        android:label="@string/menu_userfiles"
+        tools:layout="@layout/fragment_userfiles" />
 
     <fragment
         android:id="@+id/nav_playlists"

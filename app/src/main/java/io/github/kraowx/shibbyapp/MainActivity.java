@@ -46,8 +46,10 @@ import java.util.Calendar;
 import java.util.Date;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
+import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
+import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportAppDataDialog;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private AppBarConfiguration mAppBarConfiguration;
     private AudioController audioController;
     private AudioDownloadManager downloadManager;
+    private PatreonSessionManager patreonSessionManager;
     private SearchView searchView;
 
     public static Context getContext()
@@ -77,6 +80,11 @@ public class MainActivity extends AppCompatActivity
     public AudioDownloadManager getDownloadManager()
     {
         return downloadManager;
+    }
+    
+    public PatreonSessionManager getPatreonSessionManager()
+    {
+        return patreonSessionManager;
     }
 
     public SearchView getSearchView()
@@ -106,7 +114,22 @@ public class MainActivity extends AppCompatActivity
 
         audioController = new AudioController(this);
         downloadManager = new AudioDownloadManager(this);
-
+        patreonSessionManager = new PatreonSessionManager(this);
+        
+        final String patreonEmail = prefs.getString("patreonEmail", null);
+        final String patreonPassword = prefs.getString("patreonPassword", null);
+        if (patreonEmail != null && patreonPassword != null)
+        {
+            new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    patreonSessionManager.generateCookie(patreonEmail, patreonPassword);
+                }
+            }.start();
+        }
+        
         FloatingActionButton fab = findViewById(R.id.fabAudioController);
         fab.setOnClickListener(new View.OnClickListener()
         {
@@ -131,7 +154,8 @@ public class MainActivity extends AppCompatActivity
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_allfiles, R.id.nav_tags, R.id.nav_series,
-                R.id.nav_downloads, R.id.nav_favorites, R.id.nav_playlists)
+                R.id.nav_patreonfiles, R.id.nav_downloads,
+                R.id.nav_userfiles, R.id.nav_playlists)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(

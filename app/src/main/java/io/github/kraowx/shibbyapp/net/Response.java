@@ -56,6 +56,11 @@ public class Response
     {
         return respType;
     }
+    
+    public JSONArray getData()
+    {
+        return data;
+    }
 
     private static ResponseType formatResponseType(String responseStr)
     {

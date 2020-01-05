@@ -50,6 +50,35 @@ public class DataManager
         }
         return false;
     }
+    
+    public List<ShibbyFile> getPatreonFiles()
+    {
+        List<ShibbyFile> patreonFiles = new ArrayList<ShibbyFile>();
+        JSONArray filesjson = null;
+        try
+        {
+            filesjson = new JSONArray(prefs.getString("patreonFiles", "[]"));
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        if (filesjson != null)
+        {
+            for (int i = 0; i < filesjson.length(); i++)
+            {
+                try
+                {
+                    patreonFiles.add(ShibbyFile.fromJSON(filesjson.getJSONObject(i).toString()));
+                }
+                catch (JSONException je)
+                {
+                    je.printStackTrace();
+                }
+            }
+        }
+        return patreonFiles;
+    }
 
     public List<ShibbyFile> getUserFiles()
     {
@@ -320,9 +349,11 @@ public class DataManager
                         new BufferedReader(
                                 new InputStreamReader(socket.getInputStream()));
                 writer.println(request);
+                System.out.println(request);
                 String data;
                 while ((data = reader.readLine()) != null)
                 {
+                    System.out.println(Response.fromJSON(data));
                     if (handleResponse(Response.fromJSON(data)))
                     {
                         showToast("Data updated");
@@ -352,15 +383,22 @@ public class DataManager
             JSONArray dataArr = rawjson.getJSONArray("data");
             if (response.getType() == ResponseType.ALL)
             {
-                JSONArray files = dataArr.getJSONObject(0)
-                        .getJSONArray("files");
-                JSONArray tags = dataArr.getJSONObject(0)
-                        .getJSONArray("tags");
-                JSONArray series = dataArr.getJSONObject(0)
-                        .getJSONArray("series");
+                JSONObject data = dataArr.getJSONObject(0);
+                JSONArray files = data.getJSONArray("files");
+                JSONArray tags = data.getJSONArray("tags");
+                JSONArray series = data.getJSONArray("series");
+                JSONArray patreonFiles = null;
+                if (data.has("patreonFiles"))
+                {
+                    patreonFiles = data.getJSONArray("patreonFiles");
+                }
                 editor.putString("files", files.toString());
                 editor.putString("tags", tags.toString());
                 editor.putString("series", series.toString());
+                if (patreonFiles != null)
+                {
+                    editor.putString("patreonFiles", patreonFiles.toString());
+                }
                 modified = true;
             }
             else if (response.getType() == ResponseType.FILES)
@@ -376,6 +414,11 @@ public class DataManager
             else if (response.getType() == ResponseType.SERIES)
             {
                 editor.putString("series", dataArr.toString());
+                modified = true;
+            }
+            else if (response.getType() == ResponseType.PATREON_FILES)
+            {
+                editor.putString("patreonFiles", dataArr.toString());
                 modified = true;
             }
             if (modified)

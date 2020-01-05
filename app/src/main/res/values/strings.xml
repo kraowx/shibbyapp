@@ -11,7 +11,8 @@
     <string name="menu_allfiles">All Files</string>
     <string name="menu_tags">Tags</string>
     <string name="menu_series">Series</string>
+    <string name="menu_patreonfiles">Patreon Files</string>
     <string name="menu_downloads">Downloads</string>
-    <string name="menu_favorites">Favorites</string>
+    <string name="menu_userfiles">User Files</string>
     <string name="menu_playlists">Playlists</string>
 </resources>
