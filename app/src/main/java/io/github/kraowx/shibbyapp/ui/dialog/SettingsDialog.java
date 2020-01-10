@@ -34,6 +34,7 @@ public class SettingsDialog extends Dialog
 		final SharedPreferences.Editor editor = prefs.edit();
 		boolean updateStartup = prefs.getBoolean("updateStartup", true);
 		boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
+		boolean showPatreonPrefixTag = prefs.getBoolean("showPatreonPrefixTag", true);
 		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
 		int autoplay = prefs.getInt("autoplay", 1);
 		String server = prefs.getString("server", "shibbyserver.ddns.net:2012");
@@ -58,7 +59,21 @@ public class SettingsDialog extends Dialog
 				editor.putBoolean("displayLongNames", isChecked);
 				editor.commit();
 				Toast.makeText(mainActivity.getContext(),
-						"Relaunch the app for the change to take effect",
+						"Refresh the current page for the change to take effect",
+						Toast.LENGTH_LONG).show();
+			}
+		});
+		Switch switchShowPatreonPrefixTag = findViewById(R.id.switchShowPatreonPrefixTag);
+		switchShowPatreonPrefixTag.setChecked(showPatreonPrefixTag);
+		switchShowPatreonPrefixTag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+			{
+				editor.putBoolean("showPatreonPrefixTag", isChecked);
+				editor.commit();
+				Toast.makeText(mainActivity.getContext(),
+						"Refresh the current page for the change to take effect",
 						Toast.LENGTH_LONG).show();
 			}
 		});

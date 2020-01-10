@@ -1,16 +1,22 @@
 package io.github.kraowx.shibbyapp.audio;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 
 class AudioPlayer extends AsyncTask<String, Void, Boolean>
@@ -20,7 +26,8 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     private ProgressDialog progressDialog;
     private MainActivity mainActivity;
 
-    public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded, MainActivity mainActivity)
+    public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded,
+                       MainActivity mainActivity)
     {
         this.progressDialog = progressDialog;
         this.fileDownloaded = fileDownloaded;
@@ -106,13 +113,12 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     }
 
     @Override
-    protected Boolean doInBackground(String... strings)
+    protected Boolean doInBackground(final String... strings)
     {
         Boolean prepared = false;
 
         try
         {
-            //mediaPlayer.setDataSource(strings[0]);
             String cookie = mainActivity.getPatreonSessionManager().getCookie();
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Cookie", cookie);
@@ -125,14 +131,13 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
                     //mediaPlayer.stop();
                 }
             });
-
+            
             mediaPlayer.prepare();
             prepared = true;
-
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            showErrorOnUI(strings[0]);
             prepared = false;
         }
 
@@ -163,5 +168,74 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
             progressDialog.setMessage("Buffering...");
             progressDialog.show();
         }
+    }
+    
+    private void showErrorOnUI(final String link)
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                if (link.contains("patreon"))
+                {
+                    SharedPreferences prefs = PreferenceManager
+                            .getDefaultSharedPreferences(mainActivity);
+                    final String patreonEmail = prefs.getString(
+                            "patreonEmail", null);
+                    final String patreonPassword = prefs.getString(
+                            "patreonPassword", null);
+                    int code = mainActivity.getPatreonSessionManager()
+                            .verifyCredentials(patreonEmail, patreonPassword);
+                    if (code == 1)
+                    {
+                        showMessageDialog("Verification Failed",
+                                "Your Patreon account is either invalid or " +
+                                        "you do not have permission to access to this file.");
+                    }
+                    else if (code == 2)
+                    {
+                        showMessageDialog("Email Confirmation",
+                                "Before this file can be streamed you must " +
+                                        "first confirm this device/location by clicking " +
+                                        "the link in the email Patreon just sent you.");
+                    }
+                    else if (code == 3)
+                    {
+                        showMessageDialog("Too Many Requests",
+                                "Too many requests have been sent to Patreon. Access has " +
+                                        "been restricted for 10 minutes");
+                    }
+                }
+            }
+        }.start();
+    }
+    
+    private void showMessageDialog(final String title, final String message)
+    {
+        mainActivity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                SharedPreferences prefs = PreferenceManager
+                        .getDefaultSharedPreferences(mainActivity);
+                boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+                AlertDialog.Builder builder;
+                if (darkModeEnabled)
+                {
+                    builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+                }
+                else
+                {
+                    builder = new AlertDialog.Builder(mainActivity);
+                }
+                builder.setTitle(title)
+                        .setMessage(message)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+        });
     }
 }

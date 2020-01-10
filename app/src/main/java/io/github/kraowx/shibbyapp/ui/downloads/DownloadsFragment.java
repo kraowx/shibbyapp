@@ -28,6 +28,7 @@ import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 
 public class DownloadsFragment extends Fragment
         implements ShibbyFileAdapter.ItemClickListener,
@@ -120,7 +121,8 @@ public class DownloadsFragment extends Fragment
     @Override
     public void onItemClick(View view, int position)
     {
-        createFileInfoDialog(listAdapter.getItem(position));
+        FileInfoDialog fileInfoDialog = new FileInfoDialog(
+                (MainActivity)getActivity(), listAdapter.getItem(position));
     }
 
     private void initializeList(View root, final List<ShibbyFile> files)

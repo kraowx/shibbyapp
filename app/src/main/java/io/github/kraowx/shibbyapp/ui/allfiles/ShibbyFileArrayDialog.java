@@ -19,6 +19,7 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
+import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCallback;
 
 public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.ItemClickListener,
@@ -57,11 +58,13 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
     {
         if (playlistName != null)
         {
-            createFileInfoDialog(listAdapterPlaylists.getItem(position));
+            FileInfoDialog fileInfoDialog = new FileInfoDialog(
+                    mainActivity, listAdapterPlaylists.getItem(position));
         }
         else
         {
-            createFileInfoDialog(listAdapter.getItem(position));
+            FileInfoDialog fileInfoDialog = new FileInfoDialog(
+                    mainActivity, listAdapter.getItem(position));
         }
     }
 

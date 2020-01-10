@@ -82,7 +82,7 @@ public class ImportFileDialog extends Dialog
                         tagsList.add(tag.trim());
                     }
                     ShibbyFile file = new ShibbyFile(name,
-                            selectedFile.getAbsolutePath(), desc);
+                            selectedFile.getAbsolutePath(), desc, false);
                     file.setTags(tagsList);
                     DataManager dataManager = new DataManager(mainActivity);
                     if (dataManager.addUserFile(file))

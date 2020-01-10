@@ -43,16 +43,9 @@ public class PatreonSessionManager
 	
 	public String generateCookie(String email, String password)
 	{
-		HttpRequest req = HttpRequest.post("https://api.patreon.com/login");
-		req.header("Connection", "keep-alive");
-		req.header("Upgrade-Insecure-Requests", 1);
-		req.userAgent("Mozilla/5.0 (Linux; <Android Version>; <Build Tag etc.>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev>");
-//        req.userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36");
-		req.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-		req.header("Accept-Language", "en-US,en;q=0.9");
-		req.send("{\"data\":{\"email\":\"" + email + "\"," +
-				"\"password\":\"" + password + "\"}}");
+		HttpRequest req = getLoginRequest(email, password);
 		List<String> cookies = req.headers().get("Set-Cookie");
+		System.out.println(req.code());
 		sessionCookie = "";
 		for (int i = 0; i < cookies.size(); i++)
 		{
@@ -67,77 +60,56 @@ public class PatreonSessionManager
 	
 	/*
 	 * Connects to the server to check if the given credentials are valid.
-	 * Returns 1 if valid, 0 if invalid, or 2 if the server does
-	 * not support Patreon integration
+	 * Returns 1 if valid, 0 if invalid, 2 if the server does not support
+	 * Patreon integration, or 3 if too many requests are sent
 	 */
 	public int verifyCredentials(String email, String password)
 	{
-		try
+		HttpRequest req = getLoginRequest(email, password);
+		int code = req.code();
+		if (code == 400)
 		{
-			String[] server = prefs.getString("server",
-					"shibbyserver.ddns.net:2012").split(":");
-			String hostname = server[0];
-			int port = -1;
-			try
-			{
-				port = Integer.parseInt(server[1]);
-			}
-			catch (NumberFormatException nfe)
-			{
-				nfe.printStackTrace();
-			}
-			if (!hostname.isEmpty() && port != -1)
-			{
-				Socket socket = new Socket(hostname, port);
-				PrintWriter writer =
-						new PrintWriter(socket.getOutputStream(), true);
-				BufferedReader reader =
-						new BufferedReader(
-								new InputStreamReader(socket.getInputStream()));
-				JSONObject requestData = new JSONObject();
-				try
-				{
-					requestData.put("email", email);
-					requestData.put("password", password);
-				}
-				catch (JSONException je)
-				{
-					je.printStackTrace();
-				}
-				writer.println(new Request(
-						RequestType.VERIFY_PATREON_ACCOUNT, requestData));
-				String data;
-				while ((data = reader.readLine()) != null)
-				{
-					try
-					{
-						Response resp = Response.fromJSON(data);
-						switch (resp.getType())
-						{
-							case VERIFY_PATREON_ACCOUNT:
-								JSONObject json = resp.getData().getJSONObject(0);
-								return json.getBoolean("verified") ? 1 : 0;
-							case FEATURE_NOT_SUPPORTED:
-								return 2;
-						}
-					}
-					catch (JSONException je)
-					{
-						je.printStackTrace();
-					}
-				}
-			}
-			else
-			{
-				showToast("Server is invalid");
-			}
+			return 0;
 		}
-		catch (IOException ioe)
+		else if (code == 403)
 		{
-			ioe.printStackTrace();
-			showToast("Server connection error");
+			return 2;
+		}
+		else if (code == 429)
+		{
+			return 3;
+		}
+		else if (code == 200)
+		{
+			final int VERIFICATION_POST_ID = 28614620;
+			req = HttpRequest.post(
+					"https://api.patreon.com/posts/" + VERIFICATION_POST_ID);
+			req.header("Connection", "keep-alive");
+			req.header("Upgrade-Insecure-Requests", 1);
+			req.userAgent("Mozilla/5.0 (Linux; <Android Version>; <Build Tag etc.>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev>");
+//        req.userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36");
+			req.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+			req.header("Accept-Language", "en-US,en;q=0.9");
+			req.header("Cookie", sessionCookie);
+			req.send("{\"data\":{\"email\":\"" + email + "\"," +
+					"\"password\":\"" + password + "\"}}");
+			return 1;
 		}
 		return 0;
+	}
+	
+	private HttpRequest getLoginRequest(String email, String password)
+	{
+		HttpRequest req = HttpRequest.post("https://api.patreon.com/login");
+		req.header("Connection", "keep-alive");
+		req.header("Upgrade-Insecure-Requests", 1);
+		req.userAgent("Mozilla/5.0 (Linux; <Android Version>; <Build Tag etc.>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev>");
+//        req.userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36");
+		req.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+		req.header("Accept-Language", "en-US,en;q=0.9");
+		req.send("{\"data\":{\"email\":\"" + email + "\"," +
+				"\"password\":\"" + password + "\"}}");
+		return req;
 	}
 	
 	private void showToast(final String message)

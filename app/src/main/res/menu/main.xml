@@ -11,6 +11,9 @@
         android:id="@+id/action_import_appdata"
         android:title="Import App Data" />
     <item
+        android:id="@+id/action_patreon_login"
+        android:title="Login to Patreon" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"

@@ -15,23 +15,24 @@ import org.json.JSONObject;
 
 public class ShibbyFile
 {
+    private boolean isPatreonFile;
     private String name, shortName, id, link, description;
     private List<String> tags;
     private Map<String, String> extraData;
 
-    public ShibbyFile(String name, String link, String description)
+    public ShibbyFile(String name, String link, String description, boolean isPatreonFile)
     {
-        init(name, null, null, link, description, null);
+        init(name, null, null, link, description, isPatreonFile, null);
     }
 
     public ShibbyFile(String name, String shortName, String id, String link,
-                      String description, Map<String, String> extraData)
+                      String description, boolean isPatreonFile, Map<String, String> extraData)
     {
-        init(name, shortName, id, link, description, extraData);
+        init(name, shortName, id, link, description, isPatreonFile, extraData);
     }
 
     private void init(String name, String shortName, String id, String link,
-                      String description, Map<String, String> extraData)
+                      String description, boolean isPatreonFile, Map<String, String> extraData)
     {
         this.name = name;
         if (shortName != null)
@@ -49,13 +50,15 @@ public class ShibbyFile
         this.link = link;
         this.description = description;
         this.tags = getTagsFromName();
+        this.isPatreonFile = isPatreonFile;
         this.extraData = extraData != null ? extraData :
                 new HashMap<String, String>();
     }
 
     public static ShibbyFile fromJSON(String jsonStr)
     {
-        ShibbyFile file = new ShibbyFile(null, null, null);
+        ShibbyFile file = new ShibbyFile(null, null,
+                null, false);
         try
         {
             JSONObject json = new JSONObject(jsonStr);
@@ -76,9 +79,40 @@ public class ShibbyFile
             {
                 file.id = json.getString("id");
             }
-            file.tags = file.getTagsFromName();
-            file.link = json.getString("link");
+            if (json.has("tags"))
+            {
+                JSONArray tags = json.getJSONArray("tags");
+                file.tags = new ArrayList<String>();
+                for (int i = 0; i < tags.length(); i++)
+                {
+                    file.tags.add(tags.getString(i));
+                }
+            }
+            else
+            {
+                file.tags = file.getTagsFromName();
+            }
+            if (json.has("link"))
+            {
+                file.link = json.getString("link");
+            }
+            else if (json.has("links"))
+            {
+                file.link = json.getString("links")
+                        .replace("[\"", "")
+                        .replace("\"]", "")
+                        .replace("\\/\\/", "//")
+                        .replace("\\/", "/");
+            }
             file.description = json.getString("description");
+            if (!json.has("isPatreonFile"))
+            {
+                file.isPatreonFile = false;
+            }
+            else
+            {
+                file.isPatreonFile = json.getBoolean("isPatreonFile");
+            }
             file.extraData = new HashMap<String, String>();
             JSONObject extras = json.getJSONObject("extras");
             Iterator<String> it = extras.keys();
@@ -115,6 +149,7 @@ public class ShibbyFile
             json.put("tags", tagsJson);
             json.put("link", link);
             json.put("description", description);
+            json.put("isPatreonFile", isPatreonFile);
             JSONObject extras = new JSONObject();
             for (String key : extraData.keySet())
             {
@@ -203,6 +238,16 @@ public class ShibbyFile
             }
         }
         return false;
+    }
+    
+    public boolean isPatreonFile()
+    {
+        return isPatreonFile;
+    }
+    
+    public void setIsPatreonFile(boolean isPatreonFile)
+    {
+        this.isPatreonFile = isPatreonFile;
     }
 
     public Map<String, String> getExtras()

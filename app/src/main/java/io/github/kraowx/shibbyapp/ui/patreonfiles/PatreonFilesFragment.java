@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
 
 public class PatreonFilesFragment extends Fragment
@@ -143,7 +146,8 @@ public class PatreonFilesFragment extends Fragment
 	@Override
 	public void onItemClick(View view, int position)
 	{
-		createFileInfoDialog(listAdapter.getItem(position));
+		FileInfoDialog fileInfoDialog = new FileInfoDialog(
+				(MainActivity)getActivity(), listAdapter.getItem(position));
 	}
 	
 	@Override
@@ -155,6 +159,8 @@ public class PatreonFilesFragment extends Fragment
 		editor.putString("patreonEmail", email);
 		editor.putString("patreonPassword", password);
 		editor.commit();
+		Toast.makeText((MainActivity)getActivity(),
+				"Login successful", Toast.LENGTH_LONG).show();
 		updateList();
 	}
 	
@@ -188,38 +194,5 @@ public class PatreonFilesFragment extends Fragment
 				listAdapter.notifyDataSetChanged();
 			}
 		});
-	}
-	
-	private void createFileInfoDialog(ShibbyFile file)
-	{
-		final Dialog dialog = new Dialog(getContext());
-		dialog.setContentView(R.layout.file_info_dialog);
-		dialog.setTitle("File Info");
-		TextView title = dialog.findViewById(R.id.txtTitle);
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences((MainActivity)getActivity());
-		boolean displayLongNames = prefs.getBoolean(
-				"displayLongNames", false);
-		title.setText(displayLongNames ?
-				file.getName() : file.getShortName());
-		TextView tags = dialog.findViewById(R.id.txtTags);
-		tags.setText(getTagsString(file.getTags()));
-		TextView description = dialog.findViewById(R.id.txtDescription);
-		description.setText(file.getDescription());
-		dialog.show();
-	}
-	
-	private String getTagsString(List<String> tags)
-	{
-		String tagsStr = "";
-		for (int i = 0; i < tags.size(); i++)
-		{
-			tagsStr += tags.get(i);
-			if (i < tags.size()-1)
-			{
-				tagsStr += "  |  ";
-			}
-		}
-		return tagsStr + "\n";
 	}
 }

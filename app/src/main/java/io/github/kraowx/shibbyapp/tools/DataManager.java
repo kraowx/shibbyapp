@@ -38,6 +38,11 @@ public class DataManager
         this.mainActivity = mainActivity;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
     }
+    
+    private enum ResponseCode
+    {
+        SUCCESS, FAILED, ERROR
+    }
 
     @Deprecated
     public boolean needsUpdate()
@@ -57,7 +62,8 @@ public class DataManager
         JSONArray filesjson = null;
         try
         {
-            filesjson = new JSONArray(prefs.getString("patreonFiles", "[]"));
+            filesjson = new JSONArray(prefs.getString(
+                    "patreonFiles", "[]"));
         }
         catch (JSONException je)
         {
@@ -69,7 +75,8 @@ public class DataManager
             {
                 try
                 {
-                    patreonFiles.add(ShibbyFile.fromJSON(filesjson.getJSONObject(i).toString()));
+                    patreonFiles.add(ShibbyFile.fromJSON(
+                            filesjson.getJSONObject(i).toString()));
                 }
                 catch (JSONException je)
                 {
@@ -150,7 +157,8 @@ public class DataManager
             {
                 try
                 {
-                    files.add(ShibbyFile.fromJSON(filesjson.getJSONObject(i).toString()));
+                    files.add(ShibbyFile.fromJSON(
+                            filesjson.getJSONObject(i).toString()));
                 }
                 catch (JSONException je)
                 {
@@ -160,6 +168,11 @@ public class DataManager
         }
         List<ShibbyFile> userFiles = getUserFiles();
         for (ShibbyFile file : userFiles)
+        {
+            files.add(file);
+        }
+        List<ShibbyFile> patreonFiles = getPatreonFiles();
+        for (ShibbyFile file : patreonFiles)
         {
             files.add(file);
         }
@@ -349,15 +362,16 @@ public class DataManager
                         new BufferedReader(
                                 new InputStreamReader(socket.getInputStream()));
                 writer.println(request);
-                System.out.println(request);
                 String data;
                 while ((data = reader.readLine()) != null)
                 {
-                    System.out.println(Response.fromJSON(data));
-                    if (handleResponse(Response.fromJSON(data)))
+                    switch (handleResponse(Response.fromJSON(data)))
                     {
-                        showToast("Data updated");
-                        break;
+                        case SUCCESS:
+                            showToast("Data updated");
+                            return;
+                        case ERROR:
+                            return;
                     }
                 }
             }
@@ -373,14 +387,18 @@ public class DataManager
         }
     }
 
-    private boolean handleResponse(Response response)
+    private ResponseCode handleResponse(Response response)
     {
-        boolean modified = false;
+        ResponseCode code = ResponseCode.FAILED;
         try
         {
             SharedPreferences.Editor editor = prefs.edit();
             JSONObject rawjson = response.toJSON();
-            JSONArray dataArr = rawjson.getJSONArray("data");
+            JSONArray dataArr = new JSONArray();
+            if (rawjson.has("data"))
+            {
+                dataArr = rawjson.getJSONArray("data");
+            }
             if (response.getType() == ResponseType.ALL)
             {
                 JSONObject data = dataArr.getJSONObject(0);
@@ -399,29 +417,51 @@ public class DataManager
                 {
                     editor.putString("patreonFiles", patreonFiles.toString());
                 }
-                modified = true;
+                code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.FILES)
             {
                 editor.putString("files", dataArr.toString());
-                modified = true;
+                code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.TAGS)
             {
                 editor.putString("tags", dataArr.toString());
-                modified = true;
+                code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.SERIES)
             {
                 editor.putString("series", dataArr.toString());
-                modified = true;
+                code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.PATREON_FILES)
             {
-                editor.putString("patreonFiles", dataArr.toString());
-                modified = true;
+                editor.putString("patreonFiles", dataArr.getJSONObject(0)
+                        .getJSONArray("patreonFiles").toString());
+                code = ResponseCode.SUCCESS;
             }
-            if (modified)
+            else if (response.getType() == ResponseType.FEATURE_NOT_SUPPORTED)
+            {
+                showToast("Error: Current server does not support " +
+                        "Patreon data (or it is disabled)");
+                code = ResponseCode.ERROR;
+            }
+            else if (response.getType() == ResponseType.TOO_MANY_REQUESTS)
+            {
+                showToast("Error: Too many Patreon server requests");
+                code = ResponseCode.ERROR;
+            }
+            else if (response.getType() == ResponseType.VERIFY_PATREON_ACCOUNT)
+            {
+                showToast("Error: Email verification is required");
+                code = ResponseCode.ERROR;
+            }
+            else if (response.getType() == ResponseType.BAD_ACCOUNT)
+            {
+                showToast("Error: Patreon account is invalid");
+                code = ResponseCode.ERROR;
+            }
+            if (code == ResponseCode.SUCCESS)
             {
                 long time = Calendar.getInstance().getTime().getTime();
                 editor.putLong("lastUpdate", time);
@@ -432,7 +472,7 @@ public class DataManager
         {
             je.printStackTrace();
         }
-        return modified;
+        return code;
     }
 
     private boolean listHasFile(List<ShibbyFile> list, ShibbyFile file)

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +60,17 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         ShibbyFile file = mData.get(position);
         boolean displayLongNames = prefs.getBoolean(
                 "displayLongNames", false);
-        holder.txtFileName.setText(displayLongNames ?
-                file.getName() : file.getShortName());
+        boolean showPatreonPrefixTag = prefs.getBoolean(
+                "showPatreonPrefixTag", true);
+        String name = "";
+        if (file.isPatreonFile() && showPatreonPrefixTag)
+        {
+            int color = mainActivity.getResources().getColor(R.color.redAccent);
+            String hex = String.format("#%06X", (0xFFFFFF & color));
+            name += " <font color=" + hex + ">[Patreon] </font>";
+        }
+        name += displayLongNames ? file.getName() : file.getShortName();
+        holder.txtFileName.setText(Html.fromHtml(name));
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
             holder.btnDownload.setColorFilter(ContextCompat

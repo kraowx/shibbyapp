@@ -54,6 +54,7 @@ import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportAppDataDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.SettingsDialog;
 
 public class MainActivity extends AppCompatActivity
@@ -222,6 +223,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_import_appdata:
                 showImportAppDataDialog();
                 return true;
+            case R.id.action_patreon_login:
+                showPatreonLoginDialog();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -276,6 +279,26 @@ public class MainActivity extends AppCompatActivity
     private void showImportAppDataDialog()
     {
         ImportAppDataDialog importAppDataDialog = new ImportAppDataDialog(this);
+    }
+    
+    private void showPatreonLoginDialog()
+    {
+        PatreonLoginDialog patreonLoginDialog = new PatreonLoginDialog(this);
+        patreonLoginDialog.setLoginListener(new PatreonLoginDialog.LoginListener()
+        {
+            @Override
+            public void onLoginVerified(String email, String password)
+            {
+                SharedPreferences prefs = PreferenceManager
+                        .getDefaultSharedPreferences(MainActivity.this);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("patreonEmail", email);
+                editor.putString("patreonPassword", password);
+                editor.commit();
+                Toast.makeText(MainActivity.this,
+                        "Login successful", Toast.LENGTH_LONG).show();
+            }
+        });
     }
     
     private void exportAllData()
