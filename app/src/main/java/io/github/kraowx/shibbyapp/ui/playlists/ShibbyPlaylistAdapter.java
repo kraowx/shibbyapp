@@ -198,8 +198,19 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         private void showDeleteDialog()
         {
             final String playlistName = getItem(getAdapterPosition());
-            new AlertDialog.Builder(context)
-                    .setTitle("Delete playlist")
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(mainActivity);
+            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+            AlertDialog.Builder builder;
+            if (darkModeEnabled)
+            {
+                builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+            }
+            else
+            {
+                builder = new AlertDialog.Builder(mainActivity);
+            }
+            builder.setTitle("Delete playlist")
                     .setMessage("Are you sure you want to delete " +
                             "the playlist \"" + playlistName + "\"?")
                     .setPositiveButton(android.R.string.yes,

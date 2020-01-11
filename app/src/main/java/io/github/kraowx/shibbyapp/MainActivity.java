@@ -362,7 +362,6 @@ public class MainActivity extends AppCompatActivity
 
     private Version getVersion()
     {
-        //System.out.println(new Version(getVersionName(), IS_PRE_RELEASE).getName());
         return new Version(getVersionName(), IS_PRE_RELEASE);
     }
 

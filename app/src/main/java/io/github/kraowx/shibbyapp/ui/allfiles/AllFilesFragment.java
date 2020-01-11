@@ -1,6 +1,5 @@
 package io.github.kraowx.shibbyapp.ui.allfiles;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -218,37 +216,4 @@ public class AllFilesFragment extends Fragment
             }
         });
     }
-
-//    private void createFileInfoDialog(ShibbyFile file)
-//    {
-//        final Dialog dialog = new Dialog(getContext());
-//        dialog.setContentView(R.layout.file_info_dialog);
-//        dialog.setTitle("File Info");
-//        TextView title = dialog.findViewById(R.id.txtTitle);
-//        SharedPreferences prefs = PreferenceManager
-//                .getDefaultSharedPreferences((MainActivity)getActivity());
-//        boolean displayLongNames = prefs.getBoolean(
-//                "displayLongNames", false);
-//        title.setText(displayLongNames ?
-//                file.getName() : file.getShortName());
-//        TextView tags = dialog.findViewById(R.id.txtTags);
-//        tags.setText(getTagsString(file.getTags()));
-//        TextView description = dialog.findViewById(R.id.txtDescription);
-//        description.setText(file.getDescription());
-//        dialog.show();
-//    }
-//
-//    private String getTagsString(List<String> tags)
-//    {
-//        String tagsStr = "";
-//        for (int i = 0; i < tags.size(); i++)
-//        {
-//            tagsStr += tags.get(i);
-//            if (i < tags.size()-1)
-//            {
-//                tagsStr += "  |  ";
-//            }
-//        }
-//        return tagsStr + "\n";
-//    }
 }
