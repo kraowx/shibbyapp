@@ -24,10 +24,12 @@ import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.ViewHolder>
 {
+    private String searchText;
     private List<ShibbyFile> mData, mDataOrig;
     private MainActivity mainActivity;
     private LayoutInflater mInflater;
@@ -35,7 +37,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     private Context context;
     private SharedPreferences prefs;
 
-    ShibbyFileAdapter(Context context, List<ShibbyFile> data,
+    public ShibbyFileAdapter(Context context, List<ShibbyFile> data,
                       MainActivity mainActivity)
     {
         this.context = context;
@@ -44,6 +46,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         mDataOrig = (List<ShibbyFile>)((ArrayList<ShibbyFile>)mData).clone();
         this.mainActivity = mainActivity;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        searchText = "";
     }
 
     @Override
@@ -59,23 +62,39 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         ShibbyFile file = mData.get(position);
         boolean displayLongNames = prefs.getBoolean(
                 "displayLongNames", false);
-        boolean showPatreonPrefixTag = prefs.getBoolean(
-                "showPatreonPrefixTag", true);
+        boolean showSpecialPrefixTags = prefs.getBoolean(
+                "showSpecialPrefixTags", true);
         String name = "";
-        if (file.isPatreonFile() && showPatreonPrefixTag)
+        if ((file.getType().equals("patreon") ||
+                file.isPatreonFile()) && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
-            name += " <font color=" + hex + ">[Patreon] </font>";
+            name += " <font color=" + hex + ">[Patreon]</font> ";
+        }
+        else if (file.getType().equals("user") && showSpecialPrefixTags)
+        {
+            int color = mainActivity.getResources().getColor(R.color.colorAccent);
+            String hex = String.format("#%06X", (0xFFFFFF & color));
+            name += " <font color=" + hex + ">[User]</font> ";
         }
         name += displayLongNames ? file.getName() : file.getShortName();
+        if (!searchText.isEmpty() &&
+                name.toLowerCase().contains(searchText.toLowerCase()))
+        {
+            int index = name.toLowerCase().indexOf(searchText.toLowerCase());
+            String sub = name.substring(index, index + searchText.length());
+            name = name.replace(sub, "<font color=red>" + sub + "</font>");
+        }
         holder.txtFileName.setText(Html.fromHtml(name));
+        
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.redAccent));
         }
-        else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file))
+        else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
+            file.getType().equals("user"))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.colorAccent));
@@ -104,6 +123,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
 
     public void filterDisplayItems(String text)
     {
+        searchText = text;
         mData.clear();
         if (text.isEmpty())
         {
@@ -165,7 +185,8 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                 public void onClick(View view)
                 {
                     final ShibbyFile file = getItem(getAdapterPosition());
-                    if (!AudioDownloadManager.fileIsDownloaded(mainActivity, file))
+                    if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
+                            file.getType().equals("user")))
                     {
                         mainActivity.getDownloadManager().downloadFile(file, btnDownload);
                         btnDownload.setColorFilter(ContextCompat
@@ -207,8 +228,20 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                         {
                             builder = new AlertDialog.Builder(mainActivity);
                         }
-                        builder.setTitle("Delete download")
-                                .setMessage("Are you sure you want to delete this file?")
+                        String title = "Delete ";
+                        String message = "Are you sure you want to delete this file?";
+                        if (file.getType().equals("user"))
+                        {
+                            title += "user file";
+                            message += " You will have to re-import it if " +
+                                    "you want to listen to it again.";
+                        }
+                        else
+                        {
+                            title += "download";
+                        }
+                        builder.setTitle(title)
+                                .setMessage(message)
                                 .setPositiveButton(android.R.string.yes,
                                         new DialogInterface.OnClickListener()
                                 {
@@ -225,6 +258,12 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                                         else
                                         {
                                             btnDownload.setColorFilter(null);
+                                        }
+                                        if (file.getType().equals("user"))
+                                        {
+                                            new DataManager(mainActivity).removeUserFile(file);
+                                            mData.remove(file);
+                                            notifyDataSetChanged();
                                         }
                                     }
                                 })
@@ -257,27 +296,27 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         }
     }
 
-    ShibbyFile getItem(int id)
+    public ShibbyFile getItem(int id)
     {
         return mData.get(id);
     }
 
-    void addItem(ShibbyFile item)
+    public void addItem(ShibbyFile item)
     {
         mData.add(item);
     }
 
-    void removeItem(ShibbyFile item)
+    public void removeItem(ShibbyFile item)
     {
         mData.remove(item);
     }
 
-    void setData(List<ShibbyFile> files)
+    public void setData(List<ShibbyFile> files)
     {
         mData = files;
     }
 
-    void setClickListener(ItemClickListener itemClickListener)
+    public void setClickListener(ItemClickListener itemClickListener)
     {
         this.mClickListener = itemClickListener;
     }

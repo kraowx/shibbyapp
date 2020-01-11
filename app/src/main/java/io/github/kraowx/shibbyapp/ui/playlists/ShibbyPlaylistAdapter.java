@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,8 @@ import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.ItemTouchHelperAdapter;
 public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAdapter.ViewHolder>
     implements ItemTouchHelperAdapter
 {
+    private String searchText;
     private boolean showDeleteButton;
-
     private List<String> mData, mDataOrig;
     private MainActivity mainActivity;
     private LayoutInflater mInflater;
@@ -52,6 +53,7 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         this.itemTouchHelper = itemTouchHelper;
         this.showDeleteButton = showDeleteButton;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        searchText = "";
     }
     
     @Override
@@ -84,7 +86,14 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
     public void onBindViewHolder(final ViewHolder holder, int position)
     {
         String playlist = mData.get(position);
-        holder.txtPlaylistName.setText(playlist);
+        if (!searchText.isEmpty() &&
+                playlist.toLowerCase().contains(searchText.toLowerCase()))
+        {
+            int index = playlist.toLowerCase().indexOf(searchText.toLowerCase());
+            String sub = playlist.substring(index, index + searchText.length());
+            playlist = playlist.replace(sub, "<font color=red>" + sub + "</font>");
+        }
+        holder.txtPlaylistName.setText(Html.fromHtml(playlist));
         int fileCount = PlaylistManager.getPlaylistFileCount(mainActivity, playlist);
         if (playlist.equals("Create New Playlist"))
         {
@@ -117,6 +126,7 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
 
     public void filterDisplayItems(String text)
     {
+        searchText = text;
         mData.clear();
         if(text.isEmpty())
         {

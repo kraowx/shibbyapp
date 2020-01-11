@@ -73,7 +73,7 @@ public class ImportFileDialog extends Dialog
                 String name = txtName.getText().toString();
                 String desc = txtDescription.getText().toString();
                 String tags = txtTags.getText().toString();
-                if (name != "")
+                if (selectedFile != null)
                 {
                     List<String> tagsList = new ArrayList<String>();
                     String[] tagsArr = tags.split(",");
@@ -82,7 +82,7 @@ public class ImportFileDialog extends Dialog
                         tagsList.add(tag.trim());
                     }
                     ShibbyFile file = new ShibbyFile(name,
-                            selectedFile.getAbsolutePath(), desc, false);
+                            selectedFile.getAbsolutePath(), desc, "user");
                     file.setTags(tagsList);
                     DataManager dataManager = new DataManager(mainActivity);
                     if (dataManager.addUserFile(file))

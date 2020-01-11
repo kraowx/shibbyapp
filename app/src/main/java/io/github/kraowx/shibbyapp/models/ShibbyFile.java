@@ -16,23 +16,31 @@ import org.json.JSONObject;
 public class ShibbyFile
 {
     private boolean isPatreonFile;
-    private String name, shortName, id, link, description;
+    private String name, shortName, id,
+            link, description, type;
     private List<String> tags;
     private Map<String, String> extraData;
 
-    public ShibbyFile(String name, String link, String description, boolean isPatreonFile)
+    public ShibbyFile(String name, String link,
+                      String description, String type)
     {
-        init(name, null, null, link, description, isPatreonFile, null);
+        init(name, null, null, link,
+                description, type, null);
     }
 
-    public ShibbyFile(String name, String shortName, String id, String link,
-                      String description, boolean isPatreonFile, Map<String, String> extraData)
+    public ShibbyFile(String name, String shortName,
+                      String id, String link,
+                      String description, String type,
+                      Map<String, String> extraData)
     {
-        init(name, shortName, id, link, description, isPatreonFile, extraData);
+        init(name, shortName, id, link,
+                description, type, extraData);
     }
 
-    private void init(String name, String shortName, String id, String link,
-                      String description, boolean isPatreonFile, Map<String, String> extraData)
+    private void init(String name, String shortName,
+                      String id, String link,
+                      String description, String type,
+                      Map<String, String> extraData)
     {
         this.name = name;
         if (shortName != null)
@@ -50,7 +58,7 @@ public class ShibbyFile
         this.link = link;
         this.description = description;
         this.tags = getTagsFromName();
-        this.isPatreonFile = isPatreonFile;
+        this.type = type;
         this.extraData = extraData != null ? extraData :
                 new HashMap<String, String>();
     }
@@ -58,7 +66,7 @@ public class ShibbyFile
     public static ShibbyFile fromJSON(String jsonStr)
     {
         ShibbyFile file = new ShibbyFile(null, null,
-                null, false);
+                null, null);
         try
         {
             JSONObject json = new JSONObject(jsonStr);
@@ -105,6 +113,14 @@ public class ShibbyFile
                         .replace("\\/", "/");
             }
             file.description = json.getString("description");
+            if (!json.has("type"))
+            {
+                file.type = "";
+            }
+            else
+            {
+                file.type = json.getString("type");
+            }
             if (!json.has("isPatreonFile"))
             {
                 file.isPatreonFile = false;
@@ -149,6 +165,7 @@ public class ShibbyFile
             json.put("tags", tagsJson);
             json.put("link", link);
             json.put("description", description);
+            json.put("type", type);
             json.put("isPatreonFile", isPatreonFile);
             JSONObject extras = new JSONObject();
             for (String key : extraData.keySet())
@@ -238,6 +255,16 @@ public class ShibbyFile
             }
         }
         return false;
+    }
+    
+    public String getType()
+    {
+        return type;
+    }
+    
+    public void setType(String type)
+    {
+        this.type = type;
     }
     
     public boolean isPatreonFile()

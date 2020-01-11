@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.ItemTouchHelperAdapter;
 
@@ -33,7 +35,6 @@ public class ShibbyPlaylistFileAdapter
         implements ItemTouchHelperAdapter
 {
     private String playlistName;
-
     private List<ShibbyFile> mData;
     private MainActivity mainActivity;
     private LayoutInflater mInflater;
@@ -78,14 +79,31 @@ public class ShibbyPlaylistFileAdapter
         ShibbyFile file = mData.get(position);
         boolean displayLongNames = prefs.getBoolean(
                 "displayLongNames", false);
-        holder.txtFileName.setText(displayLongNames ?
-                file.getName() : file.getShortName());
+        boolean showSpecialPrefixTags = prefs.getBoolean(
+                "showSpecialPrefixTags", true);
+        String name = "";
+        if ((file.getType().equals("patreon") ||
+                file.isPatreonFile()) && showSpecialPrefixTags)
+        {
+            int color = mainActivity.getResources().getColor(R.color.redAccent);
+            String hex = String.format("#%06X", (0xFFFFFF & color));
+            name += " <font color=" + hex + ">[Patreon]</font> ";
+        }
+        else if (file.getType().equals("user") && showSpecialPrefixTags)
+        {
+            int color = mainActivity.getResources().getColor(R.color.colorAccent);
+            String hex = String.format("#%06X", (0xFFFFFF & color));
+            name += " <font color=" + hex + ">[User]</font> ";
+        }
+        name += displayLongNames ? file.getName() : file.getShortName();
+        holder.txtFileName.setText(Html.fromHtml(name));
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.redAccent));
         }
-        else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file))
+        else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
+                file.getType().equals("user"))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.colorAccent));
@@ -172,7 +190,8 @@ public class ShibbyPlaylistFileAdapter
                 public void onClick(View view)
                 {
                     final ShibbyFile file = getItem(getAdapterPosition());
-                    if (!AudioDownloadManager.fileIsDownloaded(mainActivity, file))
+                    if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
+                            file.getType().equals("user")))
                     {
                         mainActivity.getDownloadManager().downloadFile(file, btnDownload);
                         btnDownload.setColorFilter(ContextCompat
@@ -214,27 +233,47 @@ public class ShibbyPlaylistFileAdapter
                         {
                             builder = new AlertDialog.Builder(mainActivity);
                         }
-                        builder.setTitle("Delete download")
-                                .setMessage("Are you sure you want to delete this file?")
+                        String title = "Delete ";
+                        String message = "Are you sure you want to delete this file?";
+                        if (file.getType().equals("user"))
+                        {
+                            title += "user file";
+                            message += " You will have to re-import it if " +
+                                    "you want to listen to it again.";
+                        }
+                        else
+                        {
+                            title += "download";
+                        }
+                        builder.setTitle(title)
+                                .setMessage(message)
                                 .setPositiveButton(android.R.string.yes,
                                         new DialogInterface.OnClickListener()
-                                {
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        AudioDownloadManager.deleteFile(mainActivity, file);
-                                        boolean darkModeEnabled = prefs
-                                                .getBoolean("darkMode", false);
-                                        if (darkModeEnabled)
                                         {
-                                            btnDownload.setColorFilter(ContextCompat
-                                                    .getColor(mainActivity, R.color.grayLight));
-                                        }
-                                        else
-                                        {
-                                            btnDownload.setColorFilter(null);
-                                        }
-                                    }
-                                })
+                                            public void onClick(DialogInterface dialog, int which)
+                                            {
+                                                AudioDownloadManager.deleteFile(mainActivity, file);
+                                                boolean darkModeEnabled = prefs
+                                                        .getBoolean("darkMode", false);
+                                                if (darkModeEnabled)
+                                                {
+                                                    btnDownload.setColorFilter(ContextCompat
+                                                            .getColor(mainActivity, R.color.grayLight));
+                                                }
+                                                else
+                                                {
+                                                    btnDownload.setColorFilter(null);
+                                                }
+                                                if (file.getType().equals("user"))
+                                                {
+                                                    new DataManager(mainActivity).removeUserFile(file);
+                                                    PlaylistManager.removeFileFromPlaylist(
+                                                            mainActivity, file, playlistName);
+                                                    mData.remove(file);
+                                                    notifyDataSetChanged();
+                                                }
+                                            }
+                                        })
                                 .setNegativeButton(android.R.string.no, null)
                                 .setIcon(R.drawable.ic_warning)
                                 .show();
