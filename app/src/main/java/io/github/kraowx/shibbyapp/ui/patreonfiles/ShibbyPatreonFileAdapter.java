@@ -198,8 +198,17 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
                     }
                     else
                     {
-                        new AlertDialog.Builder(context)
-                                .setTitle("Delete download")
+                        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+                        AlertDialog.Builder builder;
+                        if (darkModeEnabled)
+                        {
+                            builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+                        }
+                        else
+                        {
+                            builder = new AlertDialog.Builder(mainActivity);
+                        }
+                        builder.setTitle("Delete download")
                                 .setMessage("Are you sure you want to delete this file?")
                                 .setPositiveButton(android.R.string.yes,
                                         new DialogInterface.OnClickListener()

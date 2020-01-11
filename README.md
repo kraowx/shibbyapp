@@ -23,12 +23,17 @@ This app uses the "Storage" (WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE) p
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
-- **Support for Patreon-only released files**
-    - Note that a valid Patreon account will be required with an active pledge to Shibby. This will *not* be a method to obtain these files for free
 - File metadata that gives more information about a file other than its name and description
 - Import/export audio files buttons
 
 Feel free to suggest anything else you feel might improve the app!
+
+## Patreon Files
+ShibbyApp allows you to access Patreon files from directly in the app. You can download these files for quick loading times or stream them directly from the server just like regular files.
+
+Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A Patreon account with a valid pledge to Shibby is **required** in order to access the files. *This is not a method to obtain these files for free.*
+
+This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.
 
 ## Importing Files
 You can import your own downloaded shibbyfiles or custom made files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.

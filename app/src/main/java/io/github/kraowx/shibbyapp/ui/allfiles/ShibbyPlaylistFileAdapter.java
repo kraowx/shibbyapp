@@ -204,8 +204,17 @@ public class ShibbyPlaylistFileAdapter
                     }
                     else
                     {
-                        new AlertDialog.Builder(context)
-                                .setTitle("Delete download")
+                        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+                        AlertDialog.Builder builder;
+                        if (darkModeEnabled)
+                        {
+                            builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+                        }
+                        else
+                        {
+                            builder = new AlertDialog.Builder(mainActivity);
+                        }
+                        builder.setTitle("Delete download")
                                 .setMessage("Are you sure you want to delete this file?")
                                 .setPositiveButton(android.R.string.yes,
                                         new DialogInterface.OnClickListener()
@@ -255,8 +264,19 @@ public class ShibbyPlaylistFileAdapter
 
         private void showRemoveFileFromPlaylistDialog()
         {
-            new AlertDialog.Builder(context)
-                    .setTitle("Remove file")
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(mainActivity);
+            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+            AlertDialog.Builder builder;
+            if (darkModeEnabled)
+            {
+                builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+            }
+            else
+            {
+                builder = new AlertDialog.Builder(mainActivity);
+            }
+            builder.setTitle("Remove file")
                     .setMessage("Are you sure you want to remove " +
                             "this file from the playlist?")
                     .setPositiveButton(android.R.string.yes,
