@@ -1,6 +1,8 @@
 package io.github.kraowx.shibbyapp.ui.tags;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Timer;
@@ -96,7 +101,7 @@ public class TagsFragment extends Fragment
             public void run()
             {
                 new DataManager((MainActivity)getActivity())
-                        .requestData(Request.tags());
+                        .requestData(getTagsRequest());
                 updateList();
                 refreshLayout.post(new Runnable()
                 {
@@ -171,5 +176,26 @@ public class TagsFragment extends Fragment
                 listAdapter.notifyDataSetChanged();
             }
         });
+    }
+    
+    private Request getTagsRequest()
+    {
+        if (((MainActivity)getActivity()).getPatreonSessionManager().isAuthenticated())
+        {
+            try
+            {
+                SharedPreferences prefs = PreferenceManager
+                        .getDefaultSharedPreferences((MainActivity)getActivity());
+                JSONObject data = new JSONObject();
+                data.put("email", prefs.getString("patreonEmail", null));
+                data.put("password", prefs.getString("patreonPassword", null));
+                return new Request(RequestType.TAGS, data);
+            }
+            catch (JSONException je)
+            {
+                je.printStackTrace();
+            }
+        }
+        return Request.tags();
     }
 }

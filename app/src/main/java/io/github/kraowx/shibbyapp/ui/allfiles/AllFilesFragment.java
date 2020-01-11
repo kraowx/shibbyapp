@@ -17,6 +17,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,6 +28,7 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
+import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 
@@ -116,7 +120,7 @@ public class AllFilesFragment extends Fragment
                     }
                     else
                     {
-                        dataManager.requestData(Request.all());
+                        dataManager.requestData(getAllRequest());
                     }
                 }
             }, 0, 5000);
@@ -227,5 +231,26 @@ public class AllFilesFragment extends Fragment
                 listAdapter.notifyDataSetChanged();
             }
         });
+    }
+    
+    private Request getAllRequest()
+    {
+        if (((MainActivity)getActivity()).getPatreonSessionManager().isAuthenticated())
+        {
+            try
+            {
+                SharedPreferences prefs = PreferenceManager
+                        .getDefaultSharedPreferences((MainActivity)getActivity());
+                JSONObject data = new JSONObject();
+                data.put("email", prefs.getString("patreonEmail", null));
+                data.put("password", prefs.getString("patreonPassword", null));
+                return new Request(RequestType.ALL, data);
+            }
+            catch (JSONException je)
+            {
+                je.printStackTrace();
+            }
+        }
+        return Request.all();
     }
 }
