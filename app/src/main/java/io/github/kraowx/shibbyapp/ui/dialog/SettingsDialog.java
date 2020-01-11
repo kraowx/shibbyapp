@@ -34,7 +34,7 @@ public class SettingsDialog extends Dialog
 		final SharedPreferences.Editor editor = prefs.edit();
 		boolean updateStartup = prefs.getBoolean("updateStartup", true);
 		boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
-		boolean showPatreonPrefixTag = prefs.getBoolean("showPatreonPrefixTag", true);
+		boolean showSpecialPrefixTags = prefs.getBoolean("showSpecialPrefixTags", true);
 		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
 		int autoplay = prefs.getInt("autoplay", 1);
 		String server = prefs.getString("server", "shibbyserver.ddns.net:2012");
@@ -63,14 +63,15 @@ public class SettingsDialog extends Dialog
 						Toast.LENGTH_LONG).show();
 			}
 		});
-		Switch switchShowPatreonPrefixTag = findViewById(R.id.switchShowPatreonPrefixTag);
-		switchShowPatreonPrefixTag.setChecked(showPatreonPrefixTag);
-		switchShowPatreonPrefixTag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+		Switch switchShowPatreonPrefixTag = findViewById(R.id.switchShowSpecialPrefixTags);
+		switchShowPatreonPrefixTag.setChecked(showSpecialPrefixTags);
+		switchShowPatreonPrefixTag.setOnCheckedChangeListener(
+				new CompoundButton.OnCheckedChangeListener()
 		{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
-				editor.putBoolean("showPatreonPrefixTag", isChecked);
+				editor.putBoolean("showSpecialPrefixTags", isChecked);
 				editor.commit();
 				Toast.makeText(mainActivity.getContext(),
 						"Refresh the current page for the change to take effect",

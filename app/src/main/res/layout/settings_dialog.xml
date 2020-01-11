@@ -49,10 +49,10 @@
         android:text="Display long file names" />
 
     <Switch
-        android:id="@+id/switchShowPatreonPrefixTag"
+        android:id="@+id/switchShowSpecialPrefixTags"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text='Show "[Patreon]" prefix tag' />
+        android:text="Show special prefix tags" />
 
     <Switch
         android:id="@+id/switchDarkMode"

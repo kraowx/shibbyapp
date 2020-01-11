@@ -57,9 +57,18 @@ public class SeriesFragment extends Fragment
             @Override
             public void run()
             {
-                SearchView searchView = ((MainActivity)getActivity()).getSearchView();
+                final SearchView searchView = ((MainActivity)getActivity()).getSearchView();
                 if (searchView != null)
                 {
+                    searchView.post(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            searchView.setQuery("", false);
+                            searchView.setIconified(true);
+                        }
+                    });
                     searchView.setOnQueryTextListener(SeriesFragment.this);
                     this.cancel();
                 }
@@ -94,7 +103,10 @@ public class SeriesFragment extends Fragment
     @Override
     public boolean onQueryTextChange(String text)
     {
-        listAdapter.filterDisplayItems(text);
+        if (listAdapter != null)
+        {
+            listAdapter.filterDisplayItems(text);
+        }
         return false;
     }
 

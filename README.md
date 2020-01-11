@@ -8,6 +8,7 @@ Note that default server is currently offline. For now, you must host your own s
 
 ## Features
 - Built-in audio player to either stream or play downloaded files
+- Patreon support (manage/play Patreon files directly from the app)
 - Customizable playlists
 - Loopable audio
 - Autoplay
@@ -29,13 +30,13 @@ This app uses the "Storage" (WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE) p
 Feel free to suggest anything else you feel might improve the app!
 
 ## Patreon Files
-ShibbyApp allows you to access Patreon files from directly in the app. You can download these files for quick loading times or stream them directly from the server just like regular files.
+ShibbyApp allows you to access Patreon files from directly in the app so your files are all in one place. You can download these files for quick loading times or stream them directly from the server just like regular files.
 
 Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A Patreon account with a valid pledge to Shibby is **required** in order to access the files. *This is not a method to obtain these files for free.*
 
 This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.
 
 ## Importing Files
-You can import your own downloaded shibbyfiles or custom made files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.
+You can import your own downloaded shibbyfiles or custom/edited files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.
 
 For advanced users, instead of manually downloading each shibbyfile, you can manually import pre-existing shibbyfiles into the app by renaming the files to their SHA256 equivalent and then placing them in "/storage/self/primary/Android/data/io.github.kraowx.shibbyapp/files/audio" on your Android device. You can even modify the audio data if you want as long as the name of the file is *exactly* the same as how it appears on soundgasm. I have written some bash scripts to assist with this process. First run [this](https://gist.github.com/kraowx/4c1506f4dbb643f49203669756168413) script in a new directory which will automatically download all of Shibby's files from soundgasm, and then run [this](https://gist.github.com/kraowx/24104f038b9fee14a1466367381d465b) script in the same directory which will rename each file to its SHA256 hash equivalent.

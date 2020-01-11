@@ -1,5 +1,6 @@
 package io.github.kraowx.shibbyapp.tools;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -98,6 +99,7 @@ public class DataManager
             {
                 JSONObject json = userFiles.getJSONObject(i);
                 ShibbyFile file = ShibbyFile.fromJSON(json.toString());
+                file.setType("user");
                 JSONArray tagsJson = json.getJSONArray("tags");
                 List<String> tags = new ArrayList<String>();
                 for (int j = 0; j < tagsJson.length(); j++)
@@ -126,6 +128,37 @@ public class DataManager
                 arr = new JSONArray(prefs.getString("userFiles", "[]"));
                 JSONObject fileJson = file.toJSON();
                 arr.put(fileJson);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("userFiles", arr.toString());
+                editor.commit();
+                return true;
+            }
+            catch (JSONException je)
+            {
+                je.printStackTrace();
+            }
+        }
+        return false;
+    }
+    
+    public boolean removeUserFile(ShibbyFile file)
+    {
+        List<ShibbyFile> userFiles = getUserFiles();
+        if (listHasFile(userFiles, file))
+        {
+            JSONArray arr;
+            try
+            {
+                arr = new JSONArray(prefs.getString("userFiles", "[]"));
+                for (int i = 0; i < arr.length(); i++)
+                {
+                    String idI = arr.getJSONObject(i).getString("id");
+                    String idF = file.getId();
+                    if (idI.equals(idF))
+                    {
+                        arr.remove(i);
+                    }
+                }
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("userFiles", arr.toString());
                 editor.commit();

@@ -1,6 +1,7 @@
 package io.github.kraowx.shibbyapp.ui.series;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 
 public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapter.ViewHolder>
 {
+    private String searchText;
     private List<ShibbyFileArray> mData, mDataOrig;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
@@ -26,6 +28,7 @@ public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapte
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         mDataOrig = (List<ShibbyFileArray>)((ArrayList<ShibbyFileArray>)mData).clone();
+        searchText = "";
     }
 
     @Override
@@ -40,7 +43,15 @@ public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapte
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         ShibbyFileArray filearr = mData.get(position);
-        holder.txtName.setText(filearr.getName());
+        String name = filearr.getName();
+        if (!searchText.isEmpty() &&
+                name.toLowerCase().contains(searchText.toLowerCase()))
+        {
+            int index = name.toLowerCase().indexOf(searchText.toLowerCase());
+            String sub = name.substring(index, index + searchText.length());
+            name = name.replace(sub, "<font color=red>" + sub + "</font>");
+        }
+        holder.txtName.setText(Html.fromHtml(name));
         holder.txtFileCount.setText(filearr.getFileCount() + " files");
     }
 
@@ -67,12 +78,16 @@ public class ShibbySeriesAdapter extends RecyclerView.Adapter<ShibbySeriesAdapte
         @Override
         public void onClick(View view)
         {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (mClickListener != null)
+            {
+                mClickListener.onItemClick(view, getAdapterPosition());
+            }
         }
     }
 
     public void filterDisplayItems(String text)
     {
+        searchText = text;
         mData.clear();
         if(text.isEmpty())
         {
