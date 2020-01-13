@@ -45,7 +45,6 @@ public class PatreonSessionManager
 	{
 		HttpRequest req = getLoginRequest(email, password);
 		List<String> cookies = req.headers().get("Set-Cookie");
-		System.out.println(req.code());
 		sessionCookie = "";
 		for (int i = 0; i < cookies.size(); i++)
 		{
@@ -55,6 +54,7 @@ public class PatreonSessionManager
 				sessionCookie += "; ";
 			}
 		}
+		req.closeOutputQuietly();
 		return sessionCookie;
 	}
 	
@@ -93,8 +93,10 @@ public class PatreonSessionManager
 			req.header("Cookie", sessionCookie);
 			req.send("{\"data\":{\"email\":\"" + email + "\"," +
 					"\"password\":\"" + password + "\"}}");
+			req.closeOutputQuietly();
 			return 1;
 		}
+		req.closeOutputQuietly();
 		return 0;
 	}
 	
@@ -109,19 +111,7 @@ public class PatreonSessionManager
 		req.header("Accept-Language", "en-US,en;q=0.9");
 		req.send("{\"data\":{\"email\":\"" + email + "\"," +
 				"\"password\":\"" + password + "\"}}");
+		req.closeOutputQuietly();
 		return req;
-	}
-	
-	private void showToast(final String message)
-	{
-		mainActivity.runOnUiThread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				Toast.makeText(mainActivity, message,
-						Toast.LENGTH_LONG).show();
-			}
-		});
 	}
 }
