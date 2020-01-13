@@ -87,7 +87,7 @@ public class AudioDownloadManager
         Uri uri = null;
         try
         {
-            Uri.parse(file.getLink());
+            uri = Uri.parse(file.getLink());
         }
         catch (Exception e)
         {
