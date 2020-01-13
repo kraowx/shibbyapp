@@ -15,6 +15,7 @@ Note that default server is currently offline. For now, you must host your own s
 - Search by tag
 - Search by file
 - Search by series
+- Import files
 - Light and dark themes
 
 ## [Showcase](https://ibb.co/album/gDq3aa)
