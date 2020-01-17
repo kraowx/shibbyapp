@@ -31,11 +31,16 @@ import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.ServerSelectorDialog;
 
 public class AllFilesFragment extends Fragment
         implements ShibbyFileAdapter.ItemClickListener,
-        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
+        ServerSelectorDialog.ServerSelectedListener
 {
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
+    private View root;
     private RecyclerView list;
     private SwipeRefreshLayout refreshLayout;
     private ShibbyFileAdapter listAdapter;
@@ -44,10 +49,7 @@ public class AllFilesFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        final View root = inflater.inflate(R.layout.fragment_allfiles, container, false);
-        final ProgressDialog progressDialog = new ProgressDialog((MainActivity)getActivity());
-        final DataManager dataManager = new DataManager((MainActivity)getActivity());
-        final List<ShibbyFile> files = dataManager.getFiles();
+        root = inflater.inflate(R.layout.fragment_allfiles, container, false);
 
         refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
@@ -55,12 +57,111 @@ public class AllFilesFragment extends Fragment
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
+    
+        prefs = PreferenceManager.getDefaultSharedPreferences(
+                (MainActivity)getActivity());
+        editor = prefs.edit();
+        String server = prefs.getString("server", null);
+        boolean firstRun = server == null;
+        if (firstRun)
+        {
+            ServerSelectorDialog selectorDialog =
+                    new ServerSelectorDialog((MainActivity)getActivity());
+            selectorDialog.setServerSelectedListener(this);
+        }
+        else
+        {
+            startInitialUpdate();
+        }
 
+        FloatingActionButton fabAddPlaylist =
+                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
+        fabAddPlaylist.hide();
+
+        new Timer().scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                final SearchView searchView = ((MainActivity)getActivity()).getSearchView();
+                if (searchView != null)
+                {
+                    searchView.post(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            searchView.setQuery("", false);
+                            searchView.setIconified(true);
+                        }
+                    });
+                    searchView.setOnQueryTextListener(AllFilesFragment.this);
+                    this.cancel();
+                }
+            }
+        }, 0, 1000);
+        return root;
+    }
+    
+    @Override
+    public void onServerSelected()
+    {
+        startInitialUpdate();
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                new DataManager((MainActivity)getActivity())
+                        .requestData(Request.files());
+                updateList();
+                refreshLayout.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        }.start();
+    }
+
+    @Override
+    public boolean onQueryTextChange(String text)
+    {
+        if (listAdapter != null)
+        {
+            listAdapter.filterDisplayItems(text);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String text)
+    {
+        return false;
+    }
+
+    @Override
+    public void onItemClick(View view, int position)
+    {
+        FileInfoDialog fileInfoDialog = new FileInfoDialog(
+                (MainActivity)getActivity(), listAdapter.getItem(position));
+    }
+    
+    private void startInitialUpdate()
+    {
+        final ProgressDialog progressDialog = new ProgressDialog((MainActivity)getActivity());
+        final DataManager dataManager = new DataManager((MainActivity)getActivity());
+        final List<ShibbyFile> files = dataManager.getFiles();
         if (files.size() > 0)
         {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences((MainActivity)getActivity());
-            SharedPreferences.Editor editor = prefs.edit();
             boolean updateStartup = prefs.getBoolean(
                     "updateStartup", true);
             boolean isStartup = prefs.getBoolean("isStartup", true);
@@ -125,80 +226,6 @@ public class AllFilesFragment extends Fragment
                 }
             }, 0, 5000);
         }
-
-        FloatingActionButton fabAddPlaylist =
-                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
-        fabAddPlaylist.hide();
-
-        new Timer().scheduleAtFixedRate(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                final SearchView searchView = ((MainActivity)getActivity()).getSearchView();
-                if (searchView != null)
-                {
-                    searchView.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            searchView.setQuery("", false);
-                            searchView.setIconified(true);
-                        }
-                    });
-                    searchView.setOnQueryTextListener(AllFilesFragment.this);
-                    this.cancel();
-                }
-            }
-        }, 0, 1000);
-        return root;
-    }
-
-    @Override
-    public void onRefresh()
-    {
-        new Thread()
-        {
-            @Override
-            public void run()
-            {
-                new DataManager((MainActivity)getActivity())
-                        .requestData(Request.files());
-                updateList();
-                refreshLayout.post(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        refreshLayout.setRefreshing(false);
-                    }
-                });
-            }
-        }.start();
-    }
-
-    @Override
-    public boolean onQueryTextChange(String text)
-    {
-        if (listAdapter != null)
-        {
-            listAdapter.filterDisplayItems(text);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String text)
-    {
-        return false;
-    }
-
-    @Override
-    public void onItemClick(View view, int position)
-    {
-        FileInfoDialog fileInfoDialog = new FileInfoDialog(
-                (MainActivity)getActivity(), listAdapter.getItem(position));
     }
 
     private void initializeList(View root, final List<ShibbyFile> files)

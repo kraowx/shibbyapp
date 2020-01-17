@@ -131,9 +131,16 @@ public class PatreonFilesFragment extends Fragment
 				}
 				else
 				{
-					Toast.makeText((MainActivity)getActivity(),
-							"You are not logged in!",
-							Toast.LENGTH_LONG).show();
+					((MainActivity)getActivity()).runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							Toast.makeText((MainActivity)getActivity(),
+									"You are not logged in!",
+									Toast.LENGTH_LONG).show();
+						}
+					});
 				}
 			}
 		}.start();
@@ -171,8 +178,15 @@ public class PatreonFilesFragment extends Fragment
 		editor.putString("patreonEmail", email);
 		editor.putString("patreonPassword", password);
 		editor.commit();
-		Toast.makeText((MainActivity)getActivity(),
-				"Login successful", Toast.LENGTH_LONG).show();
+		((MainActivity)getActivity()).runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Toast.makeText((MainActivity)getActivity(),
+						"Login successful", Toast.LENGTH_LONG).show();
+			}
+		});
 		updateList();
 	}
 	

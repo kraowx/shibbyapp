@@ -295,8 +295,15 @@ public class MainActivity extends AppCompatActivity
                 editor.putString("patreonEmail", email);
                 editor.putString("patreonPassword", password);
                 editor.commit();
-                Toast.makeText(MainActivity.this,
-                        "Login successful", Toast.LENGTH_LONG).show();
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Toast.makeText(MainActivity.this,
+                                "Login successful", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
     }

@@ -60,8 +60,8 @@ public class PatreonSessionManager
 	
 	/*
 	 * Connects to the server to check if the given credentials are valid.
-	 * Returns 1 if valid, 0 if invalid, 2 if the server does not support
-	 * Patreon integration, or 3 if too many requests are sent
+	 * Returns 1 if valid, 0 if invalid, 2 if email verification is required,
+	 * or 3 if too many requests are sent
 	 */
 	public int verifyCredentials(String email, String password)
 	{
@@ -71,7 +71,7 @@ public class PatreonSessionManager
 		{
 			return 0;
 		}
-		else if (code == 403)
+		else if (code == 401)
 		{
 			return 2;
 		}

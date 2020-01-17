@@ -61,7 +61,8 @@ public class PatreonLoginDialog extends Dialog
 								mainActivity.getPatreonSessionManager();
 						final int INVALID = 0;
 						final int VALID = 1;
-						final int UNSUPPORTED = 2;
+						final int EMAIL = 2;
+						final int OVERLOAD = 3;
 						switch (patreonSessionManager.verifyCredentials(email, password))
 						{
 							case INVALID:
@@ -75,8 +76,11 @@ public class PatreonLoginDialog extends Dialog
 								}
 								dismiss();
 								break;
-							case UNSUPPORTED:
-								showUnsupportedDialog(mainActivity);
+							case EMAIL:
+								showEmailVerificationDialog(mainActivity);
+								break;
+							case OVERLOAD:
+								showOverloadDialog(mainActivity);
 								break;
 						}
 						mainActivity.runOnUiThread(new Runnable()
@@ -94,7 +98,30 @@ public class PatreonLoginDialog extends Dialog
 		show();
 	}
 	
-	private void showUnsupportedDialog(final MainActivity mainActivity)
+	private void showEmailVerificationDialog(MainActivity mainActivity)
+	{
+		showErrorDialog(mainActivity, "Email Verification",
+				"You must confirm your email for this device/location " +
+						"through the email sent by Patreon.");
+	}
+	
+	private void showOverloadDialog(MainActivity mainActivity)
+	{
+		showErrorDialog(mainActivity, "Too Many Requests",
+				"You have made too many requests to the Patreon server. " +
+						"Try again in 10 minutes.");
+	}
+	
+	private void showUnsupportedDialog(MainActivity mainActivity)
+	{
+		showErrorDialog(mainActivity, "Unsupported",
+				"The server you are connected to " +
+						"has reported that it does not support Patreon " +
+						"files at the moment.");
+	}
+	
+	private void showErrorDialog(final MainActivity mainActivity,
+								 final String title, final String message)
 	{
 		mainActivity.runOnUiThread(new Runnable()
 		{
@@ -113,9 +140,8 @@ public class PatreonLoginDialog extends Dialog
 				{
 					builder = new AlertDialog.Builder(mainActivity);
 				}
-				builder.setTitle("Unsupported")
-						.setMessage("The server you are connected to " +
-								"has reported that it does not serve Patreon files.")
+				builder.setTitle(title)
+						.setMessage(message)
 						.setCancelable(false)
 						.setPositiveButton(android.R.string.ok, null)
 						.show();
