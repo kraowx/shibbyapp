@@ -1,5 +1,5 @@
 # ShibbyApp
-ShibbyApp is an Android file manager and audio player exclusively for [Shibby's audio files](https://soundgasm.net/u/kinkyshibby).
+ShibbyApp is an Android file manager and audio player exclusively for listeners of [ShibbySays.](https://www.reddit.com/r/ShibbySays/)
 
 ## Installation
 The app must be installed manually since these types of apps are not allowed in the Google Play store. Download the latest version of the app [here](https://github.com/kraowx/shibbyapp/releases/latest) on your device and save it to a place you can get to easily. Simply run the downloaded .apk file and click install when prompted. You may have to change your system settings to allow installation of apps from "unknown sources". This should be under the "Security" tab in the settings of your device.
