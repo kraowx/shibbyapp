@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -112,24 +113,33 @@ public class AllFilesFragment extends Fragment
     @Override
     public void onRefresh()
     {
-        new Thread()
+        if (listAdapter != null)
         {
-            @Override
-            public void run()
+            new Thread()
             {
-                new DataManager((MainActivity)getActivity())
-                        .requestData(Request.files());
-                updateList();
-                refreshLayout.post(new Runnable()
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
+                    new DataManager((MainActivity) getActivity())
+                            .requestData(Request.files());
+                    updateList();
+                    refreshLayout.post(new Runnable()
                     {
-                        refreshLayout.setRefreshing(false);
-                    }
-                });
-            }
-        }.start();
+                        @Override
+                        public void run()
+                        {
+                            refreshLayout.setRefreshing(false);
+                        }
+                    });
+                }
+            }.start();
+        }
+        else
+        {
+            refreshLayout.setRefreshing(false);
+            Toast.makeText((MainActivity)getActivity(),
+                    "No server specified", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
