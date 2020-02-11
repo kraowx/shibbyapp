@@ -11,6 +11,7 @@ Note that default server is currently offline. For now, you must host your own s
 - Patreon support (manage/play Patreon files directly from the app)
 - Customizable playlists
 - Loopable audio
+- Pre-audio delay timer
 - Autoplay
 - Search by tag
 - Search by file
