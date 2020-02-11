@@ -31,12 +31,12 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/btnPlayerDownload"
+            android:id="@+id/btnPlayerTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
             android:background="@drawable/btn_ripple"
-            app:srcCompat="@drawable/ic_save_alt_small" />
+            app:srcCompat="@drawable/ic_timer_off" />
 
         <ImageButton
             android:id="@+id/btnRewind"

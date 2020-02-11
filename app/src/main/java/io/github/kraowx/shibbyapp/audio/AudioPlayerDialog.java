@@ -1,9 +1,7 @@
 package io.github.kraowx.shibbyapp.audio;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -23,12 +21,15 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.ui.dialog.DurationPickerDialog;
+import mobi.upod.timedurationpicker.TimeDurationPicker;
 
 public class AudioPlayerDialog extends Dialog
 {
     private boolean fileDownloaded,
             seeking, queueIsPlaylist,
-            repeating;
+            repeating, timerRunning;
+    private int delayTime, setDelay;
     private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
     private AudioPlayer audioPlayer;
@@ -37,7 +38,7 @@ public class AudioPlayerDialog extends Dialog
 
     private TextView txtTitle, txtTags, txtElapsedTime, txtRemainingTime;
     private ImageButton btnRewind, btnPlayPause, btnFastForward,
-            btnDownload, btnRepeat;
+            btnTimer, btnRepeat;
     private SeekBar progressBar;
     private ProgressDialog progressDialog;
     private MainActivity mainActivity;
@@ -49,6 +50,7 @@ public class AudioPlayerDialog extends Dialog
         setContentView(R.layout.audio_player_dialog);
         this.mainActivity = mainActivity;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        delayTime = setDelay = -1;
         initUI();
     }
 
@@ -60,6 +62,7 @@ public class AudioPlayerDialog extends Dialog
 
     public void startTimer()
     {
+        timerRunning = true;
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask()
         {
@@ -68,58 +71,87 @@ public class AudioPlayerDialog extends Dialog
             {
                 if (audioPlayer != null)
                 {
-                    if (audioPlayer.getFileDuration() != -1 &&
-                            progressBar.getMax() != audioPlayer.getFileDuration())
+                    if (delayTime < 0)
                     {
-                        progressBar.setMax(audioPlayer.getFileDuration());
-                    }
-                    if (audioPlayer.isPlaying())
-                    {
-                        if (!seeking)
+                        if (audioPlayer.getFileDuration() != -1 &&
+                                progressBar.getMax() != audioPlayer.getFileDuration())
                         {
-                            progressBar.setProgress(audioPlayer.getPosition());
+                            progressBar.setMax(audioPlayer.getFileDuration());
                         }
-                    }
-                    // player has reached the end of the audio file
-                    else if (audioPlayer.isInitialized())
-                    {
-                        // there is a file next in the queue
-                        if (progressBar.getProgress()+1000 >= audioPlayer.getFileDuration() &&
-                                queue != null && queue.indexOf(activeFile) < queue.size()-1 &&
-                                autoplayAllowed())
+                        if (audioPlayer.isPlaying())
                         {
-                            mainActivity.runOnUiThread(new Runnable()
+                            if (!seeking)
                             {
-                                @Override
-                                public void run()
+                                progressBar.setProgress(audioPlayer.getPosition());
+                            }
+                        }
+                        // player has reached the end of the audio file
+                        else if (audioPlayer.isInitialized())
+                        {
+                            // there is a file next in the queue
+                            if (progressBar.getProgress() + 1000 >= audioPlayer.getFileDuration() &&
+                                    queue != null && queue.indexOf(activeFile) < queue.size() - 1 &&
+                                    autoplayAllowed())
+                            {
+                                mainActivity.runOnUiThread(new Runnable()
                                 {
-                                    loadFile(queue.get(queue.indexOf(activeFile)+1));
-                                    playAudio();
-                                    btnPlayPause.post(new Runnable()
+                                    @Override
+                                    public void run()
                                     {
-                                        @Override
-                                        public void run()
+                                        loadFile(queue.get(queue.indexOf(activeFile) + 1));
+                                        playAudio();
+                                        btnPlayPause.post(new Runnable()
                                         {
-                                            btnPlayPause.setImageResource(
-                                                    R.drawable.ic_pause_circle);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                        // the player is not looping, so stop the player
-                        if (!audioPlayer.isLooping())
-                        {
-                            btnPlayPause.post(new Runnable()
+                                            @Override
+                                            public void run()
+                                            {
+                                                btnPlayPause.setImageResource(
+                                                        R.drawable.ic_pause_circle);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            // the player is not looping, so stop the player
+                            if (!audioPlayer.isLooping())
                             {
-                                @Override
-                                public void run()
+                                btnPlayPause.post(new Runnable()
                                 {
-                                    btnPlayPause.setImageResource(
-                                            R.drawable.ic_play_circle);
-                                }
-                            });
+                                    @Override
+                                    public void run()
+                                    {
+                                        btnPlayPause.setImageResource(
+                                                R.drawable.ic_play_circle);
+                                    }
+                                });
+                            }
                         }
+                    }
+                    else if (delayTime > 0)
+                    {
+                        delayTime--;
+                        progressBar.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                progressBar.setProgress(delayTime*1000);
+                            }
+                        });
+                    }
+                    else if (delayTime == 0)
+                    {
+                        delayTime--;
+                        setDelay = -1;
+                        playAudio();
+                        btnTimer.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                btnTimer.setImageResource(R.drawable.ic_timer_off);
+                            }
+                        });
                     }
                 }
             }
@@ -128,6 +160,7 @@ public class AudioPlayerDialog extends Dialog
 
     public void stopTimer()
     {
+        timerRunning = false;
         timer.cancel();
         timer.purge();
     }
@@ -155,13 +188,28 @@ public class AudioPlayerDialog extends Dialog
                             tagsStr += "  |  ";
                         }
                     }
-                    txtTags.setText(file != null ?
-                            tagsStr : "");
+                    if (tagsStr.isEmpty())
+                    {
+                        txtTags.setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        txtTags.setText(tagsStr);
+                    }
                 }
                 else
                 {
                     txtTags.setVisibility(View.GONE);
                 }
+            }
+        });
+        delayTime = setDelay = -1;
+        btnTimer.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                btnTimer.setImageResource(R.drawable.ic_timer_off);
             }
         });
         txtElapsedTime.post(new Runnable()
@@ -203,41 +251,6 @@ public class AudioPlayerDialog extends Dialog
         }
         fileDownloaded = file != null ? AudioDownloadManager
                 .fileIsDownloaded(mainActivity, file) : false;
-        if (fileDownloaded)
-        {
-            btnDownload.post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    btnDownload.setColorFilter(ContextCompat.getColor(
-                            getContext(), R.color.colorAccent));
-                }
-            });
-        }
-        else if (mainActivity.getDownloadManager().isDownloadingFile(file))
-        {
-            btnDownload.post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    btnDownload.setColorFilter(ContextCompat.getColor(
-                            getContext(), R.color.redAccent));
-                }
-            });
-        }
-        else
-        {
-            btnDownload.post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    btnDownload.setColorFilter(null);
-                }
-            });
-        }
         if (file != null)
         {
             audioPlayer = new AudioPlayer(progressDialog, fileDownloaded, mainActivity);
@@ -261,88 +274,59 @@ public class AudioPlayerDialog extends Dialog
             txtTags.setVisibility(View.GONE);
             txtTags.setText("");
         }
-        btnDownload = findViewById(R.id.btnPlayerDownload);
-        btnDownload.setOnClickListener(new View.OnClickListener()
+        btnTimer = findViewById(R.id.btnPlayerTimer);
+        btnTimer.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if (activeFile != null)
-                {
-                    if (!AudioDownloadManager.fileIsDownloaded(mainActivity, activeFile))
+                DurationPickerDialog durationPicker = new DurationPickerDialog(mainActivity,
+                        (long) delayTime * 1000 + 1, new TimeDurationPicker.OnDurationChangedListener() {
+                    @Override
+                    public void onDurationChanged(TimeDurationPicker view, long duration)
                     {
-                        mainActivity.getDownloadManager().downloadFile(activeFile, btnDownload);
-                        btnDownload.setColorFilter(ContextCompat.getColor(
-                                getContext(), R.color.redAccent));
-                    }
-                    else if (mainActivity.getDownloadManager().isDownloadingFile(activeFile))
-                    {
-                        if (mainActivity.getDownloadManager().cancelDownload(activeFile))
+                        if (duration == 0)
                         {
-                            boolean darkModeEnabled = prefs
-                                    .getBoolean("darkMode", false);
-                            if (darkModeEnabled)
-                            {
-                                btnDownload.setColorFilter(ContextCompat
-                                        .getColor(mainActivity, R.color.grayLight));
-                            }
-                            else
-                            {
-                                btnDownload.setColorFilter(null);
-                            }
-                            Toast.makeText(mainActivity, "Download cancelled",
-                                    Toast.LENGTH_LONG).show();
+                            delayTime = -1;
                         }
                         else
                         {
-                            Toast.makeText(mainActivity, "Failed to cancel download",
-                                    Toast.LENGTH_LONG).show();
+                            delayTime = -1;
+                            setDelay = (int)duration/1000;
+                            final String progressTime = formatTime(setDelay*1000);
+                            final String remainingTime = formatTime(0);
+                            txtElapsedTime.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    txtElapsedTime.setText(progressTime);
+                                }
+                            });
+                            txtRemainingTime.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    txtRemainingTime.setText(remainingTime);
+                                }
+                            });
+                            progressBar.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    progressBar.setMax(setDelay*1000);
+                                    progressBar.setProgress(setDelay*1000);
+                                }
+                            });
+                        }
+                        if (setDelay > 0)
+                        {
+                            btnTimer.setImageResource(R.drawable.ic_timer);
                         }
                     }
-                    else
-                    {
-                        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
-                        AlertDialog.Builder builder;
-                        if (darkModeEnabled)
-                        {
-                            builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
-                        }
-                        else
-                        {
-                            builder = new AlertDialog.Builder(mainActivity);
-                        }
-                        builder.setTitle("Delete download")
-                                .setMessage("Are you sure you want to delete this file?")
-                                .setPositiveButton(android.R.string.yes,
-                                        new DialogInterface.OnClickListener()
-                                        {
-                                            public void onClick(DialogInterface dialog, int which)
-                                            {
-                                                AudioDownloadManager.deleteFile(mainActivity, activeFile);
-                                                boolean darkModeEnabled = prefs
-                                                        .getBoolean("darkMode", false);
-                                                if (darkModeEnabled)
-                                                {
-                                                    btnDownload.setColorFilter(ContextCompat
-                                                            .getColor(mainActivity, R.color.grayLight));
-                                                }
-                                                else
-                                                {
-                                                    btnDownload.setColorFilter(null);
-                                                }
-                                                loadFile(null);
-                                            }
-                                        })
-                                .setNegativeButton(android.R.string.no, null)
-                                .setIcon(R.drawable.ic_warning)
-                                .show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(getContext(), "Error: No file selected",
-                            Toast.LENGTH_LONG).show();
-                }
+                });
             }
         });
         btnRewind = findViewById(R.id.btnRewind);
@@ -400,11 +384,28 @@ public class AudioPlayerDialog extends Dialog
                     {
                         audioPlayer.pauseAudio();
                         btnPlayPause.setImageResource(R.drawable.ic_play_circle);
+                        stopTimer();
                     }
                     else if (audioPlayer != null)
                     {
-                        playAudio();
-                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle);
+                        if (setDelay <= 0)
+                        {
+                            playAudio();
+                        }
+                        if (timerRunning)
+                        {
+                            stopTimer();
+                            btnPlayPause.setImageResource(R.drawable.ic_play_circle);
+                        }
+                        else
+                        {
+                            if (delayTime == -1)
+                            {
+                                delayTime = setDelay;
+                            }
+                            startTimer();
+                            btnPlayPause.setImageResource(R.drawable.ic_pause_circle);
+                        }
                     }
                 }
             }
@@ -510,6 +511,22 @@ public class AudioPlayerDialog extends Dialog
                         txtRemainingTime.setText(remainingTimeSeeking);
                     }
                 }
+                else if (delayTime != -1 && setDelay != -1)
+                {
+                    String progressTime = formatTime(progress+1);
+                    String remainingTime = formatTime((setDelay*1000)+2-progress);
+                    String remainingTimeSeeking = formatTime((setDelay*1000)-(delayTime*1000));
+                    if (seeking)
+                    {
+                        txtElapsedTime.setText(progressTime);
+                        txtRemainingTime.setText(remainingTime);
+                    }
+                    else
+                    {
+                        txtElapsedTime.setText(progressTime);
+                        txtRemainingTime.setText(remainingTimeSeeking);
+                    }
+                }
             }
 
             @Override
@@ -523,9 +540,13 @@ public class AudioPlayerDialog extends Dialog
             {
                 seeking = false;
                 if (audioPlayer != null && audioPlayer.isInitialized() &&
-                        audioPlayer.getFileDuration() > 0)
+                        audioPlayer.getFileDuration() > 0 && delayTime == -1)
                 {
                     audioPlayer.seekTo(seekBar.getProgress());
+                }
+                else if (delayTime != -1)
+                {
+                    delayTime = seekBar.getProgress()/1000;
                 }
             }
         });
@@ -534,7 +555,7 @@ public class AudioPlayerDialog extends Dialog
         boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
         if (darkModeEnabled)
         {
-            btnDownload.setColorFilter(ContextCompat
+            btnTimer.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.grayLight));
             btnRewind.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.grayLight));

@@ -40,7 +40,7 @@ public class AudioController
         }
         else
         {
-            dialog.startTimer();
+//            dialog.startTimer();
             dialog.show();
         }
     }
@@ -49,7 +49,7 @@ public class AudioController
     {
         if (visible && !dialog.isShowing())
         {
-            dialog.startTimer();
+            //dialog.startTimer();
             dialog.show();
         }
         else if (dialog.isShowing())
