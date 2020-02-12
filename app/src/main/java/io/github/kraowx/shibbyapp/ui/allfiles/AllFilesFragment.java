@@ -168,74 +168,90 @@ public class AllFilesFragment extends Fragment
     private void startInitialUpdate()
     {
         final ProgressDialog progressDialog = new ProgressDialog((MainActivity)getActivity());
-        final DataManager dataManager = new DataManager((MainActivity)getActivity());
-        final List<ShibbyFile> files = dataManager.getFiles();
-        if (files.size() > 0)
+        new Thread()
         {
-            boolean updateStartup = prefs.getBoolean(
-                    "updateStartup", true);
-            boolean isStartup = prefs.getBoolean("isStartup", true);
-            if (updateStartup && isStartup)
+            @Override
+            public void run()
             {
-                editor.putBoolean("isStartup", false);
-                editor.commit();
-                refreshLayout.setRefreshing(true);
-                new Thread()
+                refreshLayout.post(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        dataManager.requestData(Request.all());
-                        ((MainActivity)getActivity()).runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                initializeList(root, dataManager.getFiles());
-                                refreshLayout.setRefreshing(false);
-                            }
-                        });
+                        refreshLayout.setRefreshing(true);
                     }
-                }.start();
-            }
-            else
-            {
-                initializeList(root, files);
-            }
-        }
-        else
-        {
-            progressDialog.setTitle("Fetching first-time data...");
-            progressDialog.show();
-            new Timer().scheduleAtFixedRate(new TimerTask()
-            {
-                @Override
-                public void run()
+                });
+                final DataManager dataManager = new DataManager((MainActivity) getActivity());
+                final List<ShibbyFile> files = dataManager.getFiles();
+                if (files.size() > 0)
                 {
-                    List<ShibbyFile> files = dataManager.getFiles();
-                    if (files.size() > 0)
+                    boolean updateStartup = prefs.getBoolean(
+                            "updateStartup", true);
+                    boolean isStartup = prefs.getBoolean("isStartup", true);
+                    if (updateStartup && isStartup)
                     {
-                        initializeList(root, files);
-                        ((MainActivity)getActivity()).runOnUiThread(new Runnable()
+                        editor.putBoolean("isStartup", false);
+                        editor.commit();
+                        refreshLayout.setRefreshing(true);
+                        new Thread()
                         {
                             @Override
                             public void run()
                             {
-                                if (progressDialog.isShowing())
+                                dataManager.requestData(Request.all());
+                                ((MainActivity) getActivity()).runOnUiThread(new Runnable()
                                 {
-                                    progressDialog.hide();
-                                }
+                                    @Override
+                                    public void run()
+                                    {
+                                        initializeList(root, dataManager.getFiles());
+                                        refreshLayout.setRefreshing(false);
+                                    }
+                                });
                             }
-                        });
-                        this.cancel();
+                        }.start();
                     }
                     else
                     {
-                        dataManager.requestData(getAllRequest());
+                        initializeList(root, files);
+                        refreshLayout.setRefreshing(false);
                     }
                 }
-            }, 0, 5000);
-        }
+                else
+                {
+                    progressDialog.setTitle("Fetching first-time data...");
+                    progressDialog.show();
+                    new Timer().scheduleAtFixedRate(new TimerTask()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            List<ShibbyFile> files = dataManager.getFiles();
+                            if (files.size() > 0)
+                            {
+                                initializeList(root, files);
+                                ((MainActivity) getActivity()).runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        if (progressDialog.isShowing())
+                                        {
+                                            progressDialog.hide();
+                                        }
+                                    }
+                                });
+                                this.cancel();
+                            }
+                            else
+                            {
+                                dataManager.requestData(getAllRequest());
+                            }
+                        }
+                    }, 0, 5000);
+                }
+            }
+        }.start();
     }
 
     private void initializeList(View root, final List<ShibbyFile> files)
