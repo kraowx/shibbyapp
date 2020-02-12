@@ -2,7 +2,9 @@ package io.github.kraowx.shibbyapp.ui.playlists;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,7 +130,8 @@ public class PlaylistsFragment extends Fragment
             @Override
             public void run()
             {
-                SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback(null);
+                SimpleItemTouchHelperCallback callback =
+                        new SimpleItemTouchHelperCallback(null);
                 mItemTouchHelper = new ItemTouchHelper(callback);
                 
                 listLayoutManager = new LinearLayoutManager(getContext());
@@ -163,7 +166,20 @@ public class PlaylistsFragment extends Fragment
 
     private void showCreatePlaylistDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences((MainActivity)getActivity());
+        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+        AlertDialog.Builder builder;
+        if (darkModeEnabled)
+        {
+            builder = new AlertDialog.Builder((MainActivity)getActivity(),
+                    R.style.DialogThemeDark_Alert);
+        }
+        else
+        {
+            builder = new AlertDialog.Builder((MainActivity)getActivity());
+        }
+        
         builder.setTitle("Playlist name");
 
         final EditText input = new EditText(getContext());

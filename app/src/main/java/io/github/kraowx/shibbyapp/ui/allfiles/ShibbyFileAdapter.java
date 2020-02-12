@@ -220,9 +220,9 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                     }
                     else
                     {
-                        Drawable icon = ContextCompat.getDrawable(mainActivity,
+                        Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
                                 R.drawable.ic_warning).mutate();
-                        icon.setColorFilter(new ColorMatrixColorFilter(new float[]
+                        darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
                                 {
                                         -1, 0, 0, 0, 200,
                                         0, -1, 0, 0, 200,
@@ -233,11 +233,14 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                         AlertDialog.Builder builder;
                         if (darkModeEnabled)
                         {
-                            builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+                            builder = new AlertDialog.Builder(mainActivity,
+                                    R.style.DialogThemeDark_Alert);
+                            builder.setIcon(darkIcon);
                         }
                         else
                         {
                             builder = new AlertDialog.Builder(mainActivity);
+                            builder.setIcon(R.drawable.ic_warning);
                         }
                         String title = "Delete ";
                         String message = "Are you sure you want to delete this file?";
@@ -279,7 +282,6 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
                                     }
                                 })
                                 .setNegativeButton(android.R.string.no, null)
-                                .setIcon(icon)
                                 .show();
                     }
                 }

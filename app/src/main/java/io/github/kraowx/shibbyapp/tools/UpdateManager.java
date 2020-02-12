@@ -63,16 +63,16 @@ public class UpdateManager
                         "darkMode", false);
                 if (darkModeEnabled)
                 {
-                    Drawable icon = ContextCompat.getDrawable(mainActivity,
+                    Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
                             R.drawable.ic_update).mutate();
-                    icon.setColorFilter(new ColorMatrixColorFilter(new float[]
+                    darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
                     {
                             -1, 0, 0, 0, 200,
                             0, -1, 0, 0, 200,
                             0, 0, -1, 0, 200,
                             0, 0, 0, 1, 0
                     }));
-                    new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark)
+                    new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark_Alert)
                             .setTitle("Update")
                             .setMessage(updateMessage)
                             .setPositiveButton(android.R.string.yes,
@@ -84,7 +84,7 @@ public class UpdateManager
                                 }
                             })
                             .setNegativeButton(android.R.string.no, null)
-                            .setIcon(icon)
+                            .setIcon(darkIcon)
                             .show();
                 }
                 else

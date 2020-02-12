@@ -210,9 +210,9 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         private void showDeleteDialog()
         {
             final String playlistName = getItem(getAdapterPosition());
-            Drawable icon = ContextCompat.getDrawable(mainActivity,
+            Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
                     R.drawable.ic_warning).mutate();
-            icon.setColorFilter(new ColorMatrixColorFilter(new float[]
+            darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
                     {
                             -1, 0, 0, 0, 200,
                             0, -1, 0, 0, 200,
@@ -225,11 +225,14 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
             AlertDialog.Builder builder;
             if (darkModeEnabled)
             {
-                builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+                builder = new AlertDialog.Builder(mainActivity,
+                        R.style.DialogThemeDark_Alert);
+                builder.setIcon(darkIcon);
             }
             else
             {
                 builder = new AlertDialog.Builder(mainActivity);
+                builder.setIcon(R.drawable.ic_warning);
             }
             builder.setTitle("Delete playlist")
                     .setMessage("Are you sure you want to delete " +
@@ -243,7 +246,6 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
                                 }
                             })
                     .setNegativeButton(android.R.string.no, null)
-                    .setIcon(icon)
                     .show();
         }
     }

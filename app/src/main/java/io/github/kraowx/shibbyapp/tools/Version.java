@@ -24,8 +24,6 @@ public class Version
             parseVersion(json.getString("name"));
             name = json.getString("name");
             preRelease = json.getBoolean("prerelease");
-            System.out.println("--------------BODY------------------");
-            System.out.println(json.getString("body"));
             updateMessage = simpleMarkdownToHtml(json.getString("body"));
         }
         catch (JSONException je)
