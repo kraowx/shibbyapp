@@ -192,7 +192,14 @@ public class AllFilesFragment extends Fragment
                     {
                         editor.putBoolean("isStartup", false);
                         editor.commit();
-                        refreshLayout.setRefreshing(true);
+                        refreshLayout.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                refreshLayout.setRefreshing(true);
+                            }
+                        });
                         new Thread()
                         {
                             @Override
@@ -214,7 +221,14 @@ public class AllFilesFragment extends Fragment
                     else
                     {
                         initializeList(root, files);
-                        refreshLayout.setRefreshing(false);
+                        refreshLayout.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                refreshLayout.setRefreshing(false);
+                            }
+                        });
                     }
                 }
                 else
