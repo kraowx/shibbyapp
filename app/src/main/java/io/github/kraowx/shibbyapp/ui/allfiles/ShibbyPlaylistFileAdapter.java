@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -223,6 +225,15 @@ public class ShibbyPlaylistFileAdapter
                     }
                     else
                     {
+                        Drawable icon = ContextCompat.getDrawable(mainActivity,
+                                R.drawable.ic_warning).mutate();
+                        icon.setColorFilter(new ColorMatrixColorFilter(new float[]
+                                {
+                                        -1, 0, 0, 0, 200,
+                                        0, -1, 0, 0, 200,
+                                        0, 0, -1, 0, 200,
+                                        0, 0, 0, 1, 0
+                                }));
                         boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
                         AlertDialog.Builder builder;
                         if (darkModeEnabled)
@@ -275,7 +286,7 @@ public class ShibbyPlaylistFileAdapter
                                             }
                                         })
                                 .setNegativeButton(android.R.string.no, null)
-                                .setIcon(R.drawable.ic_warning)
+                                .setIcon(icon)
                                 .show();
                     }
                 }
