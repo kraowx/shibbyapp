@@ -71,7 +71,7 @@ public class AudioPlayerDialog extends Dialog
             {
                 if (audioPlayer != null)
                 {
-                    if (delayTime < 0)
+                    if (delayTime < 0 && setDelay < 0)
                     {
                         if (audioPlayer.getFileDuration() != -1 &&
                                 progressBar.getMax() != audioPlayer.getFileDuration())
@@ -124,6 +124,7 @@ public class AudioPlayerDialog extends Dialog
                                                 R.drawable.ic_play_circle);
                                     }
                                 });
+                                stopTimer();
                             }
                         }
                     }
@@ -248,6 +249,7 @@ public class AudioPlayerDialog extends Dialog
                     btnPlayPause.setImageResource(R.drawable.ic_play_circle);
                 }
             });
+            stopTimer();
         }
         fileDownloaded = file != null ? AudioDownloadManager
                 .fileIsDownloaded(mainActivity, file) : false;
@@ -324,6 +326,9 @@ public class AudioPlayerDialog extends Dialog
                         if (setDelay > 0)
                         {
                             btnTimer.setImageResource(R.drawable.ic_timer);
+                            audioPlayer.pauseAudio();
+                            btnPlayPause.setImageResource(R.drawable.ic_play_circle);
+                            stopTimer();
                         }
                     }
                 });
@@ -355,6 +360,10 @@ public class AudioPlayerDialog extends Dialog
                                             R.drawable.ic_pause_circle);
                                 }
                             });
+                            if (!timerRunning)
+                            {
+                                startTimer();
+                            }
                         }
                     }
                     else
@@ -436,6 +445,10 @@ public class AudioPlayerDialog extends Dialog
                                             R.drawable.ic_pause_circle);
                                 }
                             });
+                            if (!timerRunning)
+                            {
+                                startTimer();
+                            }
                         }
                     }
                     else
