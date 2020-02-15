@@ -114,6 +114,27 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                                 Toast.LENGTH_LONG).show();
                                     }
                                 });
+                                if (loop == 0)
+                                {
+                                    final boolean darkModeEnabled = prefs
+                                            .getBoolean("darkMode", false);
+                                    btnRepeat.post(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            if (darkModeEnabled)
+                                            {
+                                                btnRepeat.setColorFilter(ContextCompat
+                                                        .getColor(mainActivity, R.color.grayLight));
+                                            }
+                                            else
+                                            {
+                                                btnRepeat.setColorFilter(null);
+                                            }
+                                        }
+                                    });
+                                }
                             }
                             else if (loop == 0)
                             {
@@ -125,24 +146,6 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                     {
                                         btnPlayPause.setImageResource(
                                                 R.drawable.ic_play_circle);
-                                    }
-                                });
-                                final boolean darkModeEnabled = prefs
-                                        .getBoolean("darkMode", false);
-                                btnRepeat.post(new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        if (darkModeEnabled)
-                                        {
-                                            btnRepeat.setColorFilter(ContextCompat
-                                                    .getColor(mainActivity, R.color.grayLight));
-                                        }
-                                        else
-                                        {
-                                            btnRepeat.setColorFilter(null);
-                                        }
                                     }
                                 });
                             }
