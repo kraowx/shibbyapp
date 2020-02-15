@@ -99,6 +99,21 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             if (loop > 0)
                             {
                                 loop--;
+                                mainActivity.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        String msg = loop + " loop";
+                                        if (loop != 1)
+                                        {
+                                            msg += "s";
+                                        }
+                                        msg += " remaining";
+                                        Toast.makeText(mainActivity, msg,
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                             else if (loop == 0)
                             {
@@ -131,7 +146,6 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                     }
                                 });
                             }
-                            Log.d("INFO", loop + "");
                         }
                         if (audioPlayer.isPlaying())
                         {
