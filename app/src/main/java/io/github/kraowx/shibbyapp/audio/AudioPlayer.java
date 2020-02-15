@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -49,6 +50,11 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     public MediaPlayer getMediaPlayer()
     {
         return mediaPlayer;
+    }
+    
+    public void setCompletionListener(MediaPlayer.OnCompletionListener listener)
+    {
+        mediaPlayer.setOnCompletionListener(listener);
     }
 
     public void seekTo(int millis)
@@ -123,15 +129,6 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Cookie", cookie);
             mediaPlayer.setDataSource(mainActivity, Uri.parse(strings[0]), headers);
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer)
-                {
-                    //mediaPlayer.stop();
-                }
-            });
-            
             mediaPlayer.prepare();
             prepared = true;
         }

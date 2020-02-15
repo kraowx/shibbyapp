@@ -2,15 +2,21 @@ package io.github.kraowx.shibbyapp.audio;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import java.util.List;
@@ -24,12 +30,18 @@ import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.ui.dialog.DurationPickerDialog;
 import mobi.upod.timedurationpicker.TimeDurationPicker;
 
-public class AudioPlayerDialog extends Dialog
+public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletionListener
 {
+    private final int NO_DELAY = -1;
+    private final int LOOP_INFINITE = -1;
+    private final int NO_LOOP = 0;
+    private final int MAX_LOOPS = 100;
+    private final int MIN_LOOPS = 0;
+    
     private boolean fileDownloaded,
             seeking, queueIsPlaylist,
-            repeating, timerRunning;
-    private int delayTime, setDelay;
+            timerRunning;
+    private int delayTime, setDelay, loop;
     private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
     private AudioPlayer audioPlayer;
@@ -50,7 +62,8 @@ public class AudioPlayerDialog extends Dialog
         setContentView(R.layout.audio_player_dialog);
         this.mainActivity = mainActivity;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
-        delayTime = setDelay = -1;
+        delayTime = setDelay = NO_DELAY;
+        loop = NO_LOOP;
         initUI();
     }
 
@@ -77,6 +90,48 @@ public class AudioPlayerDialog extends Dialog
                                 progressBar.getMax() != audioPlayer.getFileDuration())
                         {
                             progressBar.setMax(audioPlayer.getFileDuration());
+                        }
+                        // note: 1000 (arbitrary constant) is safe, but 975 (arbitrary constant)
+                        // is not always safe, though it usually gives a smoother experience
+                        if (audioPlayer.getPosition() > 3 &&
+                                audioPlayer.getPosition() > audioPlayer.getFileDuration() - 975)
+                        {
+                            if (loop > 0)
+                            {
+                                loop--;
+                            }
+                            else if (loop == 0)
+                            {
+                                audioPlayer.setLooping(false);
+                                btnPlayPause.post(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        btnPlayPause.setImageResource(
+                                                R.drawable.ic_play_circle);
+                                    }
+                                });
+                                final boolean darkModeEnabled = prefs
+                                        .getBoolean("darkMode", false);
+                                btnRepeat.post(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        if (darkModeEnabled)
+                                        {
+                                            btnRepeat.setColorFilter(ContextCompat
+                                                    .getColor(mainActivity, R.color.grayLight));
+                                        }
+                                        else
+                                        {
+                                            btnRepeat.setColorFilter(null);
+                                        }
+                                    }
+                                });
+                            }
+                            Log.d("INFO", loop + "");
                         }
                         if (audioPlayer.isPlaying())
                         {
@@ -204,7 +259,7 @@ public class AudioPlayerDialog extends Dialog
                 }
             }
         });
-        delayTime = setDelay = -1;
+        delayTime = setDelay = NO_DELAY;
         btnTimer.post(new Runnable()
         {
             @Override
@@ -256,7 +311,7 @@ public class AudioPlayerDialog extends Dialog
         if (file != null)
         {
             audioPlayer = new AudioPlayer(progressDialog, fileDownloaded, mainActivity);
-            audioPlayer.setLooping(repeating);
+            audioPlayer.setLooping(loop != NO_LOOP);
         }
         else
         {
@@ -289,11 +344,11 @@ public class AudioPlayerDialog extends Dialog
                     {
                         if (duration == 0)
                         {
-                            delayTime = -1;
+                            delayTime = NO_DELAY;
                         }
                         else
                         {
-                            delayTime = -1;
+                            delayTime = NO_DELAY;
                             setDelay = (int)duration/1000;
                             final String progressTime = formatTime(setDelay*1000);
                             final String remainingTime = formatTime(0);
@@ -474,8 +529,7 @@ public class AudioPlayerDialog extends Dialog
             {
                 if (audioPlayer != null)
                 {
-                    boolean looping = audioPlayer.isLooping();
-                    if (looping)
+                    if (loop != NO_LOOP)
                     {
                         boolean darkModeEnabled = prefs
                                 .getBoolean("darkMode", false);
@@ -494,13 +548,82 @@ public class AudioPlayerDialog extends Dialog
                         btnRepeat.setColorFilter(ContextCompat.getColor(getContext(),
                                 R.color.colorAccent));
                     }
-                    audioPlayer.setLooping(!looping);
-                    repeating = !looping;
+                    loop = loop == NO_LOOP ? LOOP_INFINITE : NO_LOOP;
+                    audioPlayer.setLooping(loop != NO_LOOP);
                 }
             }
         });
+        btnRepeat.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                AlertDialog.Builder dialog;
+                boolean darkMode = prefs.getBoolean("darkMode", false);
+                if (darkMode)
+                {
+                    dialog = new AlertDialog.Builder(mainActivity,
+                            R.style.DialogThemeDark_Alert);
+                }
+                else
+                {
+                    dialog = new AlertDialog.Builder(mainActivity);
+                }
+                LayoutInflater inflater = mainActivity.getLayoutInflater();
+                View dialogView = inflater.inflate(
+                        R.layout.loop_selector_dialog, null);
+                dialog.setTitle("Number of Loops");
+                dialog.setMessage("Select how many times the file should loop");
+                dialog.setView(dialogView);
+                final NumberPicker numberPicker =
+                        dialogView.findViewById(R.id.numberPicker);
+                numberPicker.setMaxValue(MAX_LOOPS);
+                numberPicker.setMinValue(MIN_LOOPS);
+                numberPicker.setValue(loop);
+                numberPicker.setWrapSelectorWheel(false);
+                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int value)
+                    {
+                        loop = numberPicker.getValue();
+                        if (audioPlayer != null)
+                        {
+                            if (loop == 0)
+                            {
+                                boolean darkModeEnabled = prefs
+                                        .getBoolean("darkMode", false);
+                                if (darkModeEnabled)
+                                {
+                                    btnRepeat.setColorFilter(ContextCompat
+                                            .getColor(mainActivity, R.color.grayLight));
+                                }
+                                else
+                                {
+                                    btnRepeat.setColorFilter(null);
+                                }
+                            }
+                            else
+                            {
+                                btnRepeat.setColorFilter(ContextCompat.getColor(getContext(),
+                                        R.color.colorAccent));
+                            }
+                            audioPlayer.setLooping(loop != NO_LOOP);
+                        }
+                    }
+                });
+                dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int value) {}
+                });
+                AlertDialog alertDialog = dialog.create();
+                alertDialog.show();
+                return true;
+            }
+        });
         progressBar = findViewById(R.id.progressBar);
-        progressBar.setMax(10000);
+        progressBar.setMax(10000);  // 10 seconds; arbitrary default
         progressBar.setProgress(0);
         progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
         {
@@ -524,7 +647,7 @@ public class AudioPlayerDialog extends Dialog
                         txtRemainingTime.setText(remainingTimeSeeking);
                     }
                 }
-                else if (delayTime != -1 && setDelay != -1)
+                else if (delayTime != NO_DELAY && setDelay != NO_DELAY)
                 {
                     String progressTime = formatTime(progress+1);
                     String remainingTime = formatTime((setDelay*1000)+2-progress);
@@ -632,5 +755,11 @@ public class AudioPlayerDialog extends Dialog
         {
             return minutesStr + ":" + secondsStr;
         }
+    }
+    
+    @Override
+    public void onCompletion(MediaPlayer mp)
+    {
+        Log.d("INFO", "test");
     }
 }
