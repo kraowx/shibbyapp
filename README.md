@@ -10,7 +10,7 @@ Note that default server is currently offline. For now, you must host your own s
 - Built-in audio player to either stream or play downloaded files
 - Patreon support (manage/play Patreon files directly from the app)
 - Customizable playlists
-- Loopable audio
+- Loopable audio (either infinite or a set number)
 - Pre-audio delay timer
 - Autoplay
 - Search by tag
@@ -37,6 +37,12 @@ ShibbyApp allows you to access Patreon files from directly in the app so your fi
 Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A Patreon account with a valid pledge to Shibby is **required** in order to access the files. *This is not a method to obtain these files for free.*
 
 This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.
+
+## Additional Notes and "Hidden" Features
+- In the audio player, when the loop button is pressed it will default to toggle infinite loop on and off. If you only want to loop a specific number of times you can long press on the loop icon and select a number from 0 to 100.
+- Files in a playlist and playlists themselves can be reordered by long pressing on a file/playlist and dragging it above or below another file/playlist. Note that series playlists cannot be reordered.
+- When the download button next to an undownloaded file is pressed it will turn red. This indicates that the file is downloading in the background, and the status of the download can be found in the "Download Manager" notification.
+- Refreshing inside the tags tab will only include Patreon files if you are currently logged in to Patreon. Otherwise these files will be excluded or removed from the list. Note that you may have to confirm your Patreon email for this to work.
 
 ## Importing Files
 You can import your own downloaded shibbyfiles or custom/edited files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.
