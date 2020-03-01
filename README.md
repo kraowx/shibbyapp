@@ -4,7 +4,7 @@ ShibbyApp is an Android file manager and audio player made exclusively for liste
 ## Installation
 The app must be installed manually since these types of apps are not allowed in the Google Play store. Download the latest version of the app [here](https://github.com/kraowx/shibbyapp/releases/latest) on your device and save it to a place you can get to easily. Simply run the downloaded .apk file and click install when prompted. You may have to change your system settings to allow installation of apps from "unknown sources". This should be under the "Security" tab in the settings of your device.
 
-The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.com). The limitation however is that it doesn't support Patreon files at the moment. If this is a problem for you however, you can host your own server. See [this page](https://github.com/kraowx/shibbyapp-server) for instructions on how to set up a server. Once you have your server set up, go into the app, tap on the three-dot menu in the top-right corner of the screen and tap settings. Enter the address of the server that you set up into the box in the format <code>IP:port</code>, then click the "Apply" button and restart the app.
+The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.com). The limitation however is that it doesn't support Patreon files at the moment. If this is a problem for you however, you can host your own server. See [this page](https://github.com/kraowx/shibbyapp-server) for instructions on how to set up a server. Once you have your server set up, go into the app, tap on the three-dot menu in the top-right corner of the screen and tap settings. Enter the address of the server that you set up into the box in the format <code>https://IP:port</code>, then click the "Apply" button and restart the app.
 
 ## Features
 - Built-in audio player to either stream or play downloaded files
@@ -26,6 +26,7 @@ This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAG
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
+- Some kind of vibration feature that syncs with audio? Add offset for bluetooth headphones as well
 - File metadata that gives more information about a file other than its name and description
 - Import/export audio files buttons
 
