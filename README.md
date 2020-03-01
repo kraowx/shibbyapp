@@ -4,7 +4,7 @@ ShibbyApp is an Android file manager and audio player made exclusively for liste
 ## Installation
 The app must be installed manually since these types of apps are not allowed in the Google Play store. Download the latest version of the app [here](https://github.com/kraowx/shibbyapp/releases/latest) on your device and save it to a place you can get to easily. Simply run the downloaded .apk file and click install when prompted. You may have to change your system settings to allow installation of apps from "unknown sources". This should be under the "Security" tab in the settings of your device.
 
-Note that default server is currently offline. For now, you must host your own server *or* connect to an existing server in order for the app to function. See [this page](https://github.com/kraowx/shibbyapp-server) for instructions on how to set up a server. Once you have your server set up, go into the app and you will be prompted to connect to either the default server or a custom server. Select *custom server* and you will be prompted again to enter the address of the server. Enter the address of the server that you set up into the box in the format ```IP:port``` (for example: 192.168.2.7:1234), then click the "Ok" button and the screen should fill up with a list of files.
+The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.com). The limitation however is that it doesn't support Patreon files at the moment. If this is a problem for you however, you can host your own server. See [this page](https://github.com/kraowx/shibbyapp-server) for instructions on how to set up a server. Once you have your server set up, go into the app, tap on the three-dot menu in the top-right corner of the screen and tap settings. Enter the address of the server that you set up into the box in the format <code>IP:port</code>, then click the "Apply" button and restart the app.
 
 ## Features
 - Built-in audio player to either stream or play downloaded files
@@ -22,7 +22,7 @@ Note that default server is currently offline. For now, you must host your own s
 ## [Showcase](https://ibb.co/album/gDq3aa)
 
 ## Permissions
-This app uses the "Storage" (WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user. Permission to read from the device's external storage is only requested for the "import file" feature, which requires listing the device's directories.
+This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user. Permission to read from the device's external storage is only requested for the "import file" feature, which requires listing the device's directories.
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
