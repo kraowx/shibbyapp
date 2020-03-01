@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -21,9 +22,11 @@ import java.util.Calendar;
 import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 import io.github.kraowx.shibbyapp.net.Request;
+import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.net.Response;
 import io.github.kraowx.shibbyapp.net.ResponseType;
 
@@ -369,57 +372,96 @@ public class DataManager
             showToast("Server connection error");
         }
     }
-
+    
     public void requestData(Request request)
     {
+        String url = getURL(request);
+        HttpRequest httpreq = null;
         try
         {
-            String[] server = prefs.getString("server",
-                    "shibbyserver.ddns.net:2012").split(":");
-            String hostname = server[0];
-            int port = -1;
-            try
+            httpreq = HttpRequest.get(url);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        if (httpreq != null)
+        {
+            String body = httpreq.body();
+            httpreq.closeOutputQuietly();
+            if (body != null)
             {
-                port = Integer.parseInt(server[1]);
-            }
-            catch (NumberFormatException nfe)
-            {
-                nfe.printStackTrace();
-            }
-            if (!hostname.isEmpty() && port != -1)
-            {
-                Socket socket = new Socket(hostname, port);
-                PrintWriter writer =
-                        new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader reader =
-                        new BufferedReader(
-                                new InputStreamReader(socket.getInputStream()));
-                writer.println(request);
-                String data;
-                while ((data = reader.readLine()) != null)
+                Response resp = Response.fromJSON(body);
+                switch (handleResponse(resp))
                 {
-                    switch (handleResponse(Response.fromJSON(data)))
+                    case SUCCESS:
+                        showToast("Data updated");
+                        return;
+                    case ERROR:
+                        return;
+                }
+            }
+        }
+    }
+    
+    private String getURL(Request request)
+    {
+        String url = getServer();
+        url += "?version=" + mainActivity.getVersionName().substring(1);
+        String type = request.getType().toString().toLowerCase();
+        url += "&type=" + type;
+        if (type != null)
+        {
+            if (type.equals("all") || type.equals("tags") ||
+                    type.equals("patreon_files") ||
+                    type.equals("verify_patreon_account"))
+            {
+                JSONObject data = request.getData();
+                if (data != null)
+                {
+                    try
                     {
-                        case SUCCESS:
-                            showToast("Data updated");
-                            return;
-                        case ERROR:
-                            return;
+                        url += "&email=" + data.getString("email");
+                        url += "&password=" + data.getString("password");
+                    }
+                    catch (JSONException je)
+                    {
+                        je.printStackTrace();
                     }
                 }
             }
-            else
+        }
+        return url;
+    }
+    
+    private String getServer()
+    {
+        String server = prefs.getString("server",
+                mainActivity.getString(R.string.main_server));
+        String hostname = server.substring(0, server.lastIndexOf(':'));
+        String portstr = server.substring(server.lastIndexOf(':')+1, server.length());
+        int port = -1;
+        if (server.indexOf(':') == server.lastIndexOf(':') &&
+                (server.contains("http://") || server.contains("https://")))
+        {
+            hostname = server;
+        }
+        else
+        {
+            try
             {
-                showToast("Server is invalid");
+                port = Integer.parseInt(portstr);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
-        catch (IOException ioe)
-        {
-            ioe.printStackTrace();
-            showToast("Server connection error");
-        }
+        return port == -1 ? hostname :
+                prefs.getString("server",
+                        mainActivity.getString(R.string.main_server));
     }
-
+    
     private ResponseCode handleResponse(Response response)
     {
         ResponseCode code = ResponseCode.FAILED;
@@ -427,14 +469,9 @@ public class DataManager
         {
             SharedPreferences.Editor editor = prefs.edit();
             JSONObject rawjson = response.toJSON();
-            JSONArray dataArr = new JSONArray();
-            if (rawjson.has("data"))
-            {
-                dataArr = rawjson.getJSONArray("data");
-            }
             if (response.getType() == ResponseType.ALL)
             {
-                JSONObject data = dataArr.getJSONObject(0);
+                JSONObject data = rawjson.getJSONObject("data");
                 JSONArray files = data.getJSONArray("files");
                 JSONArray tags = data.getJSONArray("tags");
                 JSONArray series = data.getJSONArray("series");
@@ -454,23 +491,26 @@ public class DataManager
             }
             else if (response.getType() == ResponseType.FILES)
             {
-                editor.putString("files", dataArr.toString());
+                JSONArray data = rawjson.getJSONArray("data");
+                editor.putString("files", data.toString());
                 code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.TAGS)
             {
-                editor.putString("tags", dataArr.toString());
+                JSONArray data = rawjson.getJSONArray("data");
+                editor.putString("tags", data.toString());
                 code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.SERIES)
             {
-                editor.putString("series", dataArr.toString());
+                JSONArray data = rawjson.getJSONArray("data");
+                editor.putString("series", data.toString());
                 code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.PATREON_FILES)
             {
-                editor.putString("patreonFiles", dataArr.getJSONObject(0)
-                        .getJSONArray("patreonFiles").toString());
+                JSONArray data = rawjson.getJSONArray("data");
+                editor.putString("patreonFiles", data.toString());
                 code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.FEATURE_NOT_SUPPORTED)
@@ -493,6 +533,11 @@ public class DataManager
             {
                 showToast("Error: Patreon account is invalid");
                 code = ResponseCode.ERROR;
+            }
+            else if (response.getType() == ResponseType.OUTDATED_CLIENT)
+            {
+                showToast("Error: You must update the app in order " +
+                        "to connect to this server");
             }
             if (code == ResponseCode.SUCCESS)
             {

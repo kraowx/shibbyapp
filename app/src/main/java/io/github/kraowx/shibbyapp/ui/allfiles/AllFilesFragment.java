@@ -62,18 +62,19 @@ public class AllFilesFragment extends Fragment
         prefs = PreferenceManager.getDefaultSharedPreferences(
                 (MainActivity)getActivity());
         editor = prefs.edit();
-        String server = prefs.getString("server", null);
-        boolean firstRun = server == null;
-        if (firstRun)
-        {
-            ServerSelectorDialog selectorDialog =
-                    new ServerSelectorDialog((MainActivity)getActivity());
-            selectorDialog.setServerSelectedListener(this);
-        }
-        else
-        {
-            startInitialUpdate();
-        }
+        startInitialUpdate();
+//        String server = prefs.getString("server", null);
+//        boolean firstRun = server == null;
+//        if (firstRun)
+//        {
+//            ServerSelectorDialog selectorDialog =
+//                    new ServerSelectorDialog((MainActivity)getActivity());
+//            selectorDialog.setServerSelectedListener(this);
+//        }
+//        else
+//        {
+//            startInitialUpdate();
+//        }
 
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
@@ -136,7 +137,14 @@ public class AllFilesFragment extends Fragment
         }
         else
         {
-            refreshLayout.setRefreshing(false);
+            refreshLayout.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    refreshLayout.setRefreshing(false);
+                }
+            });
             Toast.makeText((MainActivity)getActivity(),
                     "No server specified", Toast.LENGTH_LONG).show();
         }
@@ -233,8 +241,15 @@ public class AllFilesFragment extends Fragment
                 }
                 else
                 {
-                    progressDialog.setTitle("Fetching first-time data...");
-                    progressDialog.show();
+                    ((MainActivity)getActivity()).runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            progressDialog.setTitle("Fetching first-time data...");
+                            progressDialog.show();
+                        }
+                    });
                     new Timer().scheduleAtFixedRate(new TimerTask()
                     {
                         @Override
@@ -253,6 +268,7 @@ public class AllFilesFragment extends Fragment
                                         {
                                             progressDialog.hide();
                                         }
+                                        refreshLayout.setRefreshing(false);
                                     }
                                 });
                                 this.cancel();

@@ -78,20 +78,7 @@ public class Request
 
     public JSONObject toJSON()
     {
-        JSONObject json = new JSONObject();
-        try
-        {
-            json.put("type", reqType.toString());
-            if (data != null)
-            {
-                json.put("data", data.toString());
-            }
-        }
-        catch (JSONException je)
-        {
-            je.printStackTrace();
-        }
-        return json;
+        return data;
     }
 
     public RequestType getType()

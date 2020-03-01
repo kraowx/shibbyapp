@@ -45,7 +45,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
-import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
@@ -90,6 +89,21 @@ public class MainActivity extends AppCompatActivity
     public SearchView getSearchView()
     {
         return searchView;
+    }
+    
+    public String getVersionName()
+    {
+        try
+        {
+            PackageInfo pInfo = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0);
+            return "v" + pInfo.versionName;
+        }
+        catch (PackageManager.NameNotFoundException nnfe)
+        {
+            nnfe.printStackTrace();
+        }
+        return "";
     }
 
     @Override
@@ -369,20 +383,5 @@ public class MainActivity extends AppCompatActivity
     private Version getVersion()
     {
         return new Version(getVersionName(), IS_PRE_RELEASE);
-    }
-
-    private String getVersionName()
-    {
-        try
-        {
-            PackageInfo pInfo = getPackageManager()
-                    .getPackageInfo(getPackageName(), 0);
-            return "v" + pInfo.versionName;
-        }
-        catch (PackageManager.NameNotFoundException nnfe)
-        {
-            nnfe.printStackTrace();
-        }
-        return "";
     }
 }

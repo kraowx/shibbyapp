@@ -48,7 +48,7 @@ public class ServerSelectorDialog extends Dialog
 			@Override
 			public void onClick(View v)
 			{
-				editor.putString("server", "shibbyserver.ddns.net:2012");
+				editor.putString("server", mainActivity.getString(R.string.main_server));
 				editor.commit();
 				if (serverSelectedListener != null)
 				{

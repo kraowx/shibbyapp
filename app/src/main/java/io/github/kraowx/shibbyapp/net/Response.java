@@ -1,15 +1,14 @@
 package io.github.kraowx.shibbyapp.net;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Response
 {
     private ResponseType respType;
-    private JSONArray data;
+    private JSONObject data;
 
-    public Response(ResponseType respType, JSONArray data)
+    public Response(ResponseType respType, JSONObject data)
     {
         this.respType = respType;
         this.data = data;
@@ -25,10 +24,7 @@ public class Response
             {
                 resp.respType = formatResponseType(obj.getString("type"));
             }
-            if (obj.has("data"))
-            {
-                resp.data = obj.getJSONArray("data");
-            }
+            resp.data = obj;
         }
         catch (JSONException je)
         {
@@ -39,17 +35,18 @@ public class Response
 
     public JSONObject toJSON()
     {
-        JSONObject json = new JSONObject();
-        try
-        {
-            json.put("type", respType.toString());
-            json.put("data", data);
-        }
-        catch (JSONException je)
-        {
-            je.printStackTrace();
-        }
-        return json;
+//        JSONObject json = new JSONObject();
+//        try
+//        {
+//            json.put("type", respType.toString());
+//            json.put("data", data);
+//        }
+//        catch (JSONException je)
+//        {
+//            je.printStackTrace();
+//        }
+//        return json;
+        return data;
     }
 
     public ResponseType getType()
@@ -57,7 +54,7 @@ public class Response
         return respType;
     }
     
-    public JSONArray getData()
+    public JSONObject getData()
     {
         return data;
     }
