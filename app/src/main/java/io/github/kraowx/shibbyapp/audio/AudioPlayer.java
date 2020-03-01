@@ -127,6 +127,10 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         {
             String cookie = mainActivity.getPatreonSessionManager().getCookie();
             Map<String, String> headers = new HashMap<String, String>();
+            if (cookie == null)
+            {
+                cookie = "";
+            }
             headers.put("Cookie", cookie);
             mediaPlayer.setDataSource(mainActivity, Uri.parse(strings[0]), headers);
             mediaPlayer.prepare();
