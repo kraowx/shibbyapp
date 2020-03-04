@@ -42,6 +42,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             seeking, queueIsPlaylist,
             timerRunning;
     private int delayTime, setDelay, loop;
+    private long fileDuration;
     private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
     private AudioPlayer audioPlayer;
@@ -298,7 +299,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             @Override
             public void run()
             {
-                txtRemainingTime.setText(formatTime(0));
+                txtRemainingTime.setText(formatTime((int)fileDuration));
             }
         });
         progressBar.post(new Runnable()
@@ -306,7 +307,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             @Override
             public void run()
             {
-                progressBar.setMax(10000);
+                progressBar.setMax((int)fileDuration);
                 progressBar.setProgress(0);
             }
         });
@@ -325,6 +326,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         }
         fileDownloaded = file != null ? AudioDownloadManager
                 .fileIsDownloaded(mainActivity, file) : false;
+        fileDuration = file.getDuration();
         if (file != null)
         {
             audioPlayer = new AudioPlayer(progressDialog, fileDownloaded, mainActivity);

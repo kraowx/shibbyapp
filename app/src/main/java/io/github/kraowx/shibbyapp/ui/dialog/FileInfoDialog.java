@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ public class FileInfoDialog extends Dialog
 				.getDefaultSharedPreferences(mainActivity);
 		boolean displayLongNames = prefs.getBoolean(
 				"displayLongNames", false);
+		/* Name */
 		String name = displayLongNames ? file.getName() : file.getShortName();
 		if (file.isPatreonFile())
 		{
@@ -40,6 +42,17 @@ public class FileInfoDialog extends Dialog
 			name += " <font color=" + hex + ">(Patreon)</font>";
 		}
 		title.setText(Html.fromHtml(name));
+		/* Duration */
+		TextView duration = findViewById(R.id.txtDuration);
+		if (file.getDuration() != 0)
+		{
+			duration.setText(formatTime((int)file.getDuration()));
+		}
+		else
+		{
+			duration.setVisibility(View.GONE);
+		}
+		/* Tags */
 		TextView tags = findViewById(R.id.txtTags);
 		if (file.getTags() == null ||
 				(file.getTags() != null && file.getTags().isEmpty()))
@@ -50,6 +63,7 @@ public class FileInfoDialog extends Dialog
 		{
 			tags.setText(getTagsString(file.getTags()));
 		}
+		/* Description */
 		TextView description = findViewById(R.id.txtDescription);
 		if (file.getDescription() == null ||
 				(file.getDescription() != null && file.getDescription().isEmpty()))
@@ -76,5 +90,23 @@ public class FileInfoDialog extends Dialog
 			}
 		}
 		return tagsStr + "\n";
+	}
+	
+	private String formatTime(int time)
+	{
+		int hours = (int)((time / (1000*60*60)) % 24);
+		int minutes = (int)((time / (1000*60)) % 60);
+		int seconds = (int)(time / 1000) % 60;
+		String hoursStr = String.format("%02d", hours);
+		String minutesStr = String.format("%02d", minutes);
+		String secondsStr = String.format("%02d", seconds);
+		if (hours > 0)
+		{
+			return hoursStr + ":" + minutesStr + ":" + secondsStr;
+		}
+		else
+		{
+			return minutesStr + ":" + secondsStr;
+		}
 	}
 }

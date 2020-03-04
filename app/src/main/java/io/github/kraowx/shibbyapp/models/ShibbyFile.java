@@ -18,6 +18,7 @@ public class ShibbyFile
     private boolean isPatreonFile;
     private String name, shortName, id,
             link, description, type;
+    private long duration;
     private List<String> tags;
     private Map<String, String> extraData;
 
@@ -113,6 +114,10 @@ public class ShibbyFile
                         .replace("\\/", "/");
             }
             file.description = json.getString("description");
+            if (json.has("duration"))
+            {
+                file.duration = json.getLong("duration");
+            }
             if (!json.has("type"))
             {
                 file.type = "";
@@ -165,6 +170,10 @@ public class ShibbyFile
             json.put("tags", tagsJson);
             json.put("link", link);
             json.put("description", description);
+            if (duration != 0)
+            {
+                json.put("duration", duration);
+            }
             json.put("type", type);
             json.put("isPatreonFile", isPatreonFile);
             JSONObject extras = new JSONObject();
@@ -243,6 +252,16 @@ public class ShibbyFile
     public void setTags(List<String> tags)
     {
         this.tags = tags;
+    }
+    
+    public long getDuration()
+    {
+        return duration;
+    }
+    
+    public void setDuration(long duration)
+    {
+        this.duration = duration;
     }
 
     public boolean matchesTag(String search)

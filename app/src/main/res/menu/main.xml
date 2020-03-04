@@ -24,4 +24,9 @@
         android:title="Search"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@drawable/ic_filter_list"
+        android:title="Filter"
+        app:showAsAction="ifRoom"/>
 </menu>
