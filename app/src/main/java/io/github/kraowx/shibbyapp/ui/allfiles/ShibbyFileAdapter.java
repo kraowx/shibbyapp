@@ -81,7 +81,6 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             name += " <font color=" + hex + ">[User]</font> ";
         }
         name += displayLongNames ? file.getName() : file.getShortName();
-        System.out.println(searchText + "  " + name);
         if (searchText != null && !searchText.isEmpty() &&
                 name.toLowerCase().contains(searchText.toLowerCase()))
         {
