@@ -166,8 +166,15 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
 
         if (!fileDownloaded)
         {
-            progressDialog.setMessage("Buffering...");
-            progressDialog.show();
+            mainActivity.runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    progressDialog.setMessage("Buffering...");
+                    progressDialog.show();
+                }
+            });
         }
     }
     

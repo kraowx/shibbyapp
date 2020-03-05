@@ -235,8 +235,11 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     public void stopTimer()
     {
         timerRunning = false;
-        timer.cancel();
-        timer.purge();
+        if (timer != null)
+        {
+            timer.cancel();
+            timer.purge();
+        }
     }
 
     public void loadFile(final ShibbyFile file)
