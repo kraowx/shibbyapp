@@ -21,6 +21,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,14 +33,17 @@ import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ServerSelectorDialog;
 
 public class AllFilesFragment extends Fragment
         implements ShibbyFileAdapter.ItemClickListener,
         SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
-        ServerSelectorDialog.ServerSelectedListener
+        ServerSelectorDialog.ServerSelectedListener, FileFilterController.FilterListener
 {
+    private String[] fileTypes, tags;
+    private int[] durations;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     private View root;
@@ -63,18 +68,6 @@ public class AllFilesFragment extends Fragment
                 (MainActivity)getActivity());
         editor = prefs.edit();
         startInitialUpdate();
-//        String server = prefs.getString("server", null);
-//        boolean firstRun = server == null;
-//        if (firstRun)
-//        {
-//            ServerSelectorDialog selectorDialog =
-//                    new ServerSelectorDialog((MainActivity)getActivity());
-//            selectorDialog.setServerSelectedListener(this);
-//        }
-//        else
-//        {
-//            startInitialUpdate();
-//        }
 
         FloatingActionButton fabAddPlaylist =
                 ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
@@ -85,7 +78,8 @@ public class AllFilesFragment extends Fragment
             @Override
             public void run()
             {
-                final SearchView searchView = ((MainActivity)getActivity()).getSearchView();
+                final SearchView searchView =
+                        ((MainActivity)getActivity()).getSearchView();
                 if (searchView != null)
                 {
                     searchView.post(new Runnable()
@@ -102,7 +96,24 @@ public class AllFilesFragment extends Fragment
                 }
             }
         }, 0, 1000);
+        
+        FileFilterController fileFilterController =
+                ((MainActivity)getActivity()).getFileFilterController();
+        fileFilterController.setButtonVisible(true);
+        fileFilterController.setListener(this);
         return root;
+    }
+    
+    @Override
+    public void filtersUpdated(String[] fileTypes, int[] durations, String[] tags)
+    {
+        if (listAdapter != null)
+        {
+            this.fileTypes = fileTypes;
+            this.durations = durations;
+            this.tags = tags;
+            listAdapter.filterDisplayItems(null, fileTypes, durations, tags);
+        }
     }
     
     @Override
@@ -155,7 +166,7 @@ public class AllFilesFragment extends Fragment
     {
         if (listAdapter != null)
         {
-            listAdapter.filterDisplayItems(text);
+            listAdapter.filterDisplayItems(text, this.fileTypes, this.durations, this.tags);
         }
         return false;
     }

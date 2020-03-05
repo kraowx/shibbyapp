@@ -31,6 +31,7 @@ import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.OnStartDragListener;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCallback;
 
@@ -85,6 +86,10 @@ public class PlaylistsFragment extends Fragment
                 }
             }
         }, 0, 1000);
+    
+        FileFilterController fileFilterController =
+                ((MainActivity)getActivity()).getFileFilterController();
+        fileFilterController.setButtonVisible(false);
         return root;
     }
     

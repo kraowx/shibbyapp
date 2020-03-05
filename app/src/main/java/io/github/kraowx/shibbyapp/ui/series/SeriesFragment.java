@@ -24,6 +24,7 @@ import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 
 public class SeriesFragment extends Fragment
         implements ShibbySeriesAdapter.ItemClickListener,
@@ -74,6 +75,10 @@ public class SeriesFragment extends Fragment
                 }
             }
         }, 0, 1000);
+    
+        FileFilterController fileFilterController =
+                ((MainActivity)getActivity()).getFileFilterController();
+        fileFilterController.setButtonVisible(false);
         return root;
     }
 

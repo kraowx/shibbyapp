@@ -30,6 +30,7 @@ import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.allfiles.ShibbyFileArrayDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 
 public class TagsFragment extends Fragment
         implements ShibbyTagAdapter.ItemClickListener,
@@ -89,6 +90,10 @@ public class TagsFragment extends Fragment
                 }
             }
         }, 0, 1000);
+    
+        FileFilterController fileFilterController =
+                ((MainActivity)getActivity()).getFileFilterController();
+        fileFilterController.setButtonVisible(false);
         return root;
     }
 

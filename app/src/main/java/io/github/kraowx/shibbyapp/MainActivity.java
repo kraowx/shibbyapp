@@ -50,6 +50,8 @@ import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportAppDataDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     private AudioDownloadManager downloadManager;
     private PatreonSessionManager patreonSessionManager;
     private SearchView searchView;
+    private FileFilterController fileFilterController;
 
     public static Context getContext()
     {
@@ -89,6 +92,11 @@ public class MainActivity extends AppCompatActivity
     public SearchView getSearchView()
     {
         return searchView;
+    }
+    
+    public FileFilterController getFileFilterController()
+    {
+        return fileFilterController;
     }
     
     public String getVersionName()
@@ -129,6 +137,7 @@ public class MainActivity extends AppCompatActivity
         audioController = new AudioController(this);
         downloadManager = new AudioDownloadManager(this);
         patreonSessionManager = new PatreonSessionManager(this);
+        fileFilterController = new FileFilterController(this);
         
         final String patreonEmail = prefs.getString("patreonEmail", null);
         final String patreonPassword = prefs.getString("patreonPassword", null);
@@ -216,6 +225,7 @@ public class MainActivity extends AppCompatActivity
     {
         getMenuInflater().inflate(R.menu.main, menu);
         searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        fileFilterController.setMenuItem(menu.findItem(R.id.action_filter));
         return true;
     }
 
@@ -224,6 +234,9 @@ public class MainActivity extends AppCompatActivity
     {
         switch (item.getItemId())
         {
+            case R.id.action_filter:
+                fileFilterController.showDialog();
+                return true;
             case R.id.action_settings:
                 showSettingsDialog();
                 return true;

@@ -81,7 +81,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
             name += " <font color=" + hex + ">[User]</font> ";
         }
         name += displayLongNames ? file.getName() : file.getShortName();
-        if (!searchText.isEmpty() &&
+        if (searchText != null && !searchText.isEmpty() &&
                 name.toLowerCase().contains(searchText.toLowerCase()))
         {
             int index = name.toLowerCase().indexOf(searchText.toLowerCase());
@@ -121,30 +121,75 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     {
         return mData.size();
     }
-
-    public void filterDisplayItems(String text)
+    
+    public void filterDisplayItems(String text, String[] fileTypes,
+                                   int[] durations, String[] tags)
     {
         searchText = text;
+        int k;
+        int total = (fileTypes != null ? 1 : 0) + (durations != null ? 1 : 0) +
+                ((tags != null && tags.length > 0) ? 1 : 0) +
+                ((text != null && !text.isEmpty()) ? 1 : 0);
         mData.clear();
-        if (text.isEmpty())
+        for (int i = 0; i < mDataOrig.size(); i++)
         {
-            mData.addAll(mDataOrig);
-        }
-        else
-        {
-            text = text.toLowerCase();
-            for (ShibbyFile file : mDataOrig)
+            ShibbyFile file = mDataOrig.get(i);
+            k = 0;
+            if (fileTypes != null)
             {
+                for (String type : fileTypes)
+                {
+                    if (file.getType().equals(type))
+                    {
+                        k++;
+                        break;
+                    }
+                }
+            }
+            if (durations != null)
+            {
+                for (int dur : durations)
+                {
+                    float duration = file.getDuration() / (float) (60 * 1000);
+                    if ((dur == 60 && duration > 60))
+                    {
+                        k++;
+                        break;
+                    }
+                    else if (dur < 60 && duration > dur && duration <= dur + 20)
+                    {
+                        k++;
+                        break;
+                    }
+                }
+            }
+            if (text != null && !text.isEmpty())
+            {
+                text = text.toLowerCase();
                 if (file.getName().toLowerCase().contains(text) ||
                         file.matchesTag(text))
                 {
-                    mData.add(file);
+                    k++;
                 }
+            }
+            if (tags != null && tags.length > 0)
+            {
+                for (String tag : tags)
+                {
+                    if (file.hasTag(tag))
+                    {
+                        k++;
+                        break;
+                    }
+                }
+            }
+            if (k == total && !mData.contains(file))
+            {
+                mData.add(file);
             }
         }
         notifyDataSetChanged();
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {

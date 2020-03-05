@@ -1,17 +1,13 @@
 package io.github.kraowx.shibbyapp.ui.patreonfiles;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,14 +27,17 @@ import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
 
 public class PatreonFilesFragment extends Fragment
 		implements ShibbyPatreonFileAdapter.ItemClickListener,
 		SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
-		PatreonLoginDialog.LoginListener
+		PatreonLoginDialog.LoginListener, FileFilterController.FilterListener
 {
+	private String[] fileTypes, tags;
+	private int[] durations;
 	private RecyclerView list;
 	private SwipeRefreshLayout refreshLayout;
 	private ShibbyPatreonFileAdapter listAdapter;
@@ -100,7 +99,24 @@ public class PatreonFilesFragment extends Fragment
 				}
 			}
 		}, 0, 1000);
+		
+		FileFilterController fileFilterController =
+				((MainActivity)getActivity()).getFileFilterController();
+		fileFilterController.setButtonVisible(true);
+		fileFilterController.setListener(this);
 		return root;
+	}
+	
+	@Override
+	public void filtersUpdated(String[] fileTypes, int[] durations, String[] tags)
+	{
+		if (listAdapter != null)
+		{
+			this.fileTypes = fileTypes;
+			this.durations = durations;
+			this.tags = tags;
+			listAdapter.filterDisplayItems(null, fileTypes, durations, tags);
+		}
 	}
 	
 	@Override
@@ -151,7 +167,7 @@ public class PatreonFilesFragment extends Fragment
 	{
 		if (listAdapter != null)
 		{
-			listAdapter.filterDisplayItems(text);
+			listAdapter.filterDisplayItems(text, this.fileTypes, this.durations, this.tags);
 		}
 		return false;
 	}

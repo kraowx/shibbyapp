@@ -28,12 +28,16 @@ import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 
 public class DownloadsFragment extends Fragment
         implements ShibbyFileAdapter.ItemClickListener,
-        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
+        FileFilterController.FilterListener
 {
+    private String[] fileTypes, tags;
+    private int[] durations;
     private RecyclerView list;
     private SwipeRefreshLayout refreshLayout;
     private ShibbyFileAdapter listAdapter;
@@ -90,7 +94,24 @@ public class DownloadsFragment extends Fragment
                 }
             }
         }, 0, 1000);
+    
+        FileFilterController fileFilterController =
+                ((MainActivity)getActivity()).getFileFilterController();
+        fileFilterController.setButtonVisible(true);
+        fileFilterController.setListener(this);
         return root;
+    }
+    
+    @Override
+    public void filtersUpdated(String[] fileTypes, int[] durations, String[] tags)
+    {
+        if (listAdapter != null)
+        {
+            this.fileTypes = fileTypes;
+            this.durations = durations;
+            this.tags = tags;
+            listAdapter.filterDisplayItems(null, fileTypes, durations, tags);
+        }
     }
 
     @Override
@@ -119,7 +140,7 @@ public class DownloadsFragment extends Fragment
     {
         if (listAdapter != null)
         {
-            listAdapter.filterDisplayItems(text);
+            listAdapter.filterDisplayItems(text, this.fileTypes, this.durations, this.tags);
         }
         return false;
     }

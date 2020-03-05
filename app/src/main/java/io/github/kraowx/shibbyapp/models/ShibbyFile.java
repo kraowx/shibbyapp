@@ -254,6 +254,18 @@ public class ShibbyFile
         this.tags = tags;
     }
     
+    public boolean hasTag(String tag)
+    {
+        for (String sTag : tags)
+        {
+            if (sTag.toLowerCase().equals(tag.toLowerCase()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public long getDuration()
     {
         return duration;

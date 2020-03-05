@@ -14,6 +14,7 @@ import android.widget.EditText;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 
+@Deprecated
 public class ServerSelectorDialog extends Dialog
 {
 	private ServerSelectedListener serverSelectedListener;
