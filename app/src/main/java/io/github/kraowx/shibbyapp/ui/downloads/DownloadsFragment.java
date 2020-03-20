@@ -30,6 +30,7 @@ import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
+import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class DownloadsFragment extends Fragment
         implements ShibbyFileAdapter.ItemClickListener,
@@ -59,10 +60,20 @@ public class DownloadsFragment extends Fragment
                 initializeList(root, downloadedFiles);
             }
         }.start();
-
-        FloatingActionButton fabAddPlaylist =
-                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
-        fabAddPlaylist.hide();
+    
+        FloatingActionButton fabAdd = ((MainActivity)getActivity())
+                .findViewById(R.id.fabAddPlaylist);
+        fabAdd.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
+                        (MainActivity)getActivity(), listAdapter.getCheckedFiles()
+                        .toArray(new ShibbyFile[0]), false);
+            }
+        });
+        fabAdd.hide();
 
         refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
@@ -155,7 +166,8 @@ public class DownloadsFragment extends Fragment
     public void onItemClick(View view, int position)
     {
         FileInfoDialog fileInfoDialog = new FileInfoDialog(
-                (MainActivity)getActivity(), listAdapter.getItem(position));
+                (MainActivity)getActivity(), listAdapter.getItem(position),
+                listAdapter.getData());
     }
 
     private void initializeList(View root, final List<ShibbyFile> files)

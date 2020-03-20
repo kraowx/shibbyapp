@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
@@ -20,6 +22,7 @@ import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
+import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCallback;
 
 public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.ItemClickListener,
@@ -45,6 +48,20 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.array_info_dialog);
         setTitle(fileArray.getName());
+    
+        FloatingActionButton fabAdd = (mainActivity)
+                .findViewById(R.id.fabAddPlaylist);
+        fabAdd.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
+                        ShibbyFileArrayDialog.this.mainActivity, listAdapter.getCheckedFiles()
+                        .toArray(new ShibbyFile[0]), false);
+            }
+        });
+        
         initializeList();
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(getWindow().getAttributes());
@@ -59,12 +76,14 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         if (playlistName != null)
         {
             FileInfoDialog fileInfoDialog = new FileInfoDialog(
-                    mainActivity, listAdapterPlaylists.getItem(position));
+                    mainActivity, listAdapterPlaylists.getItem(position),
+                    listAdapterPlaylists.getData());
         }
         else
         {
             FileInfoDialog fileInfoDialog = new FileInfoDialog(
-                    mainActivity, listAdapter.getItem(position));
+                    mainActivity, listAdapter.getItem(position),
+                    listAdapter.getData());
         }
     }
 
@@ -97,38 +116,5 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
             listAdapter.setClickListener(ShibbyFileArrayDialog.this);
         }
         show();
-    }
-
-    private void createFileInfoDialog(ShibbyFile file)
-    {
-        final Dialog dialog = new Dialog(getContext());
-        dialog.setContentView(R.layout.file_info_dialog);
-        dialog.setTitle("File Info");
-        TextView title = dialog.findViewById(R.id.txtTitle);
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(mainActivity);
-        boolean displayLongNames = prefs.getBoolean(
-                "displayLongNames", false);
-        title.setText(displayLongNames ?
-                file.getName() : file.getShortName());
-        TextView tags = dialog.findViewById(R.id.txtTags);
-        tags.setText(getTagsString(file.getTags()));
-        TextView description = dialog.findViewById(R.id.txtDescription);
-        description.setText(file.getDescription());
-        dialog.show();
-    }
-
-    private String getTagsString(List<String> tags)
-    {
-        String tagsStr = "";
-        for (int i = 0; i < tags.size(); i++)
-        {
-            tagsStr += tags.get(i);
-            if (i < tags.size()-1)
-            {
-                tagsStr += "  |  ";
-            }
-        }
-        return tagsStr + "\n";
     }
 }

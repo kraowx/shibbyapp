@@ -148,7 +148,8 @@ public class UserFilesFragment extends Fragment
     public void onItemClick(View view, int position)
     {
         FileInfoDialog fileInfoDialog = new FileInfoDialog(
-                (MainActivity)getActivity(), listAdapter.getItem(position));
+                (MainActivity)getActivity(), listAdapter.getItem(position),
+                listAdapter.getData());
     }
     
     private void initializeList(View root, final List<ShibbyFile> files)

@@ -11,12 +11,15 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
 {
     private String searchText;
     private List<ShibbyFile> mData, mDataOrig;
+    private List<ShibbyFile> checkedFiles;
     private MainActivity mainActivity;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
@@ -47,6 +51,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
         this.mData = data;
         mDataOrig = (List<ShibbyFile>)((ArrayList<ShibbyFile>)mData).clone();
         this.mainActivity = mainActivity;
+        checkedFiles = new ArrayList<ShibbyFile>();
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         searchText = "";
     }
@@ -61,7 +66,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
-        ShibbyFile file = mData.get(position);
+        final ShibbyFile file = mData.get(position);
         boolean displayLongNames = prefs.getBoolean(
                 "displayLongNames", false);
         boolean showSpecialPrefixTags = prefs.getBoolean(
@@ -89,31 +94,44 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
             name = name.replace(sub, "<font color=red>" + sub + "</font>");
         }
         holder.txtFileName.setText(Html.fromHtml(name));
-        if (mainActivity.getDownloadManager().isDownloadingFile(file))
+    
+        if (checkedFiles.contains(file))
         {
-            holder.btnDownload.setColorFilter(ContextCompat
-                    .getColor(mainActivity, R.color.redAccent));
-        }
-        else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                file.getType().equals("user"))
-        {
-            holder.btnDownload.setColorFilter(ContextCompat
-                    .getColor(mainActivity, R.color.colorAccent));
+            holder.actionBox.setChecked(true);
         }
         else
         {
-            boolean darkModeEnabled = prefs
-                    .getBoolean("darkMode", false);
-            if (darkModeEnabled)
-            {
-                holder.btnDownload.setColorFilter(ContextCompat
-                        .getColor(mainActivity, R.color.grayLight));
-            }
-            else
-            {
-                holder.btnDownload.setColorFilter(null);
-            }
+            holder.actionBox.setChecked(false);
         }
+    
+        holder.actionBox.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                CheckBox actionBox = (CheckBox)v;
+                FloatingActionButton fabAdd =
+                        mainActivity.findViewById(R.id.fabAddPlaylist);
+            
+                if (actionBox.isChecked() && !checkedFiles.contains(file))
+                {
+                    checkedFiles.add(file);
+                }
+                else if (checkedFiles.contains(file))
+                {
+                    checkedFiles.remove(file);
+                }
+                
+                if (checkedFiles.size() == 1)
+                {
+                    fabAdd.show();
+                }
+                else if (checkedFiles.size() == 0)
+                {
+                    fabAdd.hide();
+                }
+            }
+        });
     }
 
     @Override
@@ -194,163 +212,20 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         TextView txtFileName;
-        ImageButton btnPlay, btnDownload, btnAddToPlaylist;
+        CheckBox actionBox;
 
         ViewHolder(View itemView)
         {
             super(itemView);
             txtFileName = itemView.findViewById(R.id.itemName);
             itemView.setOnClickListener(this);
-            initializeButtons(itemView);
+            actionBox = itemView.findViewById(R.id.actionBox);
         }
 
         @Override
         public void onClick(View view)
         {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-        }
-
-        private void initializeButtons(View view)
-        {
-            btnPlay = view.findViewById(R.id.btnPlay);
-            btnPlay.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View view)
-                {
-                    AudioController audioController = mainActivity.getAudioController();
-                    ShibbyFile file = getItem(getAdapterPosition());
-                    audioController.loadFile(file);
-                    audioController.setQueue(mData, false);
-                    audioController.setVisible(true);
-                }
-            });
-            btnDownload = view.findViewById(R.id.btnDownload);
-            btnDownload.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View view)
-                {
-                    final ShibbyFile file = getItem(getAdapterPosition());
-                    if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                            file.getType().equals("user")))
-                    {
-                        mainActivity.getDownloadManager().downloadFile(file, btnDownload);
-                        btnDownload.setColorFilter(ContextCompat
-                                .getColor(mainActivity, R.color.redAccent));
-                    }
-                    else if (mainActivity.getDownloadManager().isDownloadingFile(file))
-                    {
-                        if (mainActivity.getDownloadManager().cancelDownload(file))
-                        {
-                            boolean darkModeEnabled = prefs
-                                    .getBoolean("darkMode", false);
-                            if (darkModeEnabled)
-                            {
-                                btnDownload.setColorFilter(ContextCompat
-                                        .getColor(mainActivity, R.color.grayLight));
-                            }
-                            else
-                            {
-                                btnDownload.setColorFilter(null);
-                            }
-                            Toast.makeText(mainActivity, "Download cancelled",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        else
-                        {
-                            Toast.makeText(mainActivity, "Failed to cancel download",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                    else
-                    {
-                        Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
-                                R.drawable.ic_warning).mutate();
-                        darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
-                                {
-                                        -1, 0, 0, 0, 200,
-                                        0, -1, 0, 0, 200,
-                                        0, 0, -1, 0, 200,
-                                        0, 0, 0, 1, 0
-                                }));
-                        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
-                        AlertDialog.Builder builder;
-                        if (darkModeEnabled)
-                        {
-                            builder = new AlertDialog.Builder(mainActivity,
-                                    R.style.DialogThemeDark_Alert);
-                            builder.setIcon(darkIcon);
-                        }
-                        else
-                        {
-                            builder = new AlertDialog.Builder(mainActivity);
-                            builder.setIcon(R.drawable.ic_warning);
-                        }
-                        String title = "Delete ";
-                        String message = "Are you sure you want to delete this file?";
-                        if (file.getType().equals("user"))
-                        {
-                            title += "user file";
-                            message += " You will have to re-import it if " +
-                                    "you want to listen to it again.";
-                        }
-                        else
-                        {
-                            title += "download";
-                        }
-                        builder.setTitle(title)
-                                .setMessage(message)
-                                .setPositiveButton(android.R.string.yes,
-                                        new DialogInterface.OnClickListener()
-                                        {
-                                            public void onClick(DialogInterface dialog, int which)
-                                            {
-                                                AudioDownloadManager.deleteFile(mainActivity, file);
-                                                boolean darkModeEnabled = prefs
-                                                        .getBoolean("darkMode", false);
-                                                if (darkModeEnabled)
-                                                {
-                                                    btnDownload.setColorFilter(ContextCompat
-                                                            .getColor(mainActivity, R.color.grayLight));
-                                                }
-                                                else
-                                                {
-                                                    btnDownload.setColorFilter(null);
-                                                }
-                                                if (file.getType().equals("user"))
-                                                {
-                                                    new DataManager(mainActivity).removeUserFile(file);
-                                                    mData.remove(file);
-                                                    notifyDataSetChanged();
-                                                }
-                                            }
-                                        })
-                                .setNegativeButton(android.R.string.no, null)
-                                .show();
-                    }
-                }
-            });
-            btnAddToPlaylist = view.findViewById(R.id.btnAddToPlaylist);
-            btnAddToPlaylist.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View view)
-                {
-                    ShibbyFile file = getItem(getAdapterPosition());
-                    showAddFileToPlaylistDialog(file);
-                }
-            });
-            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
-            if (darkModeEnabled)
-            {
-                btnPlay.setColorFilter(ContextCompat
-                        .getColor(mainActivity, R.color.grayLight));
-                btnDownload.setColorFilter(ContextCompat
-                        .getColor(mainActivity, R.color.grayLight));
-                btnAddToPlaylist.setColorFilter(ContextCompat
-                        .getColor(mainActivity, R.color.grayLight));
-            }
         }
     }
 
@@ -373,6 +248,16 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     {
         mData = files;
     }
+    
+    List<ShibbyFile> getData()
+    {
+        return mData;
+    }
+    
+    List<ShibbyFile> getCheckedFiles()
+    {
+        return checkedFiles;
+    }
 
     void setClickListener(ItemClickListener itemClickListener)
     {
@@ -382,11 +267,5 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     public interface ItemClickListener
     {
         void onItemClick(View view, int position);
-    }
-
-    private void showAddFileToPlaylistDialog(ShibbyFile file)
-    {
-        AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
-                mainActivity, file, false);
     }
 }

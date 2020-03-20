@@ -26,14 +26,14 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
     private RecyclerView list;
     private ShibbyPlaylistAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
-    private ShibbyFile file;
+    private ShibbyFile[] files;
     private MainActivity mainActivity;
 
-    public AddFileToPlaylistDialog(MainActivity mainActivity, ShibbyFile file,
+    public AddFileToPlaylistDialog(MainActivity mainActivity, ShibbyFile[] files,
                                    boolean showDeleteButton)
     {
         super(mainActivity);
-        this.file = file;
+        this.files = files;
         this.mainActivity = mainActivity;
         this.showDeleteButton = showDeleteButton;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -51,7 +51,7 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
         }
         else
         {
-            addFileToPlaylist(file, playlistName);
+            addFileToPlaylist(files, playlistName);
         }
     }
 
@@ -69,18 +69,43 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
         show();
     }
 
-    private void addFileToPlaylist(ShibbyFile file, String playlistName)
+    private void addFileToPlaylist(ShibbyFile[] files, String playlistName)
     {
-        if (PlaylistManager.addFileToPlaylist(mainActivity, file, playlistName))
+        if (files.length == 1)
         {
-            Toast.makeText(mainActivity, "File added to playlist",
-                    Toast.LENGTH_LONG).show();
-            this.dismiss();
+            if (PlaylistManager.addFileToPlaylist(mainActivity, files[0], playlistName))
+            {
+                Toast.makeText(mainActivity, "File added to playlist",
+                        Toast.LENGTH_LONG).show();
+                this.dismiss();
+            }
+            else
+            {
+                Toast.makeText(mainActivity, "File is already in this playlist",
+                        Toast.LENGTH_LONG).show();
+            }
         }
-        else
+        else if (files.length > 1)
         {
-            Toast.makeText(mainActivity, "File is already in this playlist",
-                    Toast.LENGTH_LONG).show();
+            int added = 0;
+            for (ShibbyFile file : files)
+            {
+                if (PlaylistManager.addFileToPlaylist(mainActivity, file, playlistName))
+                {
+                    added++;
+                }
+            }
+            if (added > 0)
+            {
+                Toast.makeText(mainActivity, "Files added to playlist",
+                        Toast.LENGTH_LONG).show();
+                this.dismiss();
+            }
+            else
+            {
+                Toast.makeText(mainActivity, "These file are already in this playlist",
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 

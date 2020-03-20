@@ -371,6 +371,11 @@ public class ShibbyPlaylistFileAdapter
         mData.remove(item);
     }
     
+    List<ShibbyFile> getData()
+    {
+        return mData;
+    }
+    
     void setClickListener(ItemClickListener itemClickListener)
     {
         this.mClickListener = itemClickListener;

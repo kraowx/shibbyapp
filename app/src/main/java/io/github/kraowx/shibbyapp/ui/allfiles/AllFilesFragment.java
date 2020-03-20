@@ -21,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +34,11 @@ import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ServerSelectorDialog;
+import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class AllFilesFragment extends Fragment
         implements ShibbyFileAdapter.ItemClickListener,
@@ -69,9 +72,19 @@ public class AllFilesFragment extends Fragment
         editor = prefs.edit();
         startInitialUpdate();
 
-        FloatingActionButton fabAddPlaylist =
-                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
-        fabAddPlaylist.hide();
+        FloatingActionButton fabAdd = ((MainActivity)getActivity())
+                .findViewById(R.id.fabAddPlaylist);
+        fabAdd.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
+                        (MainActivity)getActivity(), listAdapter.getCheckedFiles()
+                        .toArray(new ShibbyFile[0]), false);
+            }
+        });
+        fabAdd.hide();
 
         new Timer().scheduleAtFixedRate(new TimerTask()
         {
@@ -181,7 +194,8 @@ public class AllFilesFragment extends Fragment
     public void onItemClick(View view, int position)
     {
         FileInfoDialog fileInfoDialog = new FileInfoDialog(
-                (MainActivity)getActivity(), listAdapter.getItem(position));
+                (MainActivity)getActivity(), listAdapter.getItem(position),
+                listAdapter.getData());
     }
     
     private void startInitialUpdate()
@@ -224,7 +238,14 @@ public class AllFilesFragment extends Fragment
                             @Override
                             public void run()
                             {
-                                dataManager.requestData(Request.all());
+                                try
+                                {
+                                    dataManager.requestData(Request.all());
+                                }
+                                catch (HttpRequest.HttpRequestException hre)
+                                {
+                                    hre.printStackTrace();
+                                }
                                 ((MainActivity) getActivity()).runOnUiThread(new Runnable()
                                 {
                                     @Override

@@ -30,6 +30,7 @@ import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
+import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class PatreonFilesFragment extends Fragment
 		implements ShibbyPatreonFileAdapter.ItemClickListener,
@@ -66,9 +67,19 @@ public class PatreonFilesFragment extends Fragment
 			}
 		}.start();
 		
-		FloatingActionButton fabAddPlaylist =
-				((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
-		fabAddPlaylist.hide();
+		FloatingActionButton fabAdd = ((MainActivity)getActivity())
+				.findViewById(R.id.fabAddPlaylist);
+		fabAdd.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
+						(MainActivity)getActivity(), listAdapter.getCheckedFiles()
+						.toArray(new ShibbyFile[0]), false);
+			}
+		});
+		fabAdd.hide();
 		
 		if (!((MainActivity)getActivity()).getPatreonSessionManager().isAuthenticated())
 		{
@@ -182,7 +193,7 @@ public class PatreonFilesFragment extends Fragment
 	public void onItemClick(View view, int position)
 	{
 		FileInfoDialog fileInfoDialog = new FileInfoDialog(
-				(MainActivity)getActivity(), listAdapter.getItem(position));
+				(MainActivity)getActivity(), listAdapter.getItem(position), listAdapter.getData());
 	}
 	
 	@Override
