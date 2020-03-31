@@ -186,7 +186,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                 });
                             }
                             // the player is not looping, so stop the player
-                            if (!audioPlayer.isLooping())
+                            if (!audioPlayer.isLooping() && !autoplayAllowed())
                             {
                                 btnPlayPause.post(new Runnable()
                                 {
