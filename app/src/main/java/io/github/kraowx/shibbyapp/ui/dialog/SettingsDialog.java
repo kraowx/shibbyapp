@@ -36,6 +36,7 @@ public class SettingsDialog extends Dialog
 		boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
 		boolean showSpecialPrefixTags = prefs.getBoolean("showSpecialPrefixTags", true);
 		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+		boolean wakeLockEnabled = prefs.getBoolean("wakeLock", false);
 		int autoplay = prefs.getInt("autoplay", 1);
 		String server = prefs.getString("server", mainActivity.getString(R.string.main_server));
 		final Switch switchUpdateStartup = findViewById(R.id.switchUpdateOnStartup);
@@ -100,6 +101,20 @@ public class SettingsDialog extends Dialog
 						Toast.LENGTH_LONG).show();
 			}
 		});
+		final Switch switchWakeLock = findViewById(R.id.switchWakeLock);
+		switchWakeLock.setChecked(wakeLockEnabled);
+		switchWakeLock.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+			{
+				editor.putBoolean("wakeLock", isChecked);
+				editor.commit();
+				Toast.makeText(mainActivity.getContext(),
+						"Relaunch the app for the change to fully take effect",
+						Toast.LENGTH_LONG).show();
+			}
+		});
 		final EditText txtServer = findViewById(R.id.txtServer);
 		txtServer.setText(server);
 		final Spinner spinnerAutoplay = findViewById(R.id.spinnerAutoplay);
@@ -140,12 +155,14 @@ public class SettingsDialog extends Dialog
 				switchDisplayLongNames.setChecked(false);
 				switchShowPrefixTags.setChecked(true);
 				switchDarkMode.setChecked(false);
+				switchWakeLock.setChecked(false);
 				spinnerAutoplay.setSelection(1, true);
 				editor.putString("server", mainActivity.getString(R.string.main_server));
 				editor.putBoolean("updateStartup", true);
 				editor.putBoolean("displayLongNames", false);
 				editor.putBoolean("showSpecialTagPrefixes", true);
 				editor.putBoolean("darkMode", false);
+				editor.putBoolean("wakeLock", false);
 				editor.putInt("autoplay", 1);
 				editor.commit();
 				Toast.makeText(mainActivity.getContext(),

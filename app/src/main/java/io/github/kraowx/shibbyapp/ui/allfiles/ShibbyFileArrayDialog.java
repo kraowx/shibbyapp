@@ -111,6 +111,16 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
             }
         });
         fabAdd.hide();
+    
+        FloatingActionButton fab = findViewById(R.id.fabAudioController);
+        fab.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                mainActivity.getAudioController().toggleVisible();
+            }
+        });
         
         FloatingActionButton fabShuffle = findViewById(R.id.fabShuffle);
         fabShuffle.setOnClickListener(new View.OnClickListener()

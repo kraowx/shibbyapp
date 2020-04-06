@@ -58,7 +58,13 @@
         android:id="@+id/switchDarkMode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dark Theme" />
+        android:text="Dark theme" />
+
+    <Switch
+        android:id="@+id/switchWakeLock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wake lock" />
 
     <Spinner
         android:id="@+id/spinnerAutoplay"

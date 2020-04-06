@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -35,6 +36,13 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         this.mainActivity = mainActivity;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        boolean wakeLock = prefs.getBoolean("wakeLock", false);
+        if (wakeLock)
+        {
+            /* Keep the cpu awake to avoid audio stopping while streaming */
+            mediaPlayer.setWakeMode(mainActivity, PowerManager.PARTIAL_WAKE_LOCK);
+        }
     }
 
     public boolean isPlaying()
