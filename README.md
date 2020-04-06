@@ -13,6 +13,7 @@ The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.c
 - Loopable audio (either infinite or a set number)
 - Pre-audio delay timer
 - Autoplay
+- Shuffle
 - Search by tags, files, or series
 - Filter by duration, file type, or tags
 - Import files
