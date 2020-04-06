@@ -263,6 +263,11 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     {
         return checkedFiles;
     }
+    
+    void clearCheckedFiles()
+    {
+        checkedFiles.clear();
+    }
 
     // allows clicks events to be caught
     void setClickListener(ItemClickListener itemClickListener)

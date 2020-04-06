@@ -48,19 +48,6 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.array_info_dialog);
         setTitle(fileArray.getName());
-    
-        FloatingActionButton fabAdd = (mainActivity)
-                .findViewById(R.id.fabAddPlaylist);
-        fabAdd.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
-                        ShibbyFileArrayDialog.this.mainActivity, listAdapter.getCheckedFiles()
-                        .toArray(new ShibbyFile[0]), false);
-            }
-        });
         
         initializeList();
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -115,6 +102,32 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
             list.setAdapter(listAdapter);
             listAdapter.setClickListener(ShibbyFileArrayDialog.this);
         }
+        
+        FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
+        fabAdd.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
+                        ShibbyFileArrayDialog.this.mainActivity, listAdapter.getCheckedFiles()
+                        .toArray(new ShibbyFile[0]), false);
+                dialog.setFilesAddedListener(new AddFileToPlaylistDialog.FilesAddedListener()
+                {
+                    @Override
+                    public void filesAdded(boolean added)
+                    {
+                        if (added)
+                        {
+                            listAdapter.clearCheckedFiles();
+                            listAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
+        });
+        fabAdd.hide();
+        
         show();
     }
 }

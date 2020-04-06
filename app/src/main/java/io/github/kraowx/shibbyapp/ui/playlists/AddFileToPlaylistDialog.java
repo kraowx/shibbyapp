@@ -28,6 +28,12 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
     private LinearLayoutManager listLayoutManager;
     private ShibbyFile[] files;
     private MainActivity mainActivity;
+    private FilesAddedListener listener;
+    
+    public interface FilesAddedListener
+    {
+        void filesAdded(boolean added);
+    }
 
     public AddFileToPlaylistDialog(MainActivity mainActivity, ShibbyFile[] files,
                                    boolean showDeleteButton)
@@ -39,6 +45,11 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.playlist_list);
         initializeList(PlaylistManager.getPlaylists(mainActivity));
+    }
+    
+    public void setFilesAddedListener(FilesAddedListener listener)
+    {
+        this.listener = listener;
     }
 
     @Override
@@ -77,12 +88,20 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
             {
                 Toast.makeText(mainActivity, "File added to playlist",
                         Toast.LENGTH_LONG).show();
+                if (listener != null)
+                {
+                    listener.filesAdded(true);
+                }
                 this.dismiss();
             }
             else
             {
                 Toast.makeText(mainActivity, "File is already in this playlist",
                         Toast.LENGTH_LONG).show();
+                if (listener != null)
+                {
+                    listener.filesAdded(false);
+                }
             }
         }
         else if (files.length > 1)
@@ -99,12 +118,20 @@ public class AddFileToPlaylistDialog extends Dialog implements ShibbyPlaylistAda
             {
                 Toast.makeText(mainActivity, "Files added to playlist",
                         Toast.LENGTH_LONG).show();
+                if (listener != null)
+                {
+                    listener.filesAdded(true);
+                }
                 this.dismiss();
             }
             else
             {
                 Toast.makeText(mainActivity, "These file are already in this playlist",
                         Toast.LENGTH_LONG).show();
+                if (listener != null)
+                {
+                    listener.filesAdded(false);
+                }
             }
         }
     }

@@ -258,6 +258,11 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     {
         return checkedFiles;
     }
+    
+    void clearCheckedFiles()
+    {
+        checkedFiles.clear();
+    }
 
     void setClickListener(ItemClickListener itemClickListener)
     {

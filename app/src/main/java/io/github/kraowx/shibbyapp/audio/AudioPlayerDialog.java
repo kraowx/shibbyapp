@@ -2,11 +2,16 @@ package io.github.kraowx.shibbyapp.audio;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -471,6 +476,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                         audioPlayer.pauseAudio();
                         btnPlayPause.setImageResource(R.drawable.ic_play_circle);
                         stopTimer();
+                        vibrate();
                     }
                     else if (audioPlayer != null)
                     {
@@ -747,6 +753,12 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         {
             audioPlayer.execute(AudioPlayerDialog.this.activeFile.getLink());
         }
+        vibrate();
+    }
+    
+    private void vibrate()
+    {
+        btnPlayPause.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
     }
 
     private boolean autoplayAllowed()

@@ -71,6 +71,18 @@ public class DownloadsFragment extends Fragment
                 AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
                         (MainActivity)getActivity(), listAdapter.getCheckedFiles()
                         .toArray(new ShibbyFile[0]), false);
+                dialog.setFilesAddedListener(new AddFileToPlaylistDialog.FilesAddedListener()
+                {
+                    @Override
+                    public void filesAdded(boolean added)
+                    {
+                        if (added)
+                        {
+                            listAdapter.clearCheckedFiles();
+                            listAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
             }
         });
         fabAdd.hide();

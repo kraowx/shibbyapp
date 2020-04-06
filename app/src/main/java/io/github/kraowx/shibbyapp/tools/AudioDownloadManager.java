@@ -100,7 +100,7 @@ public class AudioDownloadManager
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.addRequestHeader("Cookie", mainActivity
                 .getPatreonSessionManager().getCookie());
-        request.setTitle(file.getName());
+        request.setTitle(file.getShortName());
         request.setDescription("Downloading file");
         request.setNotificationVisibility(
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

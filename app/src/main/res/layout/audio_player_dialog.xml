@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:background="@drawable/btn_ripple"
+            android:hapticFeedbackEnabled="true"
             android:tint="@color/colorAccent"
             app:srcCompat="@drawable/ic_play_circle" />
 

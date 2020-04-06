@@ -247,6 +247,11 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     {
         return checkedFiles;
     }
+    
+    public void clearCheckedFiles()
+    {
+        checkedFiles.clear();
+    }
 
     public void setClickListener(ItemClickListener itemClickListener)
     {
