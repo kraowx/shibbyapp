@@ -64,7 +64,7 @@
         android:id="@+id/switchWakeLock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Wake lock" />
+        android:text="Wake lock (may use more battery)" />
 
     <Spinner
         android:id="@+id/spinnerAutoplay"
