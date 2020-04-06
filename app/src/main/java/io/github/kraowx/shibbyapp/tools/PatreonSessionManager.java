@@ -79,6 +79,7 @@ public class PatreonSessionManager
 		{
 			return 3;
 		}
+		/* Note: 403 means cloudflare block */
 		else if (code == 200)
 		{
 			final int VERIFICATION_POST_ID = 28614620;
