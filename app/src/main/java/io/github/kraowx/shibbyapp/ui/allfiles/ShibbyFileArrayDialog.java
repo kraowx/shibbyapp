@@ -1,14 +1,19 @@
 package io.github.kraowx.shibbyapp.ui.allfiles;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +26,9 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
+import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCallback;
@@ -76,6 +84,32 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
 
     private void initializeList()
     {
+        final FloatingActionButton fabAdd = findViewById(R.id.fabAddPlaylist);
+        fabAdd.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
+                        ShibbyFileArrayDialog.this.mainActivity, listAdapter.getCheckedFiles()
+                        .toArray(new ShibbyFile[0]), false);
+                dialog.setFilesAddedListener(new AddFileToPlaylistDialog.FilesAddedListener()
+                {
+                    @Override
+                    public void filesAdded(boolean added)
+                    {
+                        if (added)
+                        {
+                            listAdapter.clearCheckedFiles();
+                            listAdapter.notifyDataSetChanged();
+                            fabAdd.hide();
+                        }
+                    }
+                });
+            }
+        });
+        fabAdd.hide();
+        
         list = findViewById(R.id.listArrayDialog);
         list.setHasFixedSize(true);
         TextView title = findViewById(R.id.txtArrInfoDialogTitle);
@@ -98,35 +132,10 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         else
         {
             listAdapter = new ShibbyFileAdapter(getContext(),
-                    fileArray.getFiles(), mainActivity);
+                    fileArray.getFiles(), mainActivity, fabAdd);
             list.setAdapter(listAdapter);
             listAdapter.setClickListener(ShibbyFileArrayDialog.this);
         }
-        
-        FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
-        fabAdd.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
-                        ShibbyFileArrayDialog.this.mainActivity, listAdapter.getCheckedFiles()
-                        .toArray(new ShibbyFile[0]), false);
-                dialog.setFilesAddedListener(new AddFileToPlaylistDialog.FilesAddedListener()
-                {
-                    @Override
-                    public void filesAdded(boolean added)
-                    {
-                        if (added)
-                        {
-                            listAdapter.clearCheckedFiles();
-                            listAdapter.notifyDataSetChanged();
-                        }
-                    }
-                });
-            }
-        });
-        fabAdd.hide();
         
         show();
     }

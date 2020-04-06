@@ -32,13 +32,14 @@
         app:srcCompat="@drawable/ic_play_arrow" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddPlaylist"
+        android:id="@+id/fabAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:layout_marginBottom="85dp"
         android:clickable="true"
         android:tint="#FFFFFF"
+        android:visibility="invisible"
         app:layout_anchor="@id/fabAudioController"
         app:layout_anchorGravity="top"
         app:srcCompat="@drawable/ic_add" />

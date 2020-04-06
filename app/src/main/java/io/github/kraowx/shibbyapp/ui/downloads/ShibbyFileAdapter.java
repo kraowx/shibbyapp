@@ -1,22 +1,15 @@
 package io.github.kraowx.shibbyapp.ui.downloads;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -26,11 +19,7 @@ import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
-import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
-import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
-import io.github.kraowx.shibbyapp.tools.DataManager;
-import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.ViewHolder>
 {
@@ -112,7 +101,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             {
                 CheckBox actionBox = (CheckBox)v;
                 FloatingActionButton fabAdd =
-                        mainActivity.findViewById(R.id.fabAddPlaylist);
+                        mainActivity.findViewById(R.id.fabAdd);
             
                 if (actionBox.isChecked() && !checkedFiles.contains(file))
                 {

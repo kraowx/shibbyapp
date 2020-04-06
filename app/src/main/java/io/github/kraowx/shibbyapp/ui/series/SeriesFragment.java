@@ -42,9 +42,10 @@ public class SeriesFragment extends Fragment
         DataManager dataManager = new DataManager((MainActivity)getActivity());
         initializeList(root, dataManager.getSeries());
 
-        FloatingActionButton fabAddPlaylist =
-                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
-        fabAddPlaylist.hide();
+        FloatingActionButton fabAdd =
+                ((MainActivity)getActivity()).findViewById(R.id.fabAdd);
+        fabAdd.setImageResource(R.drawable.ic_add);
+        fabAdd.hide();
 
         refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);

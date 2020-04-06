@@ -54,6 +54,7 @@ public class AllFilesFragment extends Fragment
     private SwipeRefreshLayout refreshLayout;
     private ShibbyFileAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
+    private FloatingActionButton fabAdd;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -72,8 +73,9 @@ public class AllFilesFragment extends Fragment
         editor = prefs.edit();
         startInitialUpdate();
 
-        FloatingActionButton fabAdd = ((MainActivity)getActivity())
-                .findViewById(R.id.fabAddPlaylist);
+        fabAdd = ((MainActivity)getActivity())
+                .findViewById(R.id.fabAdd);
+        fabAdd.setImageResource(R.drawable.ic_add);
         fabAdd.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -91,6 +93,7 @@ public class AllFilesFragment extends Fragment
                         {
                             listAdapter.clearCheckedFiles();
                             listAdapter.notifyDataSetChanged();
+                            fabAdd.hide();
                         }
                     }
                 });
@@ -339,7 +342,7 @@ public class AllFilesFragment extends Fragment
                 listLayoutManager = new LinearLayoutManager(getContext());
                 list.setLayoutManager(listLayoutManager);
                 listAdapter = new ShibbyFileAdapter(getContext(),
-                        files, ((MainActivity)getActivity()));
+                        files, ((MainActivity)getActivity()), fabAdd);
                 list.setAdapter(listAdapter);
                 listAdapter.setClickListener(AllFilesFragment.this);
             }

@@ -111,7 +111,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
             {
                 CheckBox actionBox = (CheckBox)v;
                 FloatingActionButton fabAdd =
-                        mainActivity.findViewById(R.id.fabAddPlaylist);
+                        mainActivity.findViewById(R.id.fabAdd);
             
                 if (actionBox.isChecked() && !checkedFiles.contains(file))
                 {

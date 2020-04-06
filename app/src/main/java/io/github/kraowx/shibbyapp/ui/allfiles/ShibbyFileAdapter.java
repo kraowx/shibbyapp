@@ -31,15 +31,17 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     private ItemClickListener mClickListener;
     private Context context;
     private SharedPreferences prefs;
+    private FloatingActionButton fabAdd;
 
     public ShibbyFileAdapter(Context context, List<ShibbyFile> data,
-                      MainActivity mainActivity)
+                      MainActivity mainActivity, FloatingActionButton fabAdd)
     {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         mDataOrig = (List<ShibbyFile>)((ArrayList<ShibbyFile>)mData).clone();
         this.mainActivity = mainActivity;
+        this.fabAdd = fabAdd;
         checkedFiles = new ArrayList<ShibbyFile>();
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         searchText = "";
@@ -99,9 +101,6 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             public void onClick(View v)
             {
                 CheckBox actionBox = (CheckBox)v;
-                FloatingActionButton fabAdd =
-                        mainActivity.findViewById(R.id.fabAddPlaylist);
-                
                 if (actionBox.isChecked() && !checkedFiles.contains(file))
                 {
                     checkedFiles.add(file);

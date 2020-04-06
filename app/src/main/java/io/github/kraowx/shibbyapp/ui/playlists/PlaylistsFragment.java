@@ -53,7 +53,8 @@ public class PlaylistsFragment extends Fragment
         initializeList(root, playlists);
 
         FloatingActionButton fabAddPlaylist =
-                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
+                ((MainActivity)getActivity()).findViewById(R.id.fabAdd);
+        fabAddPlaylist.setImageResource(R.drawable.ic_playlist_add);
         fabAddPlaylist.setOnClickListener(new View.OnClickListener()
         {
             @Override

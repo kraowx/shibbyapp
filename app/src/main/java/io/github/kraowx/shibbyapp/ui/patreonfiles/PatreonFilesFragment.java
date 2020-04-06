@@ -67,8 +67,9 @@ public class PatreonFilesFragment extends Fragment
 			}
 		}.start();
 		
-		FloatingActionButton fabAdd = ((MainActivity)getActivity())
-				.findViewById(R.id.fabAddPlaylist);
+		final FloatingActionButton fabAdd = ((MainActivity)getActivity())
+				.findViewById(R.id.fabAdd);
+		fabAdd.setImageResource(R.drawable.ic_add);
 		fabAdd.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -86,6 +87,7 @@ public class PatreonFilesFragment extends Fragment
 						{
 							listAdapter.clearCheckedFiles();
 							listAdapter.notifyDataSetChanged();
+							fabAdd.hide();
 						}
 					}
 				});

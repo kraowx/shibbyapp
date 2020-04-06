@@ -56,9 +56,10 @@ public class TagsFragment extends Fragment
         }.start();
 
 
-        FloatingActionButton fabAddPlaylist =
-                ((MainActivity)getActivity()).findViewById(R.id.fabAddPlaylist);
-        fabAddPlaylist.hide();
+        FloatingActionButton fabAdd =
+                ((MainActivity)getActivity()).findViewById(R.id.fabAdd);
+        fabAdd.setImageResource(R.drawable.ic_add);
+        fabAdd.hide();
 
         refreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
