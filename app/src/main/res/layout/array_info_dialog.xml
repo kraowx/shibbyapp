@@ -29,4 +29,16 @@
         app:layout_anchor="@id/fabAudioController"
         app:layout_anchorGravity="top"
         app:srcCompat="@drawable/ic_add" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabShuffle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginRight="85dp"
+        android:clickable="true"
+        android:tint="#FFFFFF"
+        app:layout_anchor="@id/fabAudioController"
+        app:layout_anchorGravity="left"
+        app:srcCompat="@drawable/ic_shuffle_large" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

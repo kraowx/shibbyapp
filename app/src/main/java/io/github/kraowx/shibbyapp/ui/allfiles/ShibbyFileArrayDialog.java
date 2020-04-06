@@ -20,7 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
@@ -110,6 +112,32 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         });
         fabAdd.hide();
         
+        FloatingActionButton fabShuffle = findViewById(R.id.fabShuffle);
+        fabShuffle.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                List<ShibbyFile> queue = null;
+                if (playlistName != null)
+                {
+                    queue = listAdapterPlaylists.getData();
+                }
+                else
+                {
+                    queue = listAdapter.getData();
+                }
+                if (queue != null && queue.size() > 0)
+                {
+                    List<ShibbyFile> randomQueue = randomizeList(queue);
+                    ShibbyFile file = randomQueue.get(0);
+                    mainActivity.getAudioController().loadFile(file);
+                    mainActivity.getAudioController().setQueue(randomQueue, true);
+                    mainActivity.getAudioController().setVisible(true);
+                }
+            }
+        });
+        
         list = findViewById(R.id.listArrayDialog);
         list.setHasFixedSize(true);
         TextView title = findViewById(R.id.txtArrInfoDialogTitle);
@@ -136,7 +164,32 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
             list.setAdapter(listAdapter);
             listAdapter.setClickListener(ShibbyFileArrayDialog.this);
         }
-        
         show();
+    }
+    
+    private List<ShibbyFile> randomizeList(List<ShibbyFile> list)
+    {
+        List<ShibbyFile> randomList = new ArrayList<ShibbyFile>();
+        Random random = new Random();
+        int insIndex = 0, retIndex = 0;
+        int size = list.size() < 100 ? list.size() : 100;
+        for (int i = 0; i < size; i++)
+        {
+            insIndex = random.nextInt(randomList.size()+1);
+            while (randomList.contains(list.get(retIndex)))
+            {
+                retIndex = random.nextInt(list.size());
+                System.out.println(retIndex);
+            }
+            if (insIndex < randomList.size())
+            {
+                randomList.add(insIndex, list.get(retIndex));
+            }
+            else
+            {
+                randomList.add(list.get(retIndex));
+            }
+        }
+        return randomList;
     }
 }
