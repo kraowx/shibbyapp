@@ -33,6 +33,7 @@ import io.github.kraowx.shibbyapp.net.ResponseType;
 public class DataManager
 {
     final int MAX_UPDATE_TIME = 10*60*1000; // 10 minutes
+    final int SHIBBY_CAMPAIGN_ID = 322138; // Shibby's unique Patreon campaign ID
 
     private MainActivity mainActivity;
     private SharedPreferences prefs;
@@ -46,6 +47,12 @@ public class DataManager
     private enum ResponseCode
     {
         SUCCESS, FAILED, ERROR
+    }
+    
+    private enum PatreonResponseCode
+    {
+        SUCCESS, INVALID_LOGIN, NO_LOGIN,
+        EMAIL_VERIFICATION_REQUIRED, TOO_MANY_REQUESTS
     }
 
     @Deprecated
@@ -371,6 +378,179 @@ public class DataManager
             ioe.printStackTrace();
             showToast("Server connection error");
         }
+    }
+    
+    private String getFileUrl(String postId, String attachmentId)
+    {
+        return "https://patreon.com/file?h=" + postId + "&i=" + attachmentId;
+    }
+    
+    private boolean isShibbyAudioPost(JSONObject post)
+    {
+        try
+        {
+            if (post.getJSONObject("relationships").getJSONObject("campaign")
+                    .getJSONObject("data").getString("id").equals(SHIBBY_CAMPAIGN_ID + ""))
+            {
+                JSONArray tags = post.getJSONObject("relationships")
+                        .getJSONObject("user_defined_tags").getJSONArray("data");
+                if (tags.length() < 3)
+                {
+                    return false;
+                }
+                for (int i = 0; i < tags.length(); i++)
+                {
+                    if (tags.getJSONObject(i).getString("id")
+                            .toLowerCase().equals("user_defined;live event") ||
+                            tags.getJSONObject(i).getString("id")
+                                    .toLowerCase().equals("user_defined;meta"))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return post.getJSONObject("relationships").has("attachments");
+            /*return true;*/
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        return false;
+    }
+    
+    private List<String> getLinks(JSONObject post)
+    {
+        List<String> links = new ArrayList<String>();
+        try
+        {
+            JSONArray linkData = post.getJSONObject("relationships")
+                    .getJSONObject("attachments").getJSONArray("data");
+            for (int i = 0; i < linkData.length(); i++)
+            {
+                links.add(getFileUrl(post.getString("id"),
+                        linkData.getJSONObject(i).getString("id")));
+            }
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        return links;
+    }
+    
+    private List<String> parseTags(String content)
+    {
+        List<String> tags = new ArrayList<String>();
+        if (content != null)
+        {
+            String tag = "";
+            boolean inStr = false;
+            char c;
+            for (int i = 0; i < content.length(); i++)
+            {
+                c = content.charAt(i);
+                if (c == ']')
+                {
+                    tags.add(tag);
+                    tag = "";
+                    inStr = false;
+                }
+                else if (c == '[')
+                {
+                    inStr = true;
+                }
+                else if (c != '[' && inStr)
+                {
+                    tag += c;
+                }
+            }
+        }
+        return tags;
+    }
+    
+    private List<ShibbyFile> generatePatreonData()
+    {
+        PatreonSessionManager patreonSessionManager =
+                mainActivity.getPatreonSessionManager();
+        JSONObject data = null, post = null, file = null;
+        JSONArray posts = null;
+        String name, content, date;
+        List<String> links, tags;
+        List<ShibbyFile> files = new ArrayList<ShibbyFile>();
+        HttpRequest req = HttpRequest.get("https://api.patreon.com/campaigns/322138/posts");
+        patreonSessionManager.addHeadersToRequest(req);
+        try
+        {
+            data = new JSONObject(req.body());
+            posts = data.getJSONArray("data");
+            for (int i = 0; i < posts.length(); i++)
+            {
+                post = posts.getJSONObject(i);
+                name = post.getJSONObject("attributes").getString("title");
+                System.out.println(name);
+                if (name != null && isShibbyAudioPost(post))
+                {
+                    links = getLinks(post);
+                    content = post.getJSONObject("attributes").getString("content");
+                    tags = parseTags(content);
+                    date = post.getJSONObject("attributes").getString("created_at")
+                            .split("T")[0];
+                    if (links.size() == 1)
+                    {
+                        file = new JSONObject();
+                        file.put("name", name);
+                        file.put("links", links);
+                        file.put("description", content);
+                        file.put("tags", tags);
+                        file.put("isPatreonFile", true);
+                        file.put("type", "patreon");
+                        file.put("date", date);
+                        files.add(ShibbyFile.fromJSON(file.toString()));
+                    }
+                }
+            }
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        return files;
+    }
+    
+    public PatreonResponseCode requestPatreonData()
+    {
+        List<ShibbyFile> files = generatePatreonData();
+        System.out.println(files);
+        PatreonSessionManager patreonSessionManager =
+                mainActivity.getPatreonSessionManager();
+        final String patreonEmail = prefs.getString(
+                "patreonEmail", null);
+        final String patreonPassword = prefs.getString(
+                "patreonPassword", null);
+        if (patreonEmail != null && patreonPassword != null)
+        {
+            final int INVALID = 0;
+            final int VALID = 1;
+            final int EMAIL = 2;
+            final int OVERLOAD = 3;
+            switch (patreonSessionManager.verifyCredentials(
+                    patreonEmail, patreonPassword))
+            {
+                case INVALID:
+                    return PatreonResponseCode.INVALID_LOGIN;
+                case VALID:
+                    List<ShibbyFile> data = generatePatreonData();
+                    System.out.println(data);
+                    
+                    return PatreonResponseCode.SUCCESS;
+                case EMAIL:
+                    return PatreonResponseCode.EMAIL_VERIFICATION_REQUIRED;
+                case OVERLOAD:
+                    return PatreonResponseCode.TOO_MANY_REQUESTS;
+            }
+        }
+        return PatreonResponseCode.NO_LOGIN;
     }
     
     public void requestData(Request request)

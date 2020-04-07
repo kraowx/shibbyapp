@@ -46,6 +46,7 @@ import java.util.Date;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity
                 public void run()
                 {
                     patreonSessionManager.generateCookie(patreonEmail, patreonPassword);
+                    /*System.out.println(new DataManager(MainActivity.this).requestPatreonData());*/
                 }
             }.start();
         }

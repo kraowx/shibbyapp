@@ -104,15 +104,39 @@ public class PatreonSessionManager
 	private HttpRequest getLoginRequest(String email, String password)
 	{
 		HttpRequest req = HttpRequest.post("https://api.patreon.com/login");
-		req.header("Connection", "keep-alive");
-		req.header("Upgrade-Insecure-Requests", 1);
-		req.userAgent("Mozilla/5.0 (Linux; <Android Version>; <Build Tag etc.>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev>");
-//        req.userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36");
-		req.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-		req.header("Accept-Language", "en-US,en;q=0.9");
+		addHeadersToRequest(req);
+//		req.header("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
+//		req.header("accept-language", "en-US,en-CA;q=0.9,en-GB;q=0.8,en;q=0.7");
+//		req.header("cache-control", "max-age=0");
+//		req.header("sec-fetch-mode", "navigate");
+//		req.header("sec-fetch-site", "none");
+//		req.header("sec-fetch-user", "?1");
+//		req.header("upgrade-insecure-requests", 1);
+//		req.header("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36");
+//		req.header("cookie", "");
 		req.send("{\"data\":{\"email\":\"" + email + "\"," +
 				"\"password\":\"" + password + "\"}}");
 		req.closeOutputQuietly();
 		return req;
+	}
+	
+	public void addHeadersToRequest(HttpRequest req)
+	{
+		req.header("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
+		req.header("accept-language", "en-US,en-CA;q=0.9,en-GB;q=0.8,en;q=0.7");
+		req.header("cache-control", "max-age=0");
+		req.header("sec-fetch-mode", "navigate");
+		req.header("sec-fetch-site", "none");
+		req.header("sec-fetch-user", "?1");
+		req.header("upgrade-insecure-requests", 1);
+		req.header("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36");
+		if (sessionCookie != null)
+		{
+			req.header("cookie", sessionCookie);
+		}
+		else
+		{
+			req.header("cookie", "");
+		}
 	}
 }
