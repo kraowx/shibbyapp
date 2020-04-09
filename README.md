@@ -4,7 +4,7 @@ ShibbyApp is an Android file manager and audio player made exclusively for liste
 ## Installation
 The app must be installed manually since these types of apps are not allowed in the Google Play store. Download the latest version of the app [here](https://github.com/kraowx/shibbyapp/releases/latest) on your device and save it to a place you can get to easily. Simply run the downloaded .apk file and click install when prompted. You may have to change your system settings to allow installation of apps from "unknown sources". This should be under the "Security" tab in the settings of your device.
 
-The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.com). The limitation however is that it doesn't support Patreon files at the moment. If this is a problem for you however, you can host your own server. See [this page](https://github.com/kraowx/shibbyapp-server) for instructions on how to set up a server. Once you have your server set up, go into the app, tap on the three-dot menu in the top-right corner of the screen and tap settings. Enter the address of the server that you set up into the box in the format <code>https://IP:port</code>, then click the "Apply" button and restart the app.
+The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.com). <s>The limitation however is that it doesn't support Patreon files at the moment. If this is a problem for you however, you can host your own server. See [this page](https://github.com/kraowx/shibbyapp-server) for instructions on how to set up a server. Once you have your server set up, go into the app, tap on the three-dot menu in the top-right corner of the screen and tap settings. Enter the address of the server that you set up into the box in the format <code>https://IP:port</code>, then click the "Apply" button and restart the app.</s>
 
 ## Features
 - Built-in audio player to either stream or play downloaded files
@@ -37,7 +37,8 @@ ShibbyApp allows you to access Patreon files from directly in the app so your fi
 
 Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A Patreon account with a valid pledge to Shibby is **required** in order to access the files. *This is not a method to obtain these files for free.*
 
-This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.
+<s>This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.</s>
+This feature is not supported by servers at the moment. However, built-in Patreon support for the app was added in version 2.1.0.
 
 ## Additional Notes and "Hidden" Features
 - In the audio player, when the loop button is pressed it will default to toggle infinite loop on and off. If you only want to loop a specific number of times you can long press on the loop icon and select a number from 0 to 100.
