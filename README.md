@@ -44,7 +44,8 @@ This feature is not supported by servers at the moment. However, built-in Patreo
 - In the audio player, when the loop button is pressed it will default to toggle infinite loop on and off. If you only want to loop a specific number of times you can long press on the loop icon and select a number from 0 to 100.
 - Files in a playlist and playlists themselves can be reordered by long pressing on a file/playlist and dragging it above or below another file/playlist. Note that series playlists cannot be reordered.
 - When the download button next to an undownloaded file is pressed it will turn red. This indicates that the file is downloading in the background, and the status of the download can be found in the "Download Manager" notification.
-- Refreshing inside the tags tab will only include Patreon files if you are currently logged in to Patreon. Otherwise these files will be excluded or removed from the list. Note that you may have to confirm your Patreon email for this to work.
+- You can refresh the content of most pages by "pulling down" (swiping down) on the page until the refresh icon appears.
+- <s>Refreshing inside the tags tab will only include Patreon files if you are currently logged in to Patreon. Otherwise these files will be excluded or removed from the list. Note that you may have to confirm your Patreon email for this to work.</s>
 
 ## Importing Files
 You can import your own downloaded shibbyfiles or custom/edited files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.
