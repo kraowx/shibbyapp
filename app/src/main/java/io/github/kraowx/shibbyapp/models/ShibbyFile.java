@@ -80,7 +80,7 @@ public class ShibbyFile
             {
                 file.shortName = json.getString("shortName");
             }
-            if (!json.has("id") && file.name != null)
+            if (!json.has("id") && !file.name.equals(null))
             {
                 file.createIdFromName();
             }

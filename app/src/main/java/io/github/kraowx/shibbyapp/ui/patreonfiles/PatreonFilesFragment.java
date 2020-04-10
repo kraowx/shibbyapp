@@ -1,5 +1,6 @@
 package io.github.kraowx.shibbyapp.ui.patreonfiles;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +19,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,6 +33,7 @@ import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.PatreonRefreshInfoDialog;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class PatreonFilesFragment extends Fragment
@@ -43,11 +47,12 @@ public class PatreonFilesFragment extends Fragment
 	private SwipeRefreshLayout refreshLayout;
 	private ShibbyPatreonFileAdapter listAdapter;
 	private LinearLayoutManager listLayoutManager;
+	private View root;
 	
 	public View onCreateView(@NonNull LayoutInflater inflater,
 							 ViewGroup container, Bundle savedInstanceState)
 	{
-		final View root = inflater.inflate(R.layout.fragment_allfiles, container, false);
+		root = inflater.inflate(R.layout.fragment_allfiles, container, false);
 		final ProgressDialog progressDialog = new ProgressDialog((MainActivity)getActivity());
 		final DataManager dataManager = new DataManager((MainActivity)getActivity());
 		
@@ -147,44 +152,157 @@ public class PatreonFilesFragment extends Fragment
 	@Override
 	public void onRefresh()
 	{
+		refreshData();
+	}
+	
+	private void refreshData()
+	{
+		final PatreonRefreshInfoDialog refreshDialog = new PatreonRefreshInfoDialog(
+				(MainActivity)getActivity());
+		final DataManager dataManager = new DataManager((MainActivity)getActivity());
+		List<ShibbyFile> patreonFiles = dataManager.getPatreonFiles();
+		final boolean firstTime = patreonFiles.isEmpty();
+		if (firstTime)
+		{
+			refreshDialog.show();
+		}
 		new Thread()
+		{
+			@Override
+			public void run()
+			{
+				DataManager.PatreonResponseCode resp = dataManager
+						.requestPatreonData(firstTime, refreshDialog);
+				switch (resp)
+				{
+					case NO_LOGIN:
+						showNoLoginDialog();
+						break;
+					case NO_DATA:
+						showUnknownErrorDialog();
+						break;
+					case TOO_MANY_REQUESTS_10:
+						showOverloadDialog(10);
+						break;
+					case TOO_MANY_REQUESTS_30:
+						showOverloadDialog(30);
+						break;
+					case EMAIL_VERIFICATION_REQUIRED:
+						showEmailVerificationDialog();
+						break;
+					case INVALID_LOGIN:
+						showBadLoginDialog();
+						break;
+					case SUCCESS:
+						showToast("Data updated");
+						if (firstTime)
+						{
+							initializeList(root, new DataManager(
+									(MainActivity)getActivity()).getPatreonFiles());
+						}
+						else
+						{
+							updateList();
+						}
+						break;
+				}
+				refreshLayout.post(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						refreshLayout.setRefreshing(false);
+					}
+				});
+				((MainActivity)getActivity()).runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						refreshDialog.dismiss();
+					}
+				});
+			}
+		}.start();
+	}
+	
+	private void showToast(final String message)
+	{
+		((MainActivity)getActivity()).runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Toast.makeText((MainActivity)getActivity(),
+						message, Toast.LENGTH_LONG).show();
+			}
+		});
+	}
+	
+	private void showEmailVerificationDialog()
+	{
+		showErrorDialog("Email Verification",
+				"You must confirm your email for this device/location " +
+						"through the email sent by Patreon.");
+	}
+	
+	private void showOverloadDialog(int timeout)
+	{
+		showErrorDialog("Too Many Requests",
+				"You have made too many requests to the Patreon server. " +
+						"Try again in " + timeout + " minutes.");
+	}
+	
+	private void showUnknownErrorDialog()
+	{
+		showErrorDialog("Unknown Error",
+				"An unknown error has occurred. This is likely due to an " +
+						"API change on Patreon's side. Contact me if you are " +
+						"seeing this message.");
+	}
+	
+	private void showNoLoginDialog()
+	{
+		showErrorDialog("Not Logged In",
+				"You must log in to your Patreon account before you " +
+						"can refresh the latest Patreon files.");
+	}
+	
+	private void showBadLoginDialog()
+	{
+		showErrorDialog("Invalid Login",
+				"Your email and password combination was rejected by " +
+						"Patreon. Note: your account must have an active " +
+						"pledge to Shibby.");
+	}
+	
+	private void showErrorDialog(final String title, final String message)
+	{
+		((MainActivity)getActivity()).runOnUiThread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
 				SharedPreferences prefs = PreferenceManager
 						.getDefaultSharedPreferences((MainActivity)getActivity());
-				String email = prefs.getString("patreonEmail", null);
-				String password = prefs.getString("patreonPassword", null);
-				if (email != null && password != null)
+				boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+				AlertDialog.Builder builder;
+				if (darkModeEnabled)
 				{
-					new DataManager((MainActivity) getActivity())
-							.requestData(Request.patreonFiles(email, password));
-					updateList();
-					refreshLayout.post(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							refreshLayout.setRefreshing(false);
-						}
-					});
+					builder = new AlertDialog.Builder((MainActivity)getActivity(),
+							R.style.DialogThemeDark);
 				}
 				else
 				{
-					((MainActivity)getActivity()).runOnUiThread(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							Toast.makeText((MainActivity)getActivity(),
-									"You are not logged in!",
-									Toast.LENGTH_LONG).show();
-						}
-					});
+					builder = new AlertDialog.Builder((MainActivity)getActivity());
 				}
+				builder.setTitle(title)
+						.setMessage(message)
+						.setCancelable(false)
+						.setPositiveButton(android.R.string.ok, null)
+						.show();
 			}
-		}.start();
+		});
 	}
 	
 	@Override
@@ -226,9 +344,9 @@ public class PatreonFilesFragment extends Fragment
 			{
 				Toast.makeText((MainActivity)getActivity(),
 						"Login successful", Toast.LENGTH_LONG).show();
+				refreshData();
 			}
 		});
-		updateList();
 	}
 	
 	private void initializeList(View root, final List<ShibbyFile> patreonFiles)

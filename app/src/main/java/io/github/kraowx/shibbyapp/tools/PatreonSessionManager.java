@@ -38,7 +38,9 @@ public class PatreonSessionManager
 	
 	public boolean isAuthenticated()
 	{
-		return sessionCookie != null;
+		String email = prefs.getString("patreonEmail", null);
+		String password = prefs.getString("patreonPassword", null);
+		return sessionCookie != null && email != null && password != null;
 	}
 	
 	public String generateCookie(String email, String password)
@@ -61,7 +63,8 @@ public class PatreonSessionManager
 	/*
 	 * Connects to the server to check if the given credentials are valid.
 	 * Returns 1 if valid, 0 if invalid, 2 if email verification is required,
-	 * or 3 if too many requests are sent
+	 * or 3/4 if too many requests are sent (3 for 10 min timeout or 4 for
+	 * 30 min timeout)
 	 */
 	public int verifyCredentials(String email, String password)
 	{
@@ -77,6 +80,20 @@ public class PatreonSessionManager
 		}
 		else if (code == 429)
 		{
+			try
+			{
+				JSONObject errorData = new JSONObject(req.body());
+				if (errorData.getJSONArray("errors")
+						.getJSONObject(0).getString("detail")
+						.contains("half an hour"))
+				{
+					return 4;
+				}
+			}
+			catch (JSONException je)
+			{
+				je.printStackTrace();
+			}
 			return 3;
 		}
 		/* Note: 403 means cloudflare block */
@@ -105,15 +122,6 @@ public class PatreonSessionManager
 	{
 		HttpRequest req = HttpRequest.post("https://api.patreon.com/login");
 		addHeadersToRequest(req);
-//		req.header("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
-//		req.header("accept-language", "en-US,en-CA;q=0.9,en-GB;q=0.8,en;q=0.7");
-//		req.header("cache-control", "max-age=0");
-//		req.header("sec-fetch-mode", "navigate");
-//		req.header("sec-fetch-site", "none");
-//		req.header("sec-fetch-user", "?1");
-//		req.header("upgrade-insecure-requests", 1);
-//		req.header("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36");
-//		req.header("cookie", "");
 		req.send("{\"data\":{\"email\":\"" + email + "\"," +
 				"\"password\":\"" + password + "\"}}");
 		req.closeOutputQuietly();

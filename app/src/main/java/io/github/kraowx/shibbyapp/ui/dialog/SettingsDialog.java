@@ -170,6 +170,20 @@ public class SettingsDialog extends Dialog
 						Toast.LENGTH_LONG).show();
 			}
 		});
+		Button btnErasePatreonData = findViewById(R.id.btnErasePatreonData);
+		btnErasePatreonData.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				editor.putString("patreonFiles", "[]");
+				editor.putLong("patreonLastUpdate", 0);
+				editor.commit();
+				Toast.makeText(mainActivity.getContext(),
+						"Relaunch the app for the change to fully take effect",
+						Toast.LENGTH_LONG).show();
+			}
+		});
 		show();
 	}
 }

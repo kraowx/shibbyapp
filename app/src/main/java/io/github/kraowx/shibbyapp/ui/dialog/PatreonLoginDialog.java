@@ -62,7 +62,8 @@ public class PatreonLoginDialog extends Dialog
 						final int INVALID = 0;
 						final int VALID = 1;
 						final int EMAIL = 2;
-						final int OVERLOAD = 3;
+						final int OVERLOAD_10 = 3;
+						final int OVERLOAD_30 = 4;
 						switch (patreonSessionManager.verifyCredentials(email, password))
 						{
 							case INVALID:
@@ -72,6 +73,7 @@ public class PatreonLoginDialog extends Dialog
 							case VALID:
 								if (loginListener != null)
 								{
+									patreonSessionManager.generateCookie(email, password);
 									loginListener.onLoginVerified(email, password);
 								}
 								dismiss();
@@ -79,9 +81,11 @@ public class PatreonLoginDialog extends Dialog
 							case EMAIL:
 								showEmailVerificationDialog(mainActivity);
 								break;
-							case OVERLOAD:
-								showOverloadDialog(mainActivity);
+							case OVERLOAD_10:
+								showOverloadDialog(mainActivity, 10);
 								break;
+							case OVERLOAD_30:
+								showOverloadDialog(mainActivity, 30);
 						}
 						mainActivity.runOnUiThread(new Runnable()
 						{
@@ -105,11 +109,11 @@ public class PatreonLoginDialog extends Dialog
 						"through the email sent by Patreon.");
 	}
 	
-	private void showOverloadDialog(MainActivity mainActivity)
+	private void showOverloadDialog(MainActivity mainActivity, int timeout)
 	{
 		showErrorDialog(mainActivity, "Too Many Requests",
 				"You have made too many requests to the Patreon server. " +
-						"Try again in 10 minutes.");
+						"Try again in " + timeout + " minutes.");
 	}
 	
 	private void showUnsupportedDialog(MainActivity mainActivity)

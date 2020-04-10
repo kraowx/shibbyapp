@@ -43,8 +43,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
+import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
@@ -52,7 +54,6 @@ import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
-import io.github.kraowx.shibbyapp.ui.dialog.FileFilterDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportAppDataDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
@@ -150,7 +151,6 @@ public class MainActivity extends AppCompatActivity
                 public void run()
                 {
                     patreonSessionManager.generateCookie(patreonEmail, patreonPassword);
-                    /*System.out.println(new DataManager(MainActivity.this).requestPatreonData());*/
                 }
             }.start();
         }
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
+        // Passing each menu ID as a set of IDs because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_allfiles, R.id.nav_tags, R.id.nav_series,
