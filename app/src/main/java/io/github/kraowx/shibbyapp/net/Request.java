@@ -75,6 +75,11 @@ public class Request
         }
         return new Request(RequestType.PATREON_FILES, obj);
     }
+    
+    public static Request hotspots()
+    {
+        return new Request(RequestType.HOTSPOTS);
+    }
 
     public JSONObject toJSON()
     {

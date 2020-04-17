@@ -47,6 +47,7 @@ import java.util.List;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
+import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;

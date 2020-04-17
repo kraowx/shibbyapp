@@ -66,6 +66,34 @@
         android:layout_height="wrap_content"
         android:text="Wake lock (may use more battery)" />
 
+    <Switch
+        android:id="@+id/switchHotspotsEnabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hotspot vibration (experimental)" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp">
+
+        <TextView
+            android:id="@+id/txtAudioVibrationOffset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Audio-vibration offset" />
+
+        <SeekBar
+            android:id="@+id/seekBarOffset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1" />
+    </LinearLayout>
+
     <Spinner
         android:id="@+id/spinnerAutoplay"
         android:layout_width="match_parent"

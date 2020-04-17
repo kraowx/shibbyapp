@@ -1,30 +1,50 @@
 package io.github.kraowx.shibbyapp.ui.dialog;
 
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.Service;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import androidx.core.app.NotificationCompat;
+
+import java.io.IOException;
 
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 
 public class SettingsDialog extends Dialog
 {
+	private MainActivity mainActivity;
+	
 	public SettingsDialog(MainActivity mainActivity)
 	{
 		super(mainActivity);
-		initUI(mainActivity);
+		this.mainActivity = mainActivity;
+		initUI();
 	}
 	
-	private void initUI(final MainActivity mainActivity)
+	private void initUI()
 	{
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.settings_dialog);
@@ -37,6 +57,8 @@ public class SettingsDialog extends Dialog
 		boolean showSpecialPrefixTags = prefs.getBoolean("showSpecialPrefixTags", true);
 		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
 		boolean wakeLockEnabled = prefs.getBoolean("wakeLock", false);
+		boolean hotspotsEnabled = prefs.getBoolean("hotspotsEnabled", false);
+		int audioVibrationOffset = prefs.getInt("audioVibrationOffset", 0);
 		int autoplay = prefs.getInt("autoplay", 1);
 		String server = prefs.getString("server", mainActivity.getString(R.string.main_server));
 		final Switch switchUpdateStartup = findViewById(R.id.switchUpdateOnStartup);
@@ -115,6 +137,37 @@ public class SettingsDialog extends Dialog
 						Toast.LENGTH_LONG).show();
 			}
 		});
+		final Switch switchHotspotsEnabled = findViewById(R.id.switchHotspotsEnabled);
+		switchHotspotsEnabled.setChecked(hotspotsEnabled);
+		switchHotspotsEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+			{
+				editor.putBoolean("hotspotsEnabled", isChecked);
+				editor.commit();
+			}
+		});
+		final SeekBar seekBarOffset = findViewById(R.id.seekBarOffset);
+		seekBarOffset.setMax(1000);
+		seekBarOffset.setProgress(audioVibrationOffset);
+		seekBarOffset.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+		{
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar)
+			{
+				int offset = seekBar.getProgress();
+				testAudioVibrationSync(offset);
+				editor.putInt("audioVibrationOffset", offset);
+				editor.commit();
+			}
+		});
 		final EditText txtServer = findViewById(R.id.txtServer);
 		txtServer.setText(server);
 		final Spinner spinnerAutoplay = findViewById(R.id.spinnerAutoplay);
@@ -185,5 +238,46 @@ public class SettingsDialog extends Dialog
 			}
 		});
 		show();
+	}
+	
+	private void testAudioVibrationSync(int offset)
+	{
+		playSound();
+		try
+		{
+			Thread.sleep(offset);
+		}
+		catch (InterruptedException ie)
+		{
+			ie.printStackTrace();
+		}
+		vibrate();
+	}
+	
+	private void vibrate()
+	{
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+		{
+			Vibrator vibrator = (Vibrator)mainActivity
+					.getSystemService(Service.VIBRATOR_SERVICE);
+			vibrator.vibrate(VibrationEffect
+					.createOneShot(500, 200));
+		}
+	}
+	
+	private void playSound()
+	{
+		MediaPlayer mp = new MediaPlayer();
+		mp.reset();
+		try
+		{
+			mp.setDataSource(mainActivity, Settings.System.DEFAULT_NOTIFICATION_URI);
+			mp.prepare();
+		}
+		catch (IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+		mp.start();
 	}
 }

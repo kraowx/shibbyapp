@@ -24,12 +24,18 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
+import io.github.kraowx.shibbyapp.models.Hotspot;
+import io.github.kraowx.shibbyapp.models.HotspotArray;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.ui.dialog.DurationPickerDialog;
@@ -46,13 +52,16 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private boolean fileDownloaded,
             seeking, queueIsPlaylist,
             timerRunning;
-    private int delayTime, setDelay, loop;
+    private int delayTime, setDelay,
+            loop, audioVibrationOffset;
     private long fileDuration;
     private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
+    private List<HotspotArray> hotspots;
     private AudioPlayer audioPlayer;
-    private Timer timer;
+    private Timer timer, vibrationTimer;
     private SharedPreferences prefs;
+    private Vibrator vibrator;
 
     private TextView txtTitle, txtTags, txtElapsedTime, txtRemainingTime;
     private ImageButton btnRewind, btnPlayPause, btnFastForward,
@@ -68,6 +77,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         setContentView(R.layout.audio_player_dialog);
         this.mainActivity = mainActivity;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        vibrator = (Vibrator)mainActivity.getSystemService(Context.VIBRATOR_SERVICE);
         delayTime = setDelay = NO_DELAY;
         loop = NO_LOOP;
         initUI();
@@ -235,6 +245,33 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                 }
             }
         }, 0, 1000);
+        boolean hotspotsEnabled = prefs.getBoolean("hotspotsEnabled", false);
+        if (hotspotsEnabled)
+        {
+            vibrationTimer = new Timer();
+            final int VIBRATION_ERROR = 75;  // compensation for not updating every millisecond
+            vibrationTimer.scheduleAtFixedRate(new TimerTask()
+            {
+                @Override
+                public void run()
+                {
+                    for (HotspotArray arr : hotspots)
+                    {
+                        for (Hotspot hotspot : arr.getHotspots())
+                        {
+                            if (audioPlayer.getPosition() + audioVibrationOffset >
+                                    hotspot.getStartTime() - VIBRATION_ERROR &&
+                                    audioPlayer.getPosition() + audioVibrationOffset <
+                                            hotspot.getEndTime() + VIBRATION_ERROR)
+                            {
+                                executeHotspot(hotspot);
+                            }
+                        }
+                    }
+                    System.out.println(audioPlayer.getPosition());
+                }
+            }, 0, 50);
+        }
     }
 
     public void stopTimer()
@@ -244,6 +281,14 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         {
             timer.cancel();
             timer.purge();
+    
+            boolean hotspotsEnabled = prefs.getBoolean(
+                    "hotspotsEnabled", false);
+            if (hotspotsEnabled)
+            {
+                vibrationTimer.cancel();
+                vibrationTimer.purge();
+            }
         }
     }
 
@@ -344,6 +389,26 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         {
             audioPlayer = null;
         }
+        audioVibrationOffset = prefs.getInt("audioVibrationOffset", 0);
+        getHotspots();
+    }
+    
+    private List<HotspotArray> getHotspots()
+    {
+        hotspots = new ArrayList<HotspotArray>();
+        try
+        {
+            JSONArray arr = new JSONArray(prefs.getString("hotspots", "[]"));
+            for (int i = 0; i < arr.length(); i++)
+            {
+                hotspots.add(HotspotArray.fromJSON(arr.getJSONObject(i)));
+            }
+        }
+        catch (JSONException je)
+        {
+            je.printStackTrace();
+        }
+        return hotspots;
     }
 
     private void initUI()
@@ -759,6 +824,23 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private void vibrate()
     {
         btnPlayPause.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+    }
+    
+    private void vibrateFor(long duration)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            vibrator.vibrate(VibrationEffect.createOneShot(duration, 200));
+        }
+        else
+        {
+            vibrator.vibrate(duration);
+        }
+    }
+    
+    private void executeHotspot(Hotspot hotspot)
+    {
+        vibrateFor(hotspot.getDuration());
     }
 
     private boolean autoplayAllowed()

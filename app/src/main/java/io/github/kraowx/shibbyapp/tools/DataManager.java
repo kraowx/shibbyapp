@@ -1,6 +1,5 @@
 package io.github.kraowx.shibbyapp.tools;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -14,10 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,7 +26,6 @@ import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.models.ShibbyFileArray;
 import io.github.kraowx.shibbyapp.net.Request;
-import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.net.Response;
 import io.github.kraowx.shibbyapp.net.ResponseType;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonRefreshInfoDialog;
@@ -497,7 +493,6 @@ public class DataManager
             while (data.has("links") && data.getJSONObject("links").has("next") &&
                     (maxPages == -1 || pages < maxPages))
             {
-                System.out.println("PAGE: " + pages);
                 posts = data.getJSONArray("data");
                 final String startDate = posts.getJSONObject(0).getJSONObject("attributes")
                         .getString("created_at").substring(0, 9);
@@ -663,31 +658,30 @@ public class DataManager
     public void requestData(Request request)
     {
         String url = getURL(request);
-        HttpRequest httpreq = null;
         try
         {
-            httpreq = HttpRequest.get(url);
+            HttpRequest httpreq = HttpRequest.get(url);
+            if (httpreq != null)
+            {
+                String body = httpreq.body();
+                httpreq.closeOutputQuietly();
+                if (body != null)
+                {
+                    Response resp = Response.fromJSON(body);
+                    switch (handleResponse(resp))
+                    {
+                        case SUCCESS:
+                            showToast("Data updated");
+                            return;
+                        case ERROR:
+                            return;
+                    }
+                }
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-        }
-        if (httpreq != null)
-        {
-            String body = httpreq.body();
-            httpreq.closeOutputQuietly();
-            if (body != null)
-            {
-                Response resp = Response.fromJSON(body);
-                switch (handleResponse(resp))
-                {
-                    case SUCCESS:
-                        showToast("Data updated");
-                        return;
-                    case ERROR:
-                        return;
-                }
-            }
         }
     }
     
@@ -798,6 +792,13 @@ public class DataManager
             {
                 JSONArray data = rawjson.getJSONArray("data");
                 editor.putString("patreonFiles", data.toString());
+                code = ResponseCode.SUCCESS;
+            }
+            else if (response.getType() == ResponseType.HOTSPOTS)
+            {
+                JSONArray data = rawjson.getJSONArray("data");
+                System.out.println(data);
+                editor.putString("hotspots", data.toString());
                 code = ResponseCode.SUCCESS;
             }
             else if (response.getType() == ResponseType.FEATURE_NOT_SUPPORTED)
