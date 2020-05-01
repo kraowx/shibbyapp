@@ -26,7 +26,7 @@ This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAG
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
-- Some kind of vibration feature that syncs with audio? Add offset for bluetooth headphones as well
+- (WIP) Some kind of vibration feature that syncs with audio? Add offset for bluetooth headphones as well
 - File metadata that gives more information about a file other than its name and description
 - Import/export audio files buttons
 
@@ -40,7 +40,7 @@ Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A
 <s>This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.</s>
 This feature is not supported by servers at the moment. However, built-in Patreon support for the app was added in version 2.1.0.
 
-### Hotspots (Experimental)
+## Hotspots (Experimental)
 Hotspots are locations defined in an audio file that attempt to produce a more intense reaction to certain parts of the file. Currently, hotspots are somwhat arbitrarily defined to react to the loudness of the file. This is not a perfect solution by any means, so I will likely be tweaking it over time. If this feature is well received, I am considering adding a similar feature that lets the user (you) create your own hotspots, allowing for control over location, intensity, and duration. Let me know if this is something you would find useful!
 
 ## Additional Notes and "Hidden" Features
@@ -53,4 +53,4 @@ Hotspots are locations defined in an audio file that attempt to produce a more i
 ## Importing Files
 You can import your own downloaded shibbyfiles or custom/edited files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.
 
-For advanced users, instead of manually downloading each shibbyfile, you can manually import pre-existing shibbyfiles into the app by renaming the files to their SHA256 equivalent and then placing them in "/storage/self/primary/Android/data/io.github.kraowx.shibbyapp/files/audio" on your Android device. You can even modify the audio data if you want as long as the name of the file is *exactly* the same as how it appears on soundgasm. I have written some bash scripts to assist with this process. First run [this](https://gist.github.com/kraowx/4c1506f4dbb643f49203669756168413) script in a new directory which will automatically download all of Shibby's files from soundgasm, and then run [this](https://gist.github.com/kraowx/24104f038b9fee14a1466367381d465b) script in the same directory which will rename each file to its SHA256 hash equivalent.
+For advanced users, instead of downloading each shibbyfile individually, you can manually import pre-existing shibbyfiles into the app by renaming the files to their SHA256 equivalent and then placing them in "/storage/self/primary/Android/data/io.github.kraowx.shibbyapp/files/audio" on your Android device. You can even modify the audio data if you want as long as the name of the file is *exactly* the same as how it appears on soundgasm. I have written some bash scripts to assist with this process. First run [this](https://gist.github.com/kraowx/4c1506f4dbb643f49203669756168413) script in a new directory which will automatically download all of Shibby's files from soundgasm, and then run [this](https://gist.github.com/kraowx/24104f038b9fee14a1466367381d465b) script in the same directory which will rename each file to its SHA256 hash equivalent.
