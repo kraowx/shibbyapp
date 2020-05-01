@@ -43,13 +43,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
-import io.github.kraowx.shibbyapp.models.ShibbyFile;
-import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
-import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;

@@ -750,16 +750,18 @@ public class DataManager
         {
             SharedPreferences.Editor editor = prefs.edit();
             JSONObject rawjson = response.toJSON();
-            if (response.getType() == ResponseType.ALL)
-            {
+            if (response.getType() == ResponseType.ALL) {
                 JSONObject data = rawjson.getJSONObject("data");
                 JSONArray files = data.getJSONArray("files");
                 JSONArray tags = data.getJSONArray("tags");
                 JSONArray series = data.getJSONArray("series");
                 JSONArray patreonFiles = null;
-                if (data.has("patreonFiles"))
-                {
+                if (data.has("patreonFiles")) {
                     patreonFiles = data.getJSONArray("patreonFiles");
+                }
+                JSONArray hotspots = null;
+                if (data.has("hotspots")) {
+                    hotspots = data.getJSONArray("hotspots");
                 }
                 editor.putString("files", files.toString());
                 editor.putString("tags", tags.toString());
@@ -767,6 +769,10 @@ public class DataManager
                 if (patreonFiles != null)
                 {
                     editor.putString("patreonFiles", patreonFiles.toString());
+                }
+                if (hotspots != null)
+                {
+                    editor.putString("hotspots", hotspots.toString());
                 }
                 code = ResponseCode.SUCCESS;
             }
@@ -797,7 +803,6 @@ public class DataManager
             else if (response.getType() == ResponseType.HOTSPOTS)
             {
                 JSONArray data = rawjson.getJSONArray("data");
-                System.out.println(data);
                 editor.putString("hotspots", data.toString());
                 code = ResponseCode.SUCCESS;
             }

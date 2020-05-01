@@ -160,8 +160,10 @@ public class AllFilesFragment extends Fragment
                 @Override
                 public void run()
                 {
-                    new DataManager((MainActivity) getActivity())
-                            .requestData(Request.files());
+                    DataManager dataManager = new DataManager(
+                            (MainActivity)getActivity());
+                    dataManager.requestData(Request.files());
+                    dataManager.requestData(Request.hotspots());
                     updateList();
                     refreshLayout.post(new Runnable()
                     {
@@ -194,7 +196,8 @@ public class AllFilesFragment extends Fragment
     {
         if (listAdapter != null)
         {
-            listAdapter.filterDisplayItems(text, this.fileTypes, this.durations, this.tags);
+            listAdapter.filterDisplayItems(text, this.fileTypes,
+                    this.durations, this.tags);
         }
         return false;
     }
@@ -215,7 +218,8 @@ public class AllFilesFragment extends Fragment
     
     private void startInitialUpdate()
     {
-        final ProgressDialog progressDialog = new ProgressDialog((MainActivity)getActivity());
+        final ProgressDialog progressDialog =
+                new ProgressDialog((MainActivity)getActivity());
         new Thread()
         {
             @Override
@@ -229,7 +233,8 @@ public class AllFilesFragment extends Fragment
                         refreshLayout.setRefreshing(true);
                     }
                 });
-                final DataManager dataManager = new DataManager((MainActivity) getActivity());
+                final DataManager dataManager =
+                        new DataManager((MainActivity) getActivity());
                 final List<ShibbyFile> files = dataManager.getFiles();
                 if (files.size() > 0)
                 {

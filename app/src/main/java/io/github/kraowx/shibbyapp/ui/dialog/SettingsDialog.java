@@ -149,8 +149,8 @@ public class SettingsDialog extends Dialog
 			}
 		});
 		final SeekBar seekBarOffset = findViewById(R.id.seekBarOffset);
-		seekBarOffset.setMax(1000);
-		seekBarOffset.setProgress(audioVibrationOffset);
+		seekBarOffset.setMax(2000);
+		seekBarOffset.setProgress(audioVibrationOffset+1000);
 		seekBarOffset.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
 		{
 			@Override
@@ -162,7 +162,7 @@ public class SettingsDialog extends Dialog
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar)
 			{
-				int offset = seekBar.getProgress();
+				int offset = seekBar.getProgress()-1000;
 				testAudioVibrationSync(offset);
 				editor.putInt("audioVibrationOffset", offset);
 				editor.commit();
@@ -242,16 +242,30 @@ public class SettingsDialog extends Dialog
 	
 	private void testAudioVibrationSync(int offset)
 	{
-		playSound();
+		if (offset >= 0)
+		{
+			playSound();
+		}
+		else
+		{
+			vibrate();
+		}
 		try
 		{
-			Thread.sleep(offset);
+			Thread.sleep(Math.abs(offset));
 		}
 		catch (InterruptedException ie)
 		{
 			ie.printStackTrace();
 		}
-		vibrate();
+		if (offset >= 0)
+		{
+			vibrate();
+		}
+		else
+		{
+			playSound();
+		}
 	}
 	
 	private void vibrate()

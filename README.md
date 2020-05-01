@@ -22,7 +22,7 @@ The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.c
 ## [Showcase](https://ibb.co/album/gDq3aa)
 
 ## Permissions
-This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user. Permission to read from the device's external storage is only requested for the "import file" feature, which requires listing the device's directories.
+This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user. Permission to read from the device's external storage is only requested for the "import file" feature, which requires listing the device's directories. The "Vibration" permission is also used to enhance the user experience with haptic feedback on buttons and hotspots.
 
 ## Planned Features
 - Notification with media controls (play/pause, next, previous)
@@ -39,6 +39,9 @@ Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A
 
 <s>This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.</s>
 This feature is not supported by servers at the moment. However, built-in Patreon support for the app was added in version 2.1.0.
+
+### Hotspots (Experimental)
+Hotspots are locations defined in an audio file that attempt to produce a more intense reaction to certain parts of the file. Currently, hotspots are somwhat arbitrarily defined to react to the loudness of the file. This is not a perfect solution by any means, so I will likely be tweaking it over time. If this feature is well received, I am considering adding a similar feature that lets the user (you) create your own hotspots, allowing for control over location, intensity, and duration. Let me know if this is something you would find useful!
 
 ## Additional Notes and "Hidden" Features
 - In the audio player, when the loop button is pressed it will default to toggle infinite loop on and off. If you only want to loop a specific number of times you can long press on the loop icon and select a number from 0 to 100.
