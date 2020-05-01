@@ -1,10 +1,13 @@
 package io.github.kraowx.shibbyapp;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -40,6 +43,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,6 +63,9 @@ import io.github.kraowx.shibbyapp.ui.dialog.SettingsDialog;
 public class MainActivity extends AppCompatActivity
 {
     private static final boolean IS_PRE_RELEASE = false;
+    
+    private final int REQUEST_EXTERNAL_STORAGE = 1;
+    private final int REQUEST_NEW_FILE = 2;
 
     private static MainActivity mContext;
     private AppBarConfiguration mAppBarConfiguration;
@@ -190,7 +197,7 @@ public class MainActivity extends AppCompatActivity
 
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                1);
+                REQUEST_EXTERNAL_STORAGE);
     }
 
     @Override
@@ -254,7 +261,40 @@ public class MainActivity extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
         }
     }
-
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data)
+    {
+        if (requestCode == REQUEST_NEW_FILE)
+        {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null)
+            {
+                ContentResolver resolver = getContentResolver();
+                try
+                {
+                    String exportData = generateExportData();
+                    OutputStream out = resolver.openOutputStream(data.getData());
+                    out.write(exportData.getBytes());
+                    out.close();
+                    Toast.makeText(this, "Data export successful",
+                            Toast.LENGTH_LONG).show();
+                }
+                catch (IOException ioe)
+                {
+                    ioe.printStackTrace();
+                    Toast.makeText(this, "Failed to export data",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+        else
+        {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+    
+    
     @Override
     public boolean onSupportNavigateUp()
     {
@@ -335,25 +375,16 @@ public class MainActivity extends AppCompatActivity
     
     private void exportAllData()
     {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        JSONObject data = new JSONObject();
-        try
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         {
-            JSONArray playlistNames = new JSONArray(
-                    prefs.getString("playlists", "[]"));
-            data.put("playlists", playlistNames);
-            JSONArray userFiles = new JSONArray(
-                    prefs.getString("userFiles", "[]"));
-            data.put("userFiles", userFiles);
-            for (int i = 0; i < playlistNames.length(); i++)
-            {
-                JSONArray playlistData = new JSONArray(
-                        prefs.getString("playlist" +
-                                playlistNames.get(i), "[]"));
-                data.put("playlist" + playlistNames.get(i),
-                        playlistData);
-            }
+            startActivityForResult(
+                    new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                            .setType("application/json")
+                            .addCategory(Intent.CATEGORY_OPENABLE), REQUEST_NEW_FILE);
+        }
+        else
+        {
+            String data = generateExportData();
             Date time = Calendar.getInstance().getTime();
             SimpleDateFormat sdf = new SimpleDateFormat("ddMMYYYY");
             File dir = new File(Environment.getExternalStorageDirectory()
@@ -378,10 +409,35 @@ public class MainActivity extends AppCompatActivity
                         2);
             }
         }
+    }
+    
+    private String generateExportData()
+    {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        JSONObject data = new JSONObject();
+        try
+        {
+            JSONArray playlistNames = new JSONArray(
+                    prefs.getString("playlists", "[]"));
+            data.put("playlists", playlistNames);
+            JSONArray userFiles = new JSONArray(
+                    prefs.getString("userFiles", "[]"));
+            data.put("userFiles", userFiles);
+            for (int i = 0; i < playlistNames.length(); i++)
+            {
+                JSONArray playlistData = new JSONArray(
+                        prefs.getString("playlist" +
+                                playlistNames.get(i), "[]"));
+                data.put("playlist" + playlistNames.get(i),
+                        playlistData);
+            }
+        }
         catch (JSONException je)
         {
             je.printStackTrace();
         }
+        return data.toString();
     }
 
     private void setVersionOnUI()
