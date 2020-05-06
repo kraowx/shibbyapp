@@ -39,8 +39,6 @@ public class PlaylistsFragment extends Fragment
         implements ShibbyPlaylistAdapter.ItemClickListener,
         SearchView.OnQueryTextListener
 {
-    private final String RESTRICTED_NAME = "s";
-    
     private RecyclerView list;
     private ShibbyPlaylistAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
@@ -201,7 +199,7 @@ public class PlaylistsFragment extends Fragment
             public void onClick(DialogInterface dialog, int which)
             {
                 String name = input.getText().toString();
-                if (name.equals(RESTRICTED_NAME))
+                if (name.equals(PlaylistManager.RESTRICTED_NAME))
                 {
                     showNameNotAllowedDialog();
                 }
@@ -239,8 +237,16 @@ public class PlaylistsFragment extends Fragment
         }
     
         builder.setTitle("Name not allowed");
-        builder.setMessage("The playlist name \"" + RESTRICTED_NAME +
+        builder.setMessage("The playlist name \"" + PlaylistManager.RESTRICTED_NAME +
                 "\" is used internally and cannot be used.");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.cancel();
+            }
+        });
         builder.show();
     }
 }
