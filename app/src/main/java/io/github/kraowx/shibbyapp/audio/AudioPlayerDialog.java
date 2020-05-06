@@ -38,6 +38,7 @@ import io.github.kraowx.shibbyapp.models.Hotspot;
 import io.github.kraowx.shibbyapp.models.HotspotArray;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.PlayCountManager;
 import io.github.kraowx.shibbyapp.ui.dialog.DurationPickerDialog;
 import mobi.upod.timedurationpicker.TimeDurationPicker;
 
@@ -115,6 +116,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             if (loop > 0)
                             {
                                 loop--;
+                                PlayCountManager.incrementPlayCount(activeFile, mainActivity);
                                 mainActivity.runOnUiThread(new Runnable()
                                 {
                                     @Override
@@ -155,6 +157,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             else if (loop == 0)
                             {
                                 audioPlayer.setLooping(false);
+                                PlayCountManager.incrementPlayCount(activeFile, mainActivity);
                                 btnPlayPause.post(new Runnable()
                                 {
                                     @Override
@@ -164,6 +167,10 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                                 R.drawable.ic_play_circle);
                                     }
                                 });
+                            }
+                            else if (loop == LOOP_INFINITE)
+                            {
+                                PlayCountManager.incrementPlayCount(activeFile, mainActivity);
                             }
                         }
                         if (audioPlayer.isPlaying())
@@ -176,6 +183,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                         // player has reached the end of the audio file
                         else if (audioPlayer.isInitialized())
                         {
+                            PlayCountManager.incrementPlayCount(activeFile, mainActivity);
                             // there is a file next in the queue
                             if (progressBar.getProgress() + 1000 >= audioPlayer.getFileDuration() &&
                                     queue != null && queue.indexOf(activeFile) < queue.size() - 1 &&

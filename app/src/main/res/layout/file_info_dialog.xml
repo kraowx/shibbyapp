@@ -77,6 +77,16 @@
             android:gravity="center"
             android:text="Description"
             android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/txtPlayCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="20dp"
+            android:text="Played 0 times"
+            android:textSize="19sp"
+            android:textStyle="italic" />
     </LinearLayout>
 </ScrollView>
 

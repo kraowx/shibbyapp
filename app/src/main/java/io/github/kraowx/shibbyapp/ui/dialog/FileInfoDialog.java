@@ -25,6 +25,7 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.PlayCountManager;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class FileInfoDialog extends Dialog
@@ -73,6 +74,15 @@ public class FileInfoDialog extends Dialog
 		{
 			duration.setVisibility(View.GONE);
 		}
+		/* Play Count */
+		TextView playCount = findViewById(R.id.txtPlayCount);
+		int count = PlayCountManager.getPlayCount(file, mainActivity);
+		String countText = "Played " + count + " time";
+		if (count != 1)
+		{
+			countText += "s";
+		}
+		playCount.setText(countText);
 		/* Tags */
 		TextView tags = findViewById(R.id.txtTags);
 		if (file.getTags() == null ||

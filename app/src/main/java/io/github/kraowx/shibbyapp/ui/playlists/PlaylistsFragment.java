@@ -39,6 +39,8 @@ public class PlaylistsFragment extends Fragment
         implements ShibbyPlaylistAdapter.ItemClickListener,
         SearchView.OnQueryTextListener
 {
+    private final String RESTRICTED_NAME = "s";
+    
     private RecyclerView list;
     private ShibbyPlaylistAdapter listAdapter;
     private LinearLayoutManager listLayoutManager;
@@ -198,7 +200,15 @@ public class PlaylistsFragment extends Fragment
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                createPlaylist(input.getText().toString());
+                String name = input.getText().toString();
+                if (name.equals(RESTRICTED_NAME))
+                {
+                    showNameNotAllowedDialog();
+                }
+                else
+                {
+                    createPlaylist(name);
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
@@ -209,6 +219,28 @@ public class PlaylistsFragment extends Fragment
                 dialog.cancel();
             }
         });
+        builder.show();
+    }
+    
+    private void showNameNotAllowedDialog()
+    {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences((MainActivity)getActivity());
+        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+        AlertDialog.Builder builder;
+        if (darkModeEnabled)
+        {
+            builder = new AlertDialog.Builder((MainActivity)getActivity(),
+                    R.style.DialogThemeDark_Alert);
+        }
+        else
+        {
+            builder = new AlertDialog.Builder((MainActivity)getActivity());
+        }
+    
+        builder.setTitle("Name not allowed");
+        builder.setMessage("The playlist name \"" + RESTRICTED_NAME +
+                "\" is used internally and cannot be used.");
         builder.show();
     }
 }
