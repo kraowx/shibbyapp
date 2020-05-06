@@ -130,7 +130,6 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     protected Boolean doInBackground(final String... strings)
     {
         Boolean prepared = false;
-
         try
         {
             if (strings[0].contains("patreon"))
@@ -153,6 +152,7 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             showErrorOnUI(strings[0]);
             prepared = false;
         }

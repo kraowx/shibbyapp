@@ -35,6 +35,7 @@ import io.github.kraowx.shibbyapp.net.Request;
 import io.github.kraowx.shibbyapp.net.RequestType;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
+import io.github.kraowx.shibbyapp.ui.ListItemBarView;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
 import io.github.kraowx.shibbyapp.ui.dialog.FileInfoDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ServerSelectorDialog;

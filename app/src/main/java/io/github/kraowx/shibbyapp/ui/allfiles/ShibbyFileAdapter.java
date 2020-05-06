@@ -20,6 +20,7 @@ import java.util.List;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
+import io.github.kraowx.shibbyapp.ui.ListItemBarView;
 
 public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.ViewHolder>
 {
@@ -201,6 +202,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     {
         TextView txtFileName;
         CheckBox actionBox;
+        ListItemBarView barView;
 
         ViewHolder(View itemView)
         {

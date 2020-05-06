@@ -14,12 +14,17 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.odysseus.ithaka.audioinfo.AudioInfo;
+import de.odysseus.ithaka.audioinfo.mp3.MP3Info;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
