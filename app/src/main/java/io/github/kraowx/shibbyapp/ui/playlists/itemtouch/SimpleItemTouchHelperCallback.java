@@ -102,6 +102,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback
 				itemViewHolder.onItemSelected();
 			}
 		}
+		else
+		{
+			mAdapter.onItemReleased();
+		}
 		super.onSelectedChanged(viewHolder, actionState);
 	}
 	

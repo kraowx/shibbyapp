@@ -37,7 +37,7 @@ import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.SimpleItemTouchHelperCa
 
 public class PlaylistsFragment extends Fragment
         implements ShibbyPlaylistAdapter.ItemClickListener,
-        SearchView.OnQueryTextListener, OnStartDragListener
+        SearchView.OnQueryTextListener
 {
     private RecyclerView list;
     private ShibbyPlaylistAdapter listAdapter;
@@ -94,11 +94,12 @@ public class PlaylistsFragment extends Fragment
         return root;
     }
     
-    @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder)
-    {
-        mItemTouchHelper.startDrag(viewHolder);
-    }
+//    @Override
+//    public void onStartDrag(RecyclerView.ViewHolder viewHolder)
+//    {
+//        System.out.println("start drag");
+//        mItemTouchHelper.startDrag(viewHolder);
+//    }
 
     @Override
     public boolean onQueryTextChange(String text)

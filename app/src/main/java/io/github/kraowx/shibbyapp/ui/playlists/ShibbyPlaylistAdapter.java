@@ -63,8 +63,21 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
     {
         Collections.swap(mData, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
-        PlaylistManager.setPlaylistNameData(mainActivity, mData);
         return true;
+    }
+    
+    @Override
+    public void onItemReleased()
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                PlaylistManager.setPlaylistNameData(
+                        mainActivity, mData);
+            }
+        }).start();
     }
 
     @Override
