@@ -63,6 +63,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private Timer timer, vibrationTimer;
     private SharedPreferences prefs;
     private Vibrator vibrator;
+    private PlayCountIncrementer playCountIncrementer;
 
     private TextView txtTitle, txtTags, txtElapsedTime, txtRemainingTime;
     private ImageButton btnRewind, btnPlayPause, btnFastForward,
@@ -79,6 +80,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         this.mainActivity = mainActivity;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         vibrator = (Vibrator)mainActivity.getSystemService(Context.VIBRATOR_SERVICE);
+        playCountIncrementer = new PlayCountIncrementer();
         delayTime = setDelay = NO_DELAY;
         loop = NO_LOOP;
         initUI();
@@ -116,7 +118,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             if (loop > 0)
                             {
                                 loop--;
-                                PlayCountManager.incrementPlayCount(activeFile, mainActivity);
+                                playCountIncrementer.increment();
                                 mainActivity.runOnUiThread(new Runnable()
                                 {
                                     @Override
@@ -157,7 +159,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             else if (loop == 0)
                             {
                                 audioPlayer.setLooping(false);
-                                PlayCountManager.incrementPlayCount(activeFile, mainActivity);
+                                playCountIncrementer.increment();
                                 btnPlayPause.post(new Runnable()
                                 {
                                     @Override
@@ -170,7 +172,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             }
                             else if (loop == LOOP_INFINITE)
                             {
-                                PlayCountManager.incrementPlayCount(activeFile, mainActivity);
+                                playCountIncrementer.increment();
                             }
                         }
                         if (audioPlayer.isPlaying())
@@ -183,7 +185,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                         // player has reached the end of the audio file
                         else if (audioPlayer.isInitialized())
                         {
-                            PlayCountManager.incrementPlayCount(activeFile, mainActivity);
+                            playCountIncrementer.increment();
                             // there is a file next in the queue
                             if (progressBar.getProgress() + 1000 >= audioPlayer.getFileDuration() &&
                                     queue != null && queue.indexOf(activeFile) < queue.size() - 1 &&
@@ -827,6 +829,45 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             audioPlayer.execute(AudioPlayerDialog.this.activeFile.getLink());
         }
         vibrate();
+    }
+    
+    class PlayCountIncrementer
+    {
+        private boolean incrementing;
+        private Timer resetTimer;
+        
+        public void increment()
+        {
+            if (!incrementing)
+            {
+                incrementing = true;
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        PlayCountManager.incrementPlayCount(
+                                activeFile, mainActivity);
+                        reset();
+                    }
+                }).start();
+            }
+        }
+        
+        private void reset()
+        {
+            resetTimer = new Timer();
+            resetTimer.schedule(new TimerTask()
+            {
+                @Override
+                public void run()
+                {
+                    incrementing = false;
+                    resetTimer.cancel();
+                    resetTimer.purge();
+                }
+            }, 3000);
+        }
     }
     
     private void vibrate()
