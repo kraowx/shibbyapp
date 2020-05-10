@@ -54,3 +54,9 @@ Hotspots are locations defined in an audio file that attempt to produce a more i
 You can import your own downloaded shibbyfiles or custom/edited files using the "Import File" tool found in the menu in the top-right corner of the app. If you specify tags for your file, each tag must be separated by a comma. For example: "F4A, ASMR, Hypnosis". Casing does not necessarily matter, since the tags will be automatically formatted to match other tags.
 
 For advanced users, instead of downloading each shibbyfile individually, you can manually import pre-existing shibbyfiles into the app by renaming the files to their SHA256 equivalent and then placing them in "/storage/self/primary/Android/data/io.github.kraowx.shibbyapp/files/audio" on your Android device. You can even modify the audio data if you want as long as the name of the file is *exactly* the same as how it appears on soundgasm. I have written some bash scripts to assist with this process. First run [this](https://gist.github.com/kraowx/4c1506f4dbb643f49203669756168413) script in a new directory which will automatically download all of Shibby's files from soundgasm, and then run [this](https://gist.github.com/kraowx/24104f038b9fee14a1466367381d465b) script in the same directory which will rename each file to its SHA256 hash equivalent.
+
+## Used Libraries
+- [JSON-java](https://github.com/stleary/JSON-java)
+- [HTTP Request](https://github.com/kevinsawicki/http-request)
+- [Time Duration Picker](https://github.com/svenwiegand/time-duration-picker)
+- [Ithaka Audio Info](https://github.com/beckchr/ithaka-audioinfo)
