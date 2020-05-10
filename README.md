@@ -57,6 +57,6 @@ For advanced users, instead of downloading each shibbyfile individually, you can
 
 ## Used Libraries
 - [JSON-java](https://github.com/stleary/JSON-java)
-- [HTTP Request](https://github.com/kevinsawicki/http-request)
+- [Http Request](https://github.com/kevinsawicki/http-request)
 - [Time Duration Picker](https://github.com/svenwiegand/time-duration-picker)
 - [Ithaka Audio Info](https://github.com/beckchr/ithaka-audioinfo)
