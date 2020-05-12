@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
+import co.lujun.androidtagview.TagContainerLayout;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.audio.AudioController;
@@ -84,16 +85,8 @@ public class FileInfoDialog extends Dialog
 		}
 		playCount.setText(countText);
 		/* Tags */
-		TextView tags = findViewById(R.id.txtTags);
-		if (file.getTags() == null ||
-				(file.getTags() != null && file.getTags().isEmpty()))
-		{
-			tags.setText(Html.fromHtml("<i>No tags</i>"));
-		}
-		else
-		{
-			tags.setText(getTagsString(file.getTags()));
-		}
+		TagContainerLayout tags = findViewById(R.id.tags);
+		tags.setTags(file.getTags());
 		/* Description */
 		TextView description = findViewById(R.id.txtDescription);
 		if (file.getDescription() == null ||
@@ -263,20 +256,6 @@ public class FileInfoDialog extends Dialog
 					.getColor(mainActivity, R.color.colorAccent));
 		}
 		show();
-	}
-	
-	private String getTagsString(List<String> tags)
-	{
-		String tagsStr = "";
-		for (int i = 0; i < tags.size(); i++)
-		{
-			tagsStr += tags.get(i);
-			if (i < tags.size()-1)
-			{
-				tagsStr += "  |  ";
-			}
-		}
-		return tagsStr + "\n";
 	}
 	
 	private void showAddFileToPlaylistDialog(ShibbyFile file)

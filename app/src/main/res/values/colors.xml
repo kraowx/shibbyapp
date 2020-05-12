@@ -5,6 +5,7 @@
     <color name="colorPrimaryDark">#210067</color>
     <color name="colorAccent">#1B70D8</color>
     <color name="colorAccentLight">#587BCB</color>
+    <color name="colorAccentDark">#0F407B</color>
     <color name="redAccent">#F44336</color>
     <color name="gray">#AAAAAA</color>
     <color name="grayLight">#CBCBCB</color>
