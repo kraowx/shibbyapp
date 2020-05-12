@@ -89,12 +89,25 @@ public class ImportAppDataDialog extends Dialog
 						data = new JSONObject(sb.toString());
 						editor.putString("playlists", data.getJSONArray("playlists").toString());
 						editor.putString("userFiles", data.getJSONArray("userFiles").toString());
-						JSONArray arr = data.getJSONArray("playlists");
-						for (int i = 0; i < arr.length(); i++)
+						JSONArray playlists = data.getJSONArray("playlists");
+						for (int i = 0; i < playlists.length(); i++)
 						{
-							String playlistId = "playlist" + arr.getString(i);
+							String playlistId = "playlist" + playlists.getString(i);
 							editor.putString(playlistId, data.get(playlistId).toString());
 						}
+						editor.putString("playCounts", data.getJSONObject("playCounts").toString());
+						
+						/* Settings Data */
+						JSONObject settingsData = data.getJSONObject("settingsData");
+						editor.putBoolean("updateStartup", settingsData.getBoolean("updateStartup"));
+						editor.putBoolean("displayLongNames", settingsData.getBoolean("displayLongNames"));
+						editor.putBoolean("showSpecialPrefixTags", settingsData.getBoolean("showSpecialPrefixTags"));
+						editor.putBoolean("darkMode", settingsData.getBoolean("darkMode"));
+						editor.putBoolean("wakeLock", settingsData.getBoolean("wakeLock"));
+						editor.putBoolean("hotspotsEnabled", settingsData.getBoolean("hotspotsEnabled"));
+						editor.putInt("audioVibrationOffset", settingsData.getInt("audioVibrationOffset"));
+						editor.putInt("autoplay", settingsData.getInt("autoplay"));
+						editor.putString("server", settingsData.getString("server"));
 						editor.commit();
 					}
 					catch (IOException ioe)

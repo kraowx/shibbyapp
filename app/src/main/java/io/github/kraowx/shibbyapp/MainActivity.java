@@ -432,6 +432,22 @@ public class MainActivity extends AppCompatActivity
                 data.put("playlist" + playlistNames.get(i),
                         playlistData);
             }
+            JSONObject playCounts = new JSONObject(prefs.getString(
+                    "playCounts", "[]"));
+            data.put("playCounts", playCounts);
+            
+            /* Settings data */
+            JSONObject settingsData = new JSONObject();
+            settingsData.put("updateStartup", prefs.getBoolean("updateStartup", true));
+            settingsData.put("displayLongNames", prefs.getBoolean("displayLongNames", false));
+            settingsData.put("showSpecialPrefixTags", prefs.getBoolean("showSpecialPrefixTags", true));
+            settingsData.put("darkMode", prefs.getBoolean("darkMode", false));
+            settingsData.put("wakeLock", prefs.getBoolean("wakeLock", false));
+            settingsData.put("hotspotsEnabled", prefs.getBoolean("hotspotsEnabled", false));
+            settingsData.put("audioVibrationOffset", prefs.getInt("audioVibrationOffset", 0));
+            settingsData.put("autoplay", prefs.getInt("autoplay", 1));
+            settingsData.put("server", prefs.getString("server", getString(R.string.main_server)));
+            data.put("settingsData", settingsData);
         }
         catch (JSONException je)
         {
