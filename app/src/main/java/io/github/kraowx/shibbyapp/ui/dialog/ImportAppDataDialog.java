@@ -95,19 +95,25 @@ public class ImportAppDataDialog extends Dialog
 							String playlistId = "playlist" + playlists.getString(i);
 							editor.putString(playlistId, data.get(playlistId).toString());
 						}
-						editor.putString("playCounts", data.getJSONObject("playCounts").toString());
+						if (data.has("playCounts"))
+						{
+							editor.putString("playCounts", data.getJSONObject("playCounts").toString());
+						}
 						
 						/* Settings Data */
-						JSONObject settingsData = data.getJSONObject("settingsData");
-						editor.putBoolean("updateStartup", settingsData.getBoolean("updateStartup"));
-						editor.putBoolean("displayLongNames", settingsData.getBoolean("displayLongNames"));
-						editor.putBoolean("showSpecialPrefixTags", settingsData.getBoolean("showSpecialPrefixTags"));
-						editor.putBoolean("darkMode", settingsData.getBoolean("darkMode"));
-						editor.putBoolean("wakeLock", settingsData.getBoolean("wakeLock"));
-						editor.putBoolean("hotspotsEnabled", settingsData.getBoolean("hotspotsEnabled"));
-						editor.putInt("audioVibrationOffset", settingsData.getInt("audioVibrationOffset"));
-						editor.putInt("autoplay", settingsData.getInt("autoplay"));
-						editor.putString("server", settingsData.getString("server"));
+						if (data.has("settingsData"))
+						{
+							JSONObject settingsData = data.getJSONObject("settingsData");
+							editor.putBoolean("updateStartup", settingsData.getBoolean("updateStartup"));
+							editor.putBoolean("displayLongNames", settingsData.getBoolean("displayLongNames"));
+							editor.putBoolean("showSpecialPrefixTags", settingsData.getBoolean("showSpecialPrefixTags"));
+							editor.putBoolean("darkMode", settingsData.getBoolean("darkMode"));
+							editor.putBoolean("wakeLock", settingsData.getBoolean("wakeLock"));
+							editor.putBoolean("hotspotsEnabled", settingsData.getBoolean("hotspotsEnabled"));
+							editor.putInt("audioVibrationOffset", settingsData.getInt("audioVibrationOffset"));
+							editor.putInt("autoplay", settingsData.getInt("autoplay"));
+							editor.putString("server", settingsData.getString("server"));
+						}
 						editor.commit();
 					}
 					catch (IOException ioe)

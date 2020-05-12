@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity
                         playlistData);
             }
             JSONObject playCounts = new JSONObject(prefs.getString(
-                    "playCounts", "[]"));
+                    "playCounts", "{}"));
             data.put("playCounts", playCounts);
             
             /* Settings data */
