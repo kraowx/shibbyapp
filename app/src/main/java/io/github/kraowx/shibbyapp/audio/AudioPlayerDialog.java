@@ -188,27 +188,42 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             playCountIncrementer.increment();
                             // there is a file next in the queue
                             if (progressBar.getProgress() + 1000 >= audioPlayer.getFileDuration() &&
-                                    queue != null && queue.indexOf(activeFile) < queue.size() - 1 &&
                                     autoplayAllowed())
                             {
-                                mainActivity.runOnUiThread(new Runnable()
+                                if (queue != null && queue.indexOf(activeFile) < queue.size() - 1)
                                 {
-                                    @Override
-                                    public void run()
+                                    mainActivity.runOnUiThread(new Runnable()
                                     {
-                                        loadFile(queue.get(queue.indexOf(activeFile) + 1));
-                                        playAudio();
-                                        btnPlayPause.post(new Runnable()
+                                        @Override
+                                        public void run()
                                         {
-                                            @Override
-                                            public void run()
+                                            loadFile(queue.get(queue.indexOf(activeFile) + 1));
+                                            playAudio();
+                                            btnPlayPause.post(new Runnable()
                                             {
-                                                btnPlayPause.setImageResource(
-                                                        R.drawable.ic_pause_circle);
-                                            }
-                                        });
-                                    }
-                                });
+                                                @Override
+                                                public void run()
+                                                {
+                                                    btnPlayPause.setImageResource(
+                                                            R.drawable.ic_pause_circle);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    btnPlayPause.post(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            btnPlayPause.setImageResource(
+                                                    R.drawable.ic_play_circle);
+                                        }
+                                    });
+                                    stopTimer();
+                                }
                             }
                             // the player is not looping, so stop the player
                             if (!audioPlayer.isLooping() && !autoplayAllowed())
