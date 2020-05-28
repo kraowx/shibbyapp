@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public class ShibbyFileArray
 {
-    private String name;
+    private String name, description;
     private List<ShibbyFile> files;
     private Map<String, String> extraData;
 
@@ -51,6 +51,10 @@ public class ShibbyFileArray
         {
             JSONObject json = new JSONObject(jsonStr);
             arr.name = json.getString("name");
+            if (json.has("description"))
+            {
+                arr.description = json.getString("description");
+            }
             JSONArray filesArr = json.getJSONArray("files");
             arr.files = new ArrayList<ShibbyFile>();
             for (int i = 0; i < filesArr.length(); i++)
@@ -80,6 +84,10 @@ public class ShibbyFileArray
         try
         {
             json.put("name", name);
+            if (description != null)
+            {
+                json.put("description", description);
+            }
             json.put("fileCount", files.size());
             JSONArray arr = new JSONArray();
             for (ShibbyFile file : files)
@@ -109,6 +117,16 @@ public class ShibbyFileArray
     public void setName(String name)
     {
         this.name = name;
+    }
+    
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     public int getFileCount()

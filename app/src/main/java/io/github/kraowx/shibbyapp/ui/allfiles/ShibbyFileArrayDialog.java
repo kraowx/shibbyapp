@@ -74,24 +74,18 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         }
     }
 
-    private void initializeList()
-    {
+    private void initializeList() {
         final FloatingActionButton fabAdd = findViewById(R.id.fabAddPlaylist);
-        fabAdd.setOnClickListener(new View.OnClickListener()
-        {
+        fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
                         ShibbyFileArrayDialog.this.mainActivity, listAdapter.getCheckedFiles()
                         .toArray(new ShibbyFile[0]), false);
-                dialog.setFilesAddedListener(new AddFileToPlaylistDialog.FilesAddedListener()
-                {
+                dialog.setFilesAddedListener(new AddFileToPlaylistDialog.FilesAddedListener() {
                     @Override
-                    public void filesAdded(boolean added)
-                    {
-                        if (added)
-                        {
+                    public void filesAdded(boolean added) {
+                        if (added) {
                             listAdapter.clearCheckedFiles();
                             listAdapter.notifyDataSetChanged();
                             fabAdd.hide();
@@ -103,32 +97,24 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         fabAdd.hide();
     
         FloatingActionButton fab = findViewById(R.id.fabAudioController);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 mainActivity.getAudioController().toggleVisible();
             }
         });
-        
+    
         FloatingActionButton fabShuffle = findViewById(R.id.fabShuffle);
-        fabShuffle.setOnClickListener(new View.OnClickListener()
-        {
+        fabShuffle.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 List<ShibbyFile> queue = null;
-                if (playlistName != null)
-                {
+                if (playlistName != null) {
                     queue = listAdapterPlaylists.getData();
-                }
-                else
-                {
+                } else {
                     queue = listAdapter.getData();
                 }
-                if (queue != null && queue.size() > 0)
-                {
+                if (queue != null && queue.size() > 0) {
                     List<ShibbyFile> randomQueue = randomizeList(queue);
                     ShibbyFile file = randomQueue.get(0);
                     mainActivity.getAudioController().loadFile(file);
@@ -137,11 +123,22 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
                 }
             }
         });
-        
+    
         list = findViewById(R.id.listArrayDialog);
         list.setHasFixedSize(true);
         TextView title = findViewById(R.id.txtArrInfoDialogTitle);
         title.setText(fileArray.getName());
+        TextView description = findViewById(R.id.txtDescription);
+        final String DIVIDER = "\n____________________";
+        if (fileArray.getDescription() == null ||
+                fileArray.getDescription().equals(""))
+        {
+            description.setVisibility(View.GONE);
+        }
+        else
+        {
+            description.setText(fileArray.getDescription() + DIVIDER);
+        }
         listLayoutManager = new LinearLayoutManager(getContext());
         list.setLayoutManager(listLayoutManager);
         if (playlistName != null)
