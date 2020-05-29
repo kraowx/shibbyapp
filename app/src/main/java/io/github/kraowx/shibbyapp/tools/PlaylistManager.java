@@ -81,6 +81,7 @@ public class PlaylistManager
             }
             editor.putString("playlists", arr.toString());
             editor.remove("playlist" + playlistName);
+            editor.remove("descplaylist" + playlistName);
             editor.commit();
             return true;
         }
@@ -104,12 +105,36 @@ public class PlaylistManager
             {
                 arr.put(playlist);
             }
+            String description = prefs.getString("descplaylist" + playlistName, null);
+            if (description != null)
+            {
+                editor.putString("descplaylist" + newName, description);
+                editor.remove("descplaylist" + playlistName);
+            }
             editor.putString("playlists", arr.toString());
             editor.putString("playlist" + newName, fileData.toString());
             editor.remove("playlist" + playlistName);
             editor.commit();
             return true;
         }
+        return false;
+    }
+    
+    public static String getPlaylistDescription(Context context, String playlistName)
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString("descplaylist" + playlistName, null);
+    }
+    
+    public static boolean setPlaylistDescription(Context context, String playlistName,
+                                                 String description)
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("descplaylist" + playlistName, description);
+        editor.commit();
         return false;
     }
 

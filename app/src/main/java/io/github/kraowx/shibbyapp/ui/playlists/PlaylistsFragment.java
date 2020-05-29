@@ -125,6 +125,9 @@ public class PlaylistsFragment extends Fragment
                 (MainActivity)getActivity(), playlistName);
         ShibbyFileArray fileArray = new ShibbyFileArray(playlistName,
                 files.toArray(new ShibbyFile[]{}), null);
+        String description = PlaylistManager.getPlaylistDescription(
+                (MainActivity)getActivity(), playlistName);
+        fileArray.setDescription(description);
         ShibbyFileArrayDialog dialog = new ShibbyFileArrayDialog(
                 getContext(), fileArray, (MainActivity)getActivity(), playlistName);
     }

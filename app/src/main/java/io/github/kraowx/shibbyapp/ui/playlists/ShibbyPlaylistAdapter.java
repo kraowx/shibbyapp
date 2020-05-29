@@ -27,6 +27,7 @@ import java.util.List;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
+import io.github.kraowx.shibbyapp.ui.dialog.ManagePlaylistDialog;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.ItemTouchHelperAdapter;
 
 public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAdapter.ViewHolder>
@@ -41,6 +42,7 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
     private ItemTouchHelper itemTouchHelper;
     private Context context;
     private SharedPreferences prefs;
+    private ManagePlaylistDialog managePlaylistDialog;
 
     ShibbyPlaylistAdapter(Context context, List<String> data,
                           MainActivity mainActivity,
@@ -175,15 +177,30 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
             layout = (LinearLayout)itemView;
             if (showDeleteButton)
             {
-                btnDeletePlaylist = itemView.findViewById(R.id.btnDeletePlaylist);
-                btnDeletePlaylist.setOnClickListener(new View.OnClickListener()
+                String playlistName = txtPlaylistName.getText().toString();
+                managePlaylistDialog = new ManagePlaylistDialog(mainActivity, playlistName);
+                managePlaylistDialog.setListener(new ManagePlaylistDialog.PlaylistModifiedListener()
                 {
                     @Override
-                    public void onClick(View v)
+                    public void playlistTitleChanged(String oldName, String newName)
                     {
-                        showDeleteDialog();
+                        mData.remove(oldName);
+                        mData.add(newName);
+                        notifyDataSetChanged();
+                        Toast.makeText(mainActivity, "Renamed playlist",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    
+                    @Override
+                    public void playlistDeleted(String playlistName)
+                    {
+                        mData.remove(playlistName);
+                        notifyDataSetChanged();
+                        Toast.makeText(mainActivity, "Deleted playlist",
+                                Toast.LENGTH_LONG).show();
                     }
                 });
+                btnDeletePlaylist = itemView.findViewById(R.id.btnDeletePlaylist);
                 boolean darkModeEnabled = prefs
                         .getBoolean("darkMode", false);
                 if (darkModeEnabled)
@@ -191,6 +208,16 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
                     btnDeletePlaylist.setColorFilter(ContextCompat
                             .getColor(mainActivity, R.color.grayLight));
                 }
+                btnDeletePlaylist.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        String playlistName = txtPlaylistName.getText().toString();
+                        managePlaylistDialog.setPlaylistName(playlistName);
+                        managePlaylistDialog.show();
+                    }
+                });
             }
             itemView.setOnClickListener(this);
         }

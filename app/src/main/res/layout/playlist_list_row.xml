@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_ripple"
-            app:srcCompat="@drawable/ic_close_large" />
+            app:srcCompat="@drawable/ic_more_vert_large" />
     </LinearLayout>
 
 </LinearLayout>
