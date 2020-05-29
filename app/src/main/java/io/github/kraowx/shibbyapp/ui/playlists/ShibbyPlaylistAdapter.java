@@ -58,6 +58,35 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
         this.showDeleteButton = showDeleteButton;
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         searchText = "";
+        managePlaylistDialog = new ManagePlaylistDialog(mainActivity, null);
+        managePlaylistDialog.setListener(new ManagePlaylistDialog.PlaylistModifiedListener()
+        {
+            @Override
+            public void playlistTitleChanged(String oldName, String newName)
+            {
+                mData.remove(oldName);
+                mData.add(newName);
+                notifyDataSetChanged();
+                Toast.makeText(ShibbyPlaylistAdapter.this.mainActivity, "Renamed playlist",
+                        Toast.LENGTH_LONG).show();
+            }
+        
+            @Override
+            public void playlistDescriptionChanged(String playlistName, String description)
+            {
+                Toast.makeText(ShibbyPlaylistAdapter.this.mainActivity, "Description updated",
+                        Toast.LENGTH_LONG).show();
+            }
+        
+            @Override
+            public void playlistDeleted(String playlistName)
+            {
+                mData.remove(playlistName);
+                notifyDataSetChanged();
+                Toast.makeText(ShibbyPlaylistAdapter.this.mainActivity, "Deleted playlist",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
     
     @Override
@@ -177,29 +206,6 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
             layout = (LinearLayout)itemView;
             if (showDeleteButton)
             {
-                String playlistName = txtPlaylistName.getText().toString();
-                managePlaylistDialog = new ManagePlaylistDialog(mainActivity, playlistName);
-                managePlaylistDialog.setListener(new ManagePlaylistDialog.PlaylistModifiedListener()
-                {
-                    @Override
-                    public void playlistTitleChanged(String oldName, String newName)
-                    {
-                        mData.remove(oldName);
-                        mData.add(newName);
-                        notifyDataSetChanged();
-                        Toast.makeText(mainActivity, "Renamed playlist",
-                                Toast.LENGTH_LONG).show();
-                    }
-                    
-                    @Override
-                    public void playlistDeleted(String playlistName)
-                    {
-                        mData.remove(playlistName);
-                        notifyDataSetChanged();
-                        Toast.makeText(mainActivity, "Deleted playlist",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
                 btnDeletePlaylist = itemView.findViewById(R.id.btnDeletePlaylist);
                 boolean darkModeEnabled = prefs
                         .getBoolean("darkMode", false);
@@ -229,64 +235,6 @@ public class ShibbyPlaylistAdapter extends RecyclerView.Adapter<ShibbyPlaylistAd
             {
                 mClickListener.onItemClick(view, getAdapterPosition());
             }
-        }
-
-        private void deletePlaylist(String playlistName)
-        {
-            if (PlaylistManager.removePlaylist(mainActivity, playlistName))
-            {
-                mData.remove(playlistName);
-                notifyDataSetChanged();
-                Toast.makeText(mainActivity, "Deleted playlist",
-                        Toast.LENGTH_LONG).show();
-            }
-            else
-            {
-                Toast.makeText(mainActivity, "Failed to delete playlist",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-
-        private void showDeleteDialog()
-        {
-            final String playlistName = getItem(getAdapterPosition());
-            Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
-                    R.drawable.ic_warning).mutate();
-            darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
-                    {
-                            -1, 0, 0, 0, 200,
-                            0, -1, 0, 0, 200,
-                            0, 0, -1, 0, 200,
-                            0, 0, 0, 1, 0
-                    }));
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(mainActivity);
-            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
-            AlertDialog.Builder builder;
-            if (darkModeEnabled)
-            {
-                builder = new AlertDialog.Builder(mainActivity,
-                        R.style.DialogThemeDark_Alert);
-                builder.setIcon(darkIcon);
-            }
-            else
-            {
-                builder = new AlertDialog.Builder(mainActivity);
-                builder.setIcon(R.drawable.ic_warning);
-            }
-            builder.setTitle("Delete playlist")
-                    .setMessage("Are you sure you want to delete " +
-                            "the playlist \"" + playlistName + "\"?")
-                    .setPositiveButton(android.R.string.yes,
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    deletePlaylist(playlistName);
-                                }
-                            })
-                    .setNegativeButton(android.R.string.no, null)
-                    .show();
         }
     }
 

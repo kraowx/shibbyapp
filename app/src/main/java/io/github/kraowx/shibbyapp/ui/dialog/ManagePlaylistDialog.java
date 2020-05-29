@@ -35,6 +35,7 @@ public class ManagePlaylistDialog extends Dialog
 	public interface PlaylistModifiedListener
 	{
 		void playlistTitleChanged(String oldName, String newName);
+		void playlistDescriptionChanged(String playlistName, String description);
 		void playlistDeleted(String playlistName);
 	}
 	
@@ -79,8 +80,6 @@ public class ManagePlaylistDialog extends Dialog
 				createDeleteDialog();
 			}
 		});
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(mainActivity);
 		boolean darkModeEnabled = prefs
 				.getBoolean("darkMode", false);
 		if (darkModeEnabled)
@@ -97,7 +96,7 @@ public class ManagePlaylistDialog extends Dialog
 	private void createRenameDialog()
 	{
 		TextEditDialog renameDialog = new TextEditDialog(mainActivity,
-				"Rename playlist", TextEditDialog.Type.SINGLE_LINE, getTheme(),
+				"Rename playlist", playlistName, TextEditDialog.Type.SINGLE_LINE, getTheme(),
 				new DialogInterface.OnClickListener()
 				{
 					@Override
@@ -125,8 +124,10 @@ public class ManagePlaylistDialog extends Dialog
 	
 	private void createEditDescriptionDialog()
 	{
+		String description = PlaylistManager.getPlaylistDescription(
+				mainActivity, playlistName);
 		TextEditDialog editDialog = new TextEditDialog(mainActivity,
-				"Edit description", TextEditDialog.Type.MULTI_LINE, getTheme(),
+				"Edit description", description, TextEditDialog.Type.MULTI_LINE, getTheme(),
 				new DialogInterface.OnClickListener()
 				{
 					@Override
@@ -142,6 +143,11 @@ public class ManagePlaylistDialog extends Dialog
 										playlistName, description);
 							}
 						}).start();
+						if (listener != null)
+						{
+							listener.playlistDescriptionChanged(
+									playlistName, description);
+						}
 					}
 				},
 				new DialogInterface.OnClickListener()

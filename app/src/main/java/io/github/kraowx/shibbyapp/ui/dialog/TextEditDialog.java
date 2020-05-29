@@ -11,7 +11,8 @@ public class TextEditDialog extends AlertDialog
 {
 	private EditText input;
 	
-	public TextEditDialog(Context context, String title, Type size, int theme,
+	public TextEditDialog(Context context, String title,
+						  String hintText, Type size, int theme,
 						  DialogInterface.OnClickListener positiveAction,
 						  DialogInterface.OnClickListener negativeAction)
 	{
@@ -23,6 +24,11 @@ public class TextEditDialog extends AlertDialog
 		{
 			input.setSingleLine(false);
 			input.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
+		}
+		if (hintText != null)
+		{
+			input.setText(hintText);
+			input.setSelection(hintText.length());
 		}
 		setView(input);
 		setButton(AlertDialog.BUTTON_POSITIVE, "OK", positiveAction);

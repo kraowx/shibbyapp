@@ -63,6 +63,8 @@ public class PlaylistsFragment extends Fragment
                 showCreatePlaylistDialog();
             }
         });
+        // Intentionally redundant; see https://stackoverflow.com/questions/51919865/disappearing-fab-icon-on-navigation-fragment-change
+        fabAddPlaylist.hide();
         fabAddPlaylist.show();
 
         new Timer().scheduleAtFixedRate(new TimerTask()
@@ -93,13 +95,6 @@ public class PlaylistsFragment extends Fragment
         fileFilterController.setButtonVisible(false);
         return root;
     }
-    
-//    @Override
-//    public void onStartDrag(RecyclerView.ViewHolder viewHolder)
-//    {
-//        System.out.println("start drag");
-//        mItemTouchHelper.startDrag(viewHolder);
-//    }
 
     @Override
     public boolean onQueryTextChange(String text)
