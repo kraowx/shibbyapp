@@ -93,7 +93,9 @@ public class ImportAppDataDialog extends Dialog
 						for (int i = 0; i < playlists.length(); i++)
 						{
 							String playlistId = "playlist" + playlists.getString(i);
-							editor.putString(playlistId, data.get(playlistId).toString());
+							editor.putString(playlistId, data.getString(playlistId));
+							String playlistDescId = "descplaylist" + playlists.getString(i);
+							editor.putString(playlistDescId, data.getString(playlistDescId));
 						}
 						if (data.has("playCounts"))
 						{

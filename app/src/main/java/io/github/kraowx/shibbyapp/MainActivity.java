@@ -52,6 +52,7 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
+import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
 import io.github.kraowx.shibbyapp.ui.dialog.FileFilterController;
@@ -437,11 +438,14 @@ public class MainActivity extends AppCompatActivity
             data.put("userFiles", userFiles);
             for (int i = 0; i < playlistNames.length(); i++)
             {
+                String playlist = playlistNames.getString(i);
                 JSONArray playlistData = new JSONArray(
                         prefs.getString("playlist" +
-                                playlistNames.get(i), "[]"));
-                data.put("playlist" + playlistNames.get(i),
-                        playlistData);
+                                playlist, "[]"));
+                data.put("playlist" + playlist, playlistData);
+                
+                data.put("descplaylist" + playlist,
+                        PlaylistManager.getPlaylistDescription(this, playlist));
             }
             JSONObject playCounts = new JSONObject(prefs.getString(
                     "playCounts", "{}"));

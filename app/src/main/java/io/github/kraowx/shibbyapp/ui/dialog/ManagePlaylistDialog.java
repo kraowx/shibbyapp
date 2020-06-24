@@ -177,6 +177,7 @@ public class ManagePlaylistDialog extends Dialog
 						{
 							listener.playlistDeleted(playlistName);
 						}
+						ManagePlaylistDialog.this.dismiss();
 					}
 				},
 				new DialogInterface.OnClickListener()

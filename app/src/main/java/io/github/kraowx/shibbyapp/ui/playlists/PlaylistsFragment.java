@@ -185,7 +185,8 @@ public class PlaylistsFragment extends Fragment
             builder = new AlertDialog.Builder((MainActivity)getActivity());
         }
         
-        builder.setTitle("Playlist name");
+        builder.setTitle("Create playlist");
+        builder.setMessage("Enter a name for the new playlist");
 
         final EditText input = new EditText(getContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
