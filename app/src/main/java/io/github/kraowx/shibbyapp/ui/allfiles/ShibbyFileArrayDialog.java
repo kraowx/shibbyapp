@@ -64,13 +64,13 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
         {
             FileInfoDialog fileInfoDialog = new FileInfoDialog(
                     mainActivity, listAdapterPlaylists.getItem(position),
-                    listAdapterPlaylists.getData());
+                    listAdapterPlaylists.getData(), playlistName);
         }
         else
         {
             FileInfoDialog fileInfoDialog = new FileInfoDialog(
                     mainActivity, listAdapter.getItem(position),
-                    listAdapter.getData());
+                    listAdapter.getData(), null);
         }
     }
 
@@ -117,7 +117,7 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
                 if (queue != null && queue.size() > 0) {
                     List<ShibbyFile> randomQueue = randomizeList(queue);
                     ShibbyFile file = randomQueue.get(0);
-                    mainActivity.getAudioController().loadFile(file);
+                    mainActivity.getAudioController().loadFile(file, playlistName);
                     mainActivity.getAudioController().setQueue(randomQueue, true);
                     mainActivity.getAudioController().setVisible(true);
                 }

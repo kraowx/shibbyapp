@@ -24,11 +24,13 @@ public class PatreonSessionManager
 	private String sessionCookie;
 	private MainActivity mainActivity;
 	private SharedPreferences prefs;
+	private SharedPreferences.Editor editor;
 	
 	public PatreonSessionManager(MainActivity mainActivity)
 	{
 		this.mainActivity = mainActivity;
 		prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+		editor = prefs.edit();
 	}
 	
 	public String getCookie()
@@ -57,6 +59,8 @@ public class PatreonSessionManager
 			}
 		}
 		req.closeOutputQuietly();
+		editor.putString("patreonSessionCookie", sessionCookie);
+		editor.commit();
 		return sessionCookie;
 	}
 	

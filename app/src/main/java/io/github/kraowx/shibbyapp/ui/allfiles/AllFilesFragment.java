@@ -214,7 +214,7 @@ public class AllFilesFragment extends Fragment
     {
         FileInfoDialog fileInfoDialog = new FileInfoDialog(
                 (MainActivity)getActivity(), listAdapter.getItem(position),
-                listAdapter.getData());
+                listAdapter.getData(), null);
     }
     
     private void startInitialUpdate()

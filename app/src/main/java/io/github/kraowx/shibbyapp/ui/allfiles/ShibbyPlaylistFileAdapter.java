@@ -192,7 +192,7 @@ public class ShibbyPlaylistFileAdapter
                 {
                     AudioController audioController = mainActivity.getAudioController();
                     ShibbyFile file = getItem(getAdapterPosition());
-                    audioController.loadFile(file);
+                    audioController.loadFile(file, playlistName);
                     audioController.setQueue(mData, true);
                     audioController.setVisible(true);
                 }

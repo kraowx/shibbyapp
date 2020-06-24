@@ -25,7 +25,6 @@ The default server is currently hosted on [Heroku](https://shibbyapp.herokuapp.c
 This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAGE) permission in order to save downloaded audio files to the device. Downloaded files are written to the local app data which is hidden from the user. Permission to read from the device's external storage is only requested for the "import file" feature, which requires listing the device's directories. The "Vibration" permission is also used to enhance the user experience with haptic feedback on buttons and hotspots.
 
 ## Planned Features
-- Notification with media controls (play/pause, next, previous)
 - (WIP) Some kind of vibration feature that syncs with audio? Add offset for bluetooth headphones as well
 - File metadata that gives more information about a file other than its name and description
 - Import/export audio files buttons

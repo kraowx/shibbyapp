@@ -150,7 +150,7 @@ public class UserFilesFragment extends Fragment
     {
         FileInfoDialog fileInfoDialog = new FileInfoDialog(
                 (MainActivity)getActivity(), listAdapter.getItem(position),
-                listAdapter.getData());
+                listAdapter.getData(), null);
     }
     
     private void initializeList(View root, final List<ShibbyFile> files)

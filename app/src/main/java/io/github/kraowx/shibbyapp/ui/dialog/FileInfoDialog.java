@@ -31,18 +31,21 @@ import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class FileInfoDialog extends Dialog
 {
+	private String queueName;
 	private ShibbyFile file;
 	private List<ShibbyFile> queue;
 	private MainActivity mainActivity;
 	private SharedPreferences prefs;
 	
 	public FileInfoDialog(MainActivity mainActivity,
-						  ShibbyFile file, List<ShibbyFile> queue)
+						  ShibbyFile file, List<ShibbyFile> queue,
+						  String queueName)
 	{
 		super(mainActivity);
 		this.mainActivity = mainActivity;
 		this.file = file;
 		this.queue = queue;
+		this.queueName = queueName;
 		prefs = PreferenceManager
 				.getDefaultSharedPreferences(mainActivity);
 		init();
@@ -107,7 +110,7 @@ public class FileInfoDialog extends Dialog
 			public void onClick(View view)
 			{
 				AudioController audioController = mainActivity.getAudioController();
-				audioController.loadFile(file);
+				audioController.loadFile(file, queueName);
 				audioController.setQueue(queue, false);
 				audioController.setVisible(true);
 			}

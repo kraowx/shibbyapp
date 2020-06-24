@@ -2,11 +2,15 @@ package io.github.kraowx.shibbyapp.audio;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -26,28 +30,32 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     private boolean initialized, fileDownloaded;
     private MediaPlayer mediaPlayer;
     private ProgressDialog progressDialog;
-    private MainActivity mainActivity;
-
-    public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded,
-                       MainActivity mainActivity)
+//    private MainActivity mainActivity;
+    private Context context;
+    private SharedPreferences prefs;
+    
+    public AudioPlayer(ProgressDialog progressDialog, boolean fileDownloaded, Context context)
     {
         this.progressDialog = progressDialog;
         this.fileDownloaded = fileDownloaded;
-        this.mainActivity = mainActivity;
+        this.context = context;
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+//        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build());
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean wakeLock = prefs.getBoolean("wakeLock", false);
         if (wakeLock)
         {
             /* Keep the cpu awake to avoid audio stopping while streaming */
-            mediaPlayer.setWakeMode(mainActivity, PowerManager.PARTIAL_WAKE_LOCK);
+            mediaPlayer.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
         }
     }
 
     public boolean isPlaying()
     {
-        return mediaPlayer.isPlaying();
+        return mediaPlayer != null && mediaPlayer.isPlaying();
     }
 
     public boolean isInitialized()
@@ -60,9 +68,9 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         return mediaPlayer;
     }
     
-    public void setCompletionListener(MediaPlayer.OnCompletionListener listener)
+    public void setOnPreparedListener(MediaPlayer.OnPreparedListener listener)
     {
-        mediaPlayer.setOnCompletionListener(listener);
+        mediaPlayer.setOnPreparedListener(listener);
     }
 
     public void seekTo(int millis)
@@ -97,12 +105,29 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
             mediaPlayer.start();
         }
     }
+    
+    public void destroy()
+    {
+        if (mediaPlayer != null)
+        {
+            mediaPlayer.release();
+            mediaPlayer = null;
+            initialized = false;
+        }
+    }
 
     public int getPosition()
     {
         if (initialized)
         {
-            return mediaPlayer.getCurrentPosition();
+            try
+            {
+                return mediaPlayer.getCurrentPosition();
+            }
+            catch (IllegalStateException e)
+            {
+                return -1;
+            }
         }
         return -1;
     }
@@ -111,19 +136,29 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
     {
         if (initialized)
         {
-            return mediaPlayer.getDuration();
+            try
+            {
+                return mediaPlayer.getDuration();
+            }
+            catch (IllegalStateException e)
+            {
+                return -1;
+            }
         }
         return -2;
     }
 
     public boolean isLooping()
     {
-        return mediaPlayer.isLooping();
+        return mediaPlayer != null && mediaPlayer.isLooping();
     }
 
     public void setLooping(boolean loop)
     {
-        mediaPlayer.setLooping(loop);
+        if (mediaPlayer != null)
+        {
+            mediaPlayer.setLooping(loop);
+        }
     }
 
     @Override
@@ -134,14 +169,14 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         {
             if (strings[0].contains("patreon"))
             {
-                String cookie = mainActivity.getPatreonSessionManager().getCookie();
+                String cookie = prefs.getString("patreonSessionCookie", null);
                 Map<String, String> headers = new HashMap<String, String>();
                 if (cookie == null)
                 {
                     cookie = "";
                 }
                 headers.put("Cookie", cookie);
-                mediaPlayer.setDataSource(mainActivity, Uri.parse(strings[0]), headers);
+                mediaPlayer.setDataSource(context, Uri.parse(strings[0]), headers);
             }
             else
             {
@@ -153,7 +188,7 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         catch (Exception e)
         {
             e.printStackTrace();
-            showErrorOnUI(strings[0]);
+//            showErrorOnUI(strings[0]);
             prepared = false;
         }
 
@@ -181,84 +216,92 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
 
         if (!fileDownloaded)
         {
-            mainActivity.runOnUiThread(new Runnable()
+            try
             {
-                @Override
-                public void run()
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable()
                 {
-                    progressDialog.setMessage("Buffering...");
-                    progressDialog.show();
-                }
-            });
+                    @Override
+                    public void run()
+                    {
+                        progressDialog.setMessage("Buffering...");
+                        progressDialog.show();
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+            
+            }
         }
     }
     
-    private void showErrorOnUI(final String link)
-    {
-        new Thread()
-        {
-            @Override
-            public void run()
-            {
-                if (link.contains("patreon"))
-                {
-                    SharedPreferences prefs = PreferenceManager
-                            .getDefaultSharedPreferences(mainActivity);
-                    final String patreonEmail = prefs.getString(
-                            "patreonEmail", null);
-                    final String patreonPassword = prefs.getString(
-                            "patreonPassword", null);
-                    int code = mainActivity.getPatreonSessionManager()
-                            .verifyCredentials(patreonEmail, patreonPassword);
-                    if (code == 1)
-                    {
-                        showMessageDialog("Verification Failed",
-                                "Your Patreon account is either invalid or " +
-                                        "you do not have permission to access to this file.");
-                    }
-                    else if (code == 2)
-                    {
-                        showMessageDialog("Email Confirmation",
-                                "Before this file can be streamed you must " +
-                                        "first confirm this device/location by clicking " +
-                                        "the link in the email Patreon just sent you.");
-                    }
-                    else if (code == 3)
-                    {
-                        showMessageDialog("Too Many Requests",
-                                "Too many requests have been sent to Patreon. Access has " +
-                                        "been restricted for 10 minutes");
-                    }
-                }
-            }
-        }.start();
-    }
-    
-    private void showMessageDialog(final String title, final String message)
-    {
-        mainActivity.runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                SharedPreferences prefs = PreferenceManager
-                        .getDefaultSharedPreferences(mainActivity);
-                boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
-                AlertDialog.Builder builder;
-                if (darkModeEnabled)
-                {
-                    builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
-                }
-                else
-                {
-                    builder = new AlertDialog.Builder(mainActivity);
-                }
-                builder.setTitle(title)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            }
-        });
-    }
+//    private void showErrorOnUI(final String link)
+//    {
+//        new Thread()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                if (link.contains("patreon"))
+//                {
+//                    SharedPreferences prefs = PreferenceManager
+//                            .getDefaultSharedPreferences(context);
+//                    final String patreonEmail = prefs.getString(
+//                            "patreonEmail", null);
+//                    final String patreonPassword = prefs.getString(
+//                            "patreonPassword", null);
+//                    int code = mainActivity.getPatreonSessionManager()
+//                            .verifyCredentials(patreonEmail, patreonPassword);
+//                    if (code == 1)
+//                    {
+//                        showMessageDialog("Verification Failed",
+//                                "Your Patreon account is either invalid or " +
+//                                        "you do not have permission to access to this file.");
+//                    }
+//                    else if (code == 2)
+//                    {
+//                        showMessageDialog("Email Confirmation",
+//                                "Before this file can be streamed you must " +
+//                                        "first confirm this device/location by clicking " +
+//                                        "the link in the email Patreon just sent you.");
+//                    }
+//                    else if (code == 3)
+//                    {
+//                        showMessageDialog("Too Many Requests",
+//                                "Too many requests have been sent to Patreon. Access has " +
+//                                        "been restricted for 10 minutes");
+//                    }
+//                }
+//            }
+//        }.start();
+//    }
+//
+//    private void showMessageDialog(final String title, final String message)
+//    {
+//        mainActivity.runOnUiThread(new Runnable()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                SharedPreferences prefs = PreferenceManager
+//                        .getDefaultSharedPreferences(context);
+//                boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+//                AlertDialog.Builder builder;
+//                if (darkModeEnabled)
+//                {
+//                    builder = new AlertDialog.Builder(context, R.style.DialogThemeDark);
+//                }
+//                else
+//                {
+//                    builder = new AlertDialog.Builder(context);
+//                }
+//                builder.setTitle(title)
+//                        .setMessage(message)
+//                        .setCancelable(false)
+//                        .setPositiveButton(android.R.string.ok, null)
+//                        .show();
+//            }
+//        });
+//    }
 }

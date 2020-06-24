@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
             android:background="@drawable/btn_ripple"
-            app:srcCompat="@drawable/ic_fastfoward" />
+            app:srcCompat="@drawable/ic_fastforward" />
 
         <ImageButton
             android:id="@+id/btnPlayerRepeat"

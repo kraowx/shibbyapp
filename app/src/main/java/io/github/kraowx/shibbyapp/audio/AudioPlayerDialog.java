@@ -42,7 +42,8 @@ import io.github.kraowx.shibbyapp.tools.PlayCountManager;
 import io.github.kraowx.shibbyapp.ui.dialog.DurationPickerDialog;
 import mobi.upod.timedurationpicker.TimeDurationPicker;
 
-public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletionListener
+public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletionListener,
+        AudioPlayerService.ActionListener
 {
     private final int NO_DELAY = -1;
     private final int LOOP_INFINITE = -1;
@@ -56,10 +57,11 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private int delayTime, setDelay,
             loop, audioVibrationOffset;
     private long fileDuration;
-    private ShibbyFile activeFile;
+//    private ShibbyFile activeFile;
     private List<ShibbyFile> queue;
     private List<HotspotArray> hotspots;
-    private AudioPlayer audioPlayer;
+    private AudioPlayerService service;
+//    private AudioPlayer audioPlayer;
     private Timer timer, vibrationTimer;
     private SharedPreferences prefs;
     private Vibrator vibrator;
@@ -81,9 +83,17 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         vibrator = (Vibrator)mainActivity.getSystemService(Context.VIBRATOR_SERVICE);
         playCountIncrementer = new PlayCountIncrementer();
+        progressDialog = new ProgressDialog(getContext());
         delayTime = setDelay = NO_DELAY;
         loop = NO_LOOP;
         initUI();
+    }
+    
+    public void setService(AudioPlayerService service)
+    {
+        this.service = service;
+        service.setProgressDialog(progressDialog);
+        service.setActionListener(this);
     }
 
     public void setQueue(List<ShibbyFile> queue, boolean isPlaylist)
@@ -101,19 +111,20 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             @Override
             public void run()
             {
-                if (audioPlayer != null)
+                if (service != null && service.playerExists())
                 {
+                    System.out.println("RUN");
                     if (delayTime < 0 && setDelay < 0)
                     {
-                        if (audioPlayer.getFileDuration() != -1 &&
-                                progressBar.getMax() != audioPlayer.getFileDuration())
+                        if (service.getFileDuration() != -1 &&
+                                progressBar.getMax() != service.getFileDuration())
                         {
-                            progressBar.setMax(audioPlayer.getFileDuration());
+                            progressBar.setMax(service.getFileDuration());
                         }
                         // note: 1000 (arbitrary constant) is safe, but 975 (arbitrary constant)
                         // is not always safe, though it usually gives a smoother experience
-                        if (audioPlayer.getPosition() > 3 &&
-                                audioPlayer.getPosition() > audioPlayer.getFileDuration() - 975)
+                        if (service.getPosition() > 3 &&
+                                service.getPosition() > service.getFileDuration() - 975)
                         {
                             if (loop > 0)
                             {
@@ -158,7 +169,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             }
                             else if (loop == 0)
                             {
-                                audioPlayer.setLooping(false);
+                                service.setLooping(false);
                                 playCountIncrementer.increment();
                                 btnPlayPause.post(new Runnable()
                                 {
@@ -175,29 +186,30 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                 playCountIncrementer.increment();
                             }
                         }
-                        if (audioPlayer.isPlaying())
+                        if (service.isPlaying())
                         {
                             if (!seeking)
                             {
-                                progressBar.setProgress(audioPlayer.getPosition());
+                                progressBar.setProgress(service.getPosition());
                             }
                         }
                         // player has reached the end of the audio file
-                        else if (audioPlayer.isInitialized())
+                        else if (service.playerIsInitialized())
                         {
                             playCountIncrementer.increment();
                             // there is a file next in the queue
-                            if (progressBar.getProgress() + 1000 >= audioPlayer.getFileDuration() &&
+                            if (progressBar.getProgress() + 1000 >= service.getFileDuration() &&
                                     autoplayAllowed())
                             {
-                                if (queue != null && queue.indexOf(activeFile) < queue.size() - 1)
+                                if (queue != null && queue.indexOf(service.getActiveFile()) < queue.size() - 1)
                                 {
                                     mainActivity.runOnUiThread(new Runnable()
                                     {
                                         @Override
                                         public void run()
                                         {
-                                            loadFile(queue.get(queue.indexOf(activeFile) + 1));
+                                            loadFile(queue.get(queue.indexOf(service.getActiveFile()) + 1),
+                                                    service.getActivePlaylist());
                                             playAudio();
                                             btnPlayPause.post(new Runnable()
                                             {
@@ -226,7 +238,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                 }
                             }
                             // the player is not looping, so stop the player
-                            if (!audioPlayer.isLooping() && !autoplayAllowed())
+                            if (!service.isLooping() && !autoplayAllowed())
                             {
                                 btnPlayPause.post(new Runnable()
                                 {
@@ -284,16 +296,16 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                     {
                         for (Hotspot hotspot : arr.getHotspots())
                         {
-                            if (audioPlayer.getPosition() + audioVibrationOffset >
+                            if (service.getPosition() + audioVibrationOffset >
                                     hotspot.getStartTime() - VIBRATION_ERROR &&
-                                    audioPlayer.getPosition() + audioVibrationOffset <
+                                    service.getPosition() + audioVibrationOffset <
                                             hotspot.getEndTime() + VIBRATION_ERROR)
                             {
                                 executeHotspot(hotspot);
                             }
                         }
                     }
-                    System.out.println(audioPlayer.getPosition());
+                    System.out.println(service.getPosition());
                 }
             }, 0, 50);
         }
@@ -317,9 +329,8 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         }
     }
 
-    public void loadFile(final ShibbyFile file)
+    public void loadFile(final ShibbyFile file, final String playlistName)
     {
-        this.activeFile = file;
         txtTitle.post(new Runnable()
         {
             @Override
@@ -389,33 +400,91 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                 progressBar.setProgress(0);
             }
         });
-        if (audioPlayer != null && audioPlayer.isPlaying())
+        btnPlayPause.post(new Runnable()
         {
-            audioPlayer.stopAudio();
-            btnPlayPause.post(new Runnable()
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    btnPlayPause.setImageResource(R.drawable.ic_play_circle);
-                }
-            });
-            stopTimer();
+                btnPlayPause.setImageResource(R.drawable.ic_play_circle);
+            }
+        });
+        if (service.playerExists() && service.isPlaying())
+        {
+            service.stopAudio();
         }
-        fileDownloaded = file != null ? AudioDownloadManager
-                .fileIsDownloaded(mainActivity, file) : false;
         fileDuration = file.getDuration();
-        if (file != null)
-        {
-            audioPlayer = new AudioPlayer(progressDialog, fileDownloaded, mainActivity);
-            audioPlayer.setLooping(loop != NO_LOOP);
-        }
-        else
-        {
-            audioPlayer = null;
-        }
+        service.loadFile(file, playlistName);
         audioVibrationOffset = prefs.getInt("audioVibrationOffset", 0);
         getHotspots();
+    }
+    
+    @Override
+    public void actionFired(String action)
+    {
+        if (action.equals(AudioPlayerService.ACTION_PLAY))
+        {
+            btnPlayPause.setImageResource(R.drawable.ic_pause_circle);
+        }
+        else if (action.equals(AudioPlayerService.ACTION_REWIND))
+        {
+            if (queue != null)
+            {
+                int index = queue.indexOf(service.getActiveFile());
+                if (index > 0)
+                {
+                    boolean isPlaying = service.isPlaying();
+                    ShibbyFile newFile = queue.get(index - 1);
+                    loadFile(newFile, service.getActivePlaylist());
+                    if (isPlaying)
+                    {
+                        playAudio();
+                        btnPlayPause.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                btnPlayPause.setImageResource(
+                                        R.drawable.ic_pause_circle);
+                            }
+                        });
+                        if (!timerRunning)
+                        {
+                            startTimer();
+                        }
+                    }
+                }
+            }
+        }
+        else if (action.equals(AudioPlayerService.ACTION_FASTFORWARD))
+        {
+            if (queue != null)
+            {
+                int index = queue.indexOf(service.getActiveFile());
+                if (index < queue.size() - 1)
+                {
+                    boolean isPlaying = service.isPlaying();
+                    ShibbyFile newFile = queue.get(index + 1);
+                    loadFile(newFile, service.getActivePlaylist());
+                    if (isPlaying)
+                    {
+                        playAudio();
+                        btnPlayPause.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                btnPlayPause.setImageResource(
+                                        R.drawable.ic_pause_circle);
+                            }
+                        });
+                        if (!timerRunning)
+                        {
+                            startTimer();
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private List<HotspotArray> getHotspots()
@@ -442,7 +511,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
 
         txtTitle = findViewById(R.id.txtAudioTitle);
         txtTags = findViewById(R.id.txtTags);
-        if (activeFile == null)
+        if (service == null || (service != null && service.getActiveFile() == null))
         {
             txtTitle.setText("No file selected");
             txtTags.setVisibility(View.GONE);
@@ -498,7 +567,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                         if (setDelay > 0)
                         {
                             btnTimer.setImageResource(R.drawable.ic_timer);
-                            audioPlayer.pauseAudio();
+                            pauseAudio();
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle);
                             stopTimer();
                         }
@@ -514,12 +583,12 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             {
                 if (queue != null)
                 {
-                    int index = queue.indexOf(activeFile);
+                    int index = queue.indexOf(service.getActiveFile());
                     if (index > 0)
                     {
-                        boolean isPlaying = audioPlayer.isPlaying();
+                        boolean isPlaying = service.isPlaying();
                         ShibbyFile newFile = queue.get(index - 1);
-                        loadFile(newFile);
+                        loadFile(newFile, service.getActivePlaylist());
                         if (isPlaying)
                         {
                             playAudio();
@@ -551,6 +620,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             "No queue selected",
                             Toast.LENGTH_LONG).show();
                 }
+                vibrate();
             }
         });
         btnPlayPause = findViewById(R.id.btnPlayPause);
@@ -559,32 +629,34 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             @Override
             public void onClick(View v)
             {
-                if (AudioPlayerDialog.this.activeFile != null)
+                if (service != null && service.getActiveFile() != null)
                 {
-                    if (audioPlayer != null && audioPlayer.isPlaying())
+                    if (service.playerExists() && service.isPlaying())
                     {
-                        audioPlayer.pauseAudio();
+                        pauseAudio();
                         btnPlayPause.setImageResource(R.drawable.ic_play_circle);
-                        stopTimer();
                         vibrate();
                     }
-                    else if (audioPlayer != null)
+                    else if (service.playerExists())
                     {
                         if (setDelay <= 0)
                         {
                             playAudio();
+                            btnPlayPause.setImageResource(R.drawable.ic_pause_circle);
+                            vibrate();
                         }
-                        if (timerRunning)
+                        
+                        if (delayTime == -1)
+                        {
+                            delayTime = setDelay;
+                        }
+                        if (setDelay > 0 && timerRunning)
                         {
                             stopTimer();
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle);
                         }
-                        else
+                        else if (setDelay > 0)
                         {
-                            if (delayTime == -1)
-                            {
-                                delayTime = setDelay;
-                            }
                             startTimer();
                             btnPlayPause.setImageResource(R.drawable.ic_pause_circle);
                         }
@@ -600,12 +672,12 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             {
                 if (queue != null)
                 {
-                    int index = queue.indexOf(activeFile);
+                    int index = queue.indexOf(service.getActiveFile());
                     if (index < queue.size() - 1)
                     {
-                        boolean isPlaying = audioPlayer.isPlaying();
+                        boolean isPlaying = service.isPlaying();
                         ShibbyFile newFile = queue.get(index + 1);
-                        loadFile(newFile);
+                        loadFile(newFile, service.getActivePlaylist());
                         if (isPlaying)
                         {
                             playAudio();
@@ -637,6 +709,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                             "No queue selected",
                             Toast.LENGTH_LONG).show();
                 }
+                vibrate();
             }
         });
         btnRepeat = findViewById(R.id.btnPlayerRepeat);
@@ -645,7 +718,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             @Override
             public void onClick(View v)
             {
-                if (audioPlayer != null)
+                if (service != null && service.playerExists())
                 {
                     if (loop != NO_LOOP)
                     {
@@ -667,7 +740,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                 R.color.colorAccent));
                     }
                     loop = loop == NO_LOOP ? LOOP_INFINITE : NO_LOOP;
-                    audioPlayer.setLooping(loop != NO_LOOP);
+                    service.setLooping(loop != NO_LOOP);
                 }
             }
         });
@@ -705,7 +778,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                     public void onClick(DialogInterface dialogInterface, int value)
                     {
                         loop = numberPicker.getValue();
-                        if (audioPlayer != null)
+                        if (service.playerExists())
                         {
                             if (loop == 0)
                             {
@@ -726,7 +799,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                                 btnRepeat.setColorFilter(ContextCompat.getColor(getContext(),
                                         R.color.colorAccent));
                             }
-                            audioPlayer.setLooping(loop != NO_LOOP);
+                            service.setLooping(loop != NO_LOOP);
                         }
                     }
                 });
@@ -748,12 +821,12 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
-                if (audioPlayer != null && audioPlayer.getFileDuration() > 0)
+                if (service != null && service.playerExists() && service.getFileDuration() > 0)
                 {
-                    int duration = audioPlayer.getFileDuration();
+                    int duration = service.getFileDuration();
                     String progressTime = formatTime(progress);
                     String remainingTime = formatTime(duration-progress);
-                    String remainingTimeSeeking = formatTime(duration-audioPlayer.getPosition());
+                    String remainingTimeSeeking = formatTime(duration-service.getPosition());
                     if (seeking)
                     {
                         txtElapsedTime.setText(progressTime);
@@ -793,10 +866,10 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             public void onStopTrackingTouch(SeekBar seekBar)
             {
                 seeking = false;
-                if (audioPlayer != null && audioPlayer.isInitialized() &&
-                        audioPlayer.getFileDuration() > 0 && delayTime == -1)
+                if (service != null && service.playerExists() &&
+                        service.getFileDuration() > 0 && delayTime == -1)
                 {
-                    audioPlayer.seekTo(seekBar.getProgress());
+                    service.seekTo(seekBar.getProgress());
                 }
                 else if (delayTime != -1)
                 {
@@ -806,6 +879,30 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         });
         txtElapsedTime = findViewById(R.id.txtElapsedTime);
         txtRemainingTime = findViewById(R.id.txtRemainingTime);
+        setOnDismissListener(new OnDismissListener()
+        {
+            @Override
+            public void onDismiss(DialogInterface dialog)
+            {
+                if (timerRunning)
+                {
+                    stopTimer();
+                    System.out.println("TIMER STOPPED");
+                }
+            }
+        });
+        setOnShowListener(new OnShowListener()
+        {
+            @Override
+            public void onShow(DialogInterface dialog)
+            {
+                if (!timerRunning)
+                {
+                    startTimer();
+                    System.out.println("TIMER STARTED");
+                }
+            }
+        });
         boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
         if (darkModeEnabled)
         {
@@ -818,32 +915,6 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             btnRepeat.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.grayLight));
         }
-    }
-
-    private void playAudio()
-    {
-        if (audioPlayer.isInitialized())
-        {
-            if (audioPlayer.getPosition() != audioPlayer.getFileDuration())
-            {
-                audioPlayer.resumeAudio();
-            }
-            else
-            {
-                audioPlayer.seekTo(0);
-            }
-        }
-        else if (fileDownloaded)
-        {
-            audioPlayer.execute(AudioDownloadManager
-                    .getFileLocation(mainActivity, activeFile)
-                    .getAbsolutePath());
-        }
-        else
-        {
-            audioPlayer.execute(AudioPlayerDialog.this.activeFile.getLink());
-        }
-        vibrate();
     }
     
     class PlayCountIncrementer
@@ -862,7 +933,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                     public void run()
                     {
                         PlayCountManager.incrementPlayCount(
-                                activeFile, mainActivity);
+                                service.getActiveFile(), mainActivity);
                         reset();
                     }
                 }).start();
@@ -882,6 +953,42 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                     resetTimer.purge();
                 }
             }, 3000);
+        }
+    }
+    
+    private void playAudio()
+    {
+        if (service != null)
+        {
+            service.playAudio();
+            if (!timerRunning)
+            {
+                startTimer();
+            }
+        }
+    }
+    
+    private void stopAudio()
+    {
+        if (service != null)
+        {
+            service.stopAudio();
+            if (timerRunning)
+            {
+                stopTimer();
+            }
+        }
+    }
+    
+    private void pauseAudio()
+    {
+        if (service != null)
+        {
+            service.pauseAudio();
+            if (timerRunning)
+            {
+                stopTimer();
+            }
         }
     }
     

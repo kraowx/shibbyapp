@@ -199,6 +199,17 @@ public class MainActivity extends AppCompatActivity
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                 REQUEST_EXTERNAL_STORAGE);
     }
+    
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        if (audioController.isServiceBound())
+        {
+            unbindService(audioController.getServiceConnection());
+            audioController.getService().stopSelf();
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

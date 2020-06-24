@@ -325,7 +325,8 @@ public class PatreonFilesFragment extends Fragment
 	public void onItemClick(View view, int position)
 	{
 		FileInfoDialog fileInfoDialog = new FileInfoDialog(
-				(MainActivity)getActivity(), listAdapter.getItem(position), listAdapter.getData());
+				(MainActivity)getActivity(), listAdapter.getItem(position),
+				listAdapter.getData(), null);
 	}
 	
 	@Override
