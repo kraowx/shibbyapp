@@ -45,12 +45,22 @@
                 app:srcCompat="@drawable/ic_get_app_verylarge" />
 
             <ImageButton
+                android:id="@+id/btnExport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:background="@drawable/btn_ripple"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_share_verylarge" />
+
+            <ImageButton
                 android:id="@+id/btnAddToPlaylist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:background="@drawable/btn_ripple"
                 app:srcCompat="@drawable/ic_add_verylarge" />
+
         </LinearLayout>
 
         <TextView

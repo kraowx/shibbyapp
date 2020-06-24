@@ -3,20 +3,26 @@ package io.github.kraowx.shibbyapp.ui.dialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.Window;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
+import java.io.File;
 import java.util.List;
 
 import co.lujun.androidtagview.TagContainerLayout;
@@ -220,6 +226,31 @@ public class FileInfoDialog extends Dialog
 				}
 			}
 		});
+		ImageButton btnExport = findViewById(R.id.btnExport);
+		btnExport.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Intent sendIntent = new Intent();
+				sendIntent.setAction(Intent.ACTION_SEND);
+				File fileOnDisk = AudioDownloadManager
+						.getFileLocation(mainActivity, file);
+				
+				
+//				sendIntent.setType(getMimeType(fileOnDisk.getAbsolutePath()));
+//				sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fileOnDisk));
+				sendIntent.putExtra(Intent.EXTRA_TITLE, "TEST");
+
+
+				Uri uri = FileProvider.getUriForFile(mainActivity, mainActivity
+								.getPackageName() + ".provider", fileOnDisk);
+				sendIntent.setDataAndType(uri, getMimeType(fileOnDisk.getAbsolutePath()));
+				sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				
+				mainActivity.startActivity(sendIntent);
+			}
+		});
 		ImageButton btnAddToPlaylist = findViewById(R.id.btnAddToPlaylist);
 		btnAddToPlaylist.setOnClickListener(new View.OnClickListener()
 		{
@@ -237,6 +268,8 @@ public class FileInfoDialog extends Dialog
 					.getColor(mainActivity, R.color.grayLight));
 			btnDownload.setColorFilter(ContextCompat
 					.getColor(mainActivity, R.color.grayLight));
+			btnExport.setColorFilter(ContextCompat
+					.getColor(mainActivity, R.color.grayLight));
 			btnAddToPlaylist.setColorFilter(ContextCompat
 					.getColor(mainActivity, R.color.grayLight));
 		}
@@ -244,6 +277,7 @@ public class FileInfoDialog extends Dialog
 		{
 			btnPlay.setColorFilter(null);
 			btnDownload.setColorFilter(null);
+			btnExport.setColorFilter(null);
 			btnAddToPlaylist.setColorFilter(null);
 		}
 		
@@ -283,5 +317,15 @@ public class FileInfoDialog extends Dialog
 		{
 			return minutesStr + ":" + secondsStr;
 		}
+	}
+	
+	private String getMimeType(String url)
+	{
+		String type = null;
+		String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+		if (extension != null) {
+			type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+		}
+		return type;
 	}
 }
