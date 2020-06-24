@@ -111,17 +111,14 @@ public class AudioPlayerService extends Service
 		vibrator = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 //		playCountIncrementer = new PlayCountIncrementer();
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-		{
-			createNotificationChannel();
-			Intent notificationIntent = new Intent(this, MainActivity.class);
-			notificationContentIntent =
-					PendingIntent.getActivity(this, 0, notificationIntent, 0);
-			
-			mediaSession = new MediaSession(getApplicationContext(), "shibbyappPlayerSession");
-			
-			startForeground(1, generateNotification(null, null, false));
-		}
+		createNotificationChannel();
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		notificationContentIntent =
+				PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		
+		mediaSession = new MediaSession(getApplicationContext(), "shibbyappPlayerSession");
+		
+		startForeground(1, generateNotification(null, null, false));
 		
 		/* Keep wifi and the cpu awake to avoid audio stopping while streaming */
 		PowerManager powerManager = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
@@ -214,28 +211,29 @@ public class AudioPlayerService extends Service
 	private Notification generateNotification(String fileName, String playlistName,
 											  boolean setPlaying)
 	{
+		Notification.Builder builder = new Notification.Builder(this);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
 		{
-			return new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
-					.setContentTitle(fileName != null ? fileName : "No file playing")
-					.setSubText(playlistName)
-					.setSmallIcon(R.drawable.ic_play_circle)
-					.addAction(getRewindAction())
-					.addAction(getPlayPauseAction(setPlaying))
-					.addAction(getFastForwardAction())
-//					.addAction(getStopAction())
-					.setStyle(new Notification.MediaStyle()
-							.setMediaSession(mediaSession.getSessionToken())
-							.setShowActionsInCompactView(0, 1, 2, 3))
-//					.setContentIntent(notificationContentIntent)
-					.build();
+			builder.setChannelId(NOTIFICATION_CHANNEL_ID);
 		}
-		return null;
+		return builder
+				.setContentTitle(fileName != null ? fileName : "No file playing")
+				.setSubText(playlistName)
+				.setSmallIcon(R.drawable.ic_play_circle)
+				.addAction(getRewindAction())
+				.addAction(getPlayPauseAction(setPlaying))
+				.addAction(getFastForwardAction())
+//					.addAction(getStopAction())
+				.setStyle(new Notification.MediaStyle()
+						.setMediaSession(mediaSession.getSessionToken())
+						.setShowActionsInCompactView(0, 1, 2, 3))
+//					.setContentIntent(notificationContentIntent)
+				.setOnlyAlertOnce(true)
+				.build();
 	}
 	
 	private void updateNotification(ShibbyFile file, String playlistName, boolean setPlaying)
 	{
-		System.out.println("updating");
 		Notification notification = generateNotification(file != null ?
 				file.getShortName() : null, playlistName, setPlaying);
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -395,7 +393,7 @@ public class AudioPlayerService extends Service
 		}
 		audioVibrationOffset = prefs.getInt("audioVibrationOffset", 0);
 		updateNotification(file, playlistName, false);
-		getHotspots();
+//		getHotspots();
 	}
 	
 	private List<HotspotArray> getHotspots()
