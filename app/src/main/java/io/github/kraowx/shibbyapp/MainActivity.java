@@ -47,9 +47,12 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import io.github.kraowx.shibbyapp.audio.AudioController;
+import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
@@ -60,6 +63,7 @@ import io.github.kraowx.shibbyapp.ui.dialog.ImportAppDataDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.ImportFileDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.PatreonLoginDialog;
 import io.github.kraowx.shibbyapp.ui.dialog.SettingsDialog;
+import io.github.kraowx.shibbyapp.ui.dialog.UpdateV3ResetDialog;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -199,6 +203,8 @@ public class MainActivity extends AppCompatActivity
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                 REQUEST_EXTERNAL_STORAGE);
+        
+        checkForOldFiles();
     }
     
     @Override
@@ -314,6 +320,20 @@ public class MainActivity extends AppCompatActivity
                 this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+    
+    private void checkForOldFiles()
+    {
+        DataManager dataManager = new DataManager(MainActivity.this);
+        List<ShibbyFile> files = dataManager.getFiles();
+        for (ShibbyFile file : files)
+        {
+            if (file.getVersion() < 3)
+            {
+                new UpdateV3ResetDialog(MainActivity.this);
+                break;
+            }
+        }
     }
 
     private void checkForUpdate()

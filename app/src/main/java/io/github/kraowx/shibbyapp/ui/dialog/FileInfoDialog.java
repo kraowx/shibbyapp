@@ -5,17 +5,19 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.Window;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,8 @@ import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class FileInfoDialog extends Dialog
 {
+	private final String AUDIO_INFO_SEPARATOR = " • ";
+	
 	private String queueName;
 	private ShibbyFile file;
 	private List<ShibbyFile> queue;
@@ -63,11 +67,9 @@ public class FileInfoDialog extends Dialog
 		setContentView(R.layout.file_info_dialog);
 		setTitle("File Info");
 		TextView title = findViewById(R.id.txtTitle);
-		boolean displayLongNames = prefs.getBoolean(
-				"displayLongNames", false);
 		/* Name */
-		String name = displayLongNames ? file.getName() : file.getShortName();
-		if (file.isPatreonFile())
+		String name = file.getName();
+		if (file.getViewType().equals("patreon"))
 		{
 			int color = mainActivity.getResources().getColor(R.color.redAccent);
 			String hex = String.format("#%06X", (0xFFFFFF & color));
@@ -96,6 +98,16 @@ public class FileInfoDialog extends Dialog
 		/* Tags */
 		TagContainerLayout tags = findViewById(R.id.tags);
 		tags.setTags(file.getTags());
+		/* Audio Info */
+		TextView audioInfo = findViewById(R.id.txtAudioInfo);
+		if (file.getVersion() >= 3)
+		{
+			audioInfo.setText(getAudioInfoText());
+		}
+		else
+		{
+			audioInfo.setVisibility(View.GONE);
+		}
 		/* Description */
 		TextView description = findViewById(R.id.txtDescription);
 		if (file.getDescription() == null ||
@@ -107,6 +119,124 @@ public class FileInfoDialog extends Dialog
 		{
 			description.setMovementMethod(LinkMovementMethod.getInstance());
 			description.setText(Html.fromHtml(file.getDescription()));
+		}
+		/* More Info */
+		final LinearLayout layoutTone = findViewById(R.id.layoutTone);
+		final LinearLayout layoutSetting = findViewById(R.id.layoutSetting);
+		final LinearLayout layoutConsent = findViewById(R.id.layoutConsent);
+		final LinearLayout layoutDS = findViewById(R.id.layoutDS);
+		final LinearLayout layoutHypnosisStyle = findViewById(R.id.layoutHypnosisStyle);
+		final LinearLayout layoutHypnosisLevel = findViewById(R.id.layoutHypnosisLevel);
+		final LinearLayout layoutWakener = findViewById(R.id.layoutWakener);
+		final LinearLayout layoutAftercare = findViewById(R.id.layoutAftercare);
+		final TagContainerLayout triggers = findViewById(R.id.triggers);
+		final TextView txtTone = findViewById(R.id.txtTone);
+		final TextView txtSetting = findViewById(R.id.txtSetting);
+		final TextView txtConsent = findViewById(R.id.txtConsent);
+		final TextView txtDS = findViewById(R.id.txtDS);
+		final TextView txtHypnosisStyle = findViewById(R.id.txtHypnosisStyle);
+		final TextView txtHypnosisLevel = findViewById(R.id.txtHypnosisLevel);
+		final TextView txtWakener = findViewById(R.id.txtWakener);
+		final TextView txtAftercare = findViewById(R.id.txtAftercare);
+		final TextView txtTriggersHeader = findViewById(R.id.txtTriggersHeader);
+		boolean alwaysShowDetailedFileInfo = prefs.getBoolean("alwaysShowDetailedFileInfo", false);
+		if (!alwaysShowDetailedFileInfo)
+		{
+			layoutTone.setVisibility(View.GONE);
+			layoutSetting.setVisibility(View.GONE);
+			layoutConsent.setVisibility(View.GONE);
+			layoutDS.setVisibility(View.GONE);
+			layoutHypnosisStyle.setVisibility(View.GONE);
+			layoutHypnosisLevel.setVisibility(View.GONE);
+			layoutWakener.setVisibility(View.GONE);
+			layoutAftercare.setVisibility(View.GONE);
+			txtTriggersHeader.setVisibility(View.GONE);
+			triggers.setVisibility(View.GONE);
+		}
+		final Button btnMoreInfo = findViewById(R.id.btnMoreInfo);
+		btnMoreInfo.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String text = btnMoreInfo.getText().toString();
+				boolean show = text.equals("Show More Info");
+				int visibility = show ? View.VISIBLE : View.GONE;
+				layoutTone.setVisibility(visibility);
+				layoutSetting.setVisibility(visibility);
+				layoutConsent.setVisibility(visibility);
+				layoutDS.setVisibility(visibility);
+				if (file.getHypnosisStyle() != null)
+				{
+					layoutHypnosisStyle.setVisibility(visibility);
+					layoutHypnosisLevel.setVisibility(visibility);
+					layoutWakener.setVisibility(visibility);
+					layoutAftercare.setVisibility(visibility);
+				}
+				if (file.getTriggers() != null)
+				{
+					txtTriggersHeader.setVisibility(visibility);
+					triggers.setVisibility(visibility);
+				}
+				if (show)
+				{
+					btnMoreInfo.setText("Show Less Info");
+				}
+				else
+				{
+					btnMoreInfo.setText("Show More Info");
+				}
+			}
+		});
+		if (file.getVersion() >= 3)
+		{
+			txtTone.setText(file.getTone());
+			txtSetting.setText(file.getSetting());
+			txtConsent.setText(file.getConsentType());
+			txtDS.setText(file.getDSType());
+			txtHypnosisStyle.setText(file.getHypnosisStyle());
+			txtHypnosisLevel.setText(file.getHypnosisLevel());
+			int hypnosisLevelColor = getHypnosisLevelColor();
+			if (hypnosisLevelColor != -1)
+			{
+				txtHypnosisLevel.setTextColor(hypnosisLevelColor);
+			}
+			txtWakener.setText(file.hasWakener() ? "Yes" : "No");
+			txtAftercare.setText(file.hasAftercare() ? "Yes" : "No");
+			if (file.getTriggers() != null)
+			{
+				for (String trigger : file.getTriggers())
+				{
+					triggers.addTag(trigger);
+				}
+			}
+			else
+			{
+				txtTriggersHeader.setVisibility(View.GONE);
+				triggers.setVisibility(View.GONE);
+			}
+			
+			if (file.getHypnosisStyle() == null)
+			{
+				layoutHypnosisStyle.setVisibility(View.GONE);
+				layoutHypnosisLevel.setVisibility(View.GONE);
+				layoutWakener.setVisibility(View.GONE);
+				layoutAftercare.setVisibility(View.GONE);
+			}
+		}
+		else
+		{
+			btnMoreInfo.setVisibility(View.GONE);
+			layoutTone.setVisibility(View.GONE);
+			layoutSetting.setVisibility(View.GONE);
+			layoutConsent.setVisibility(View.GONE);
+			layoutDS.setVisibility(View.GONE);
+			layoutHypnosisStyle.setVisibility(View.GONE);
+			layoutHypnosisLevel.setVisibility(View.GONE);
+			layoutWakener.setVisibility(View.GONE);
+			layoutAftercare.setVisibility(View.GONE);
+			txtTriggersHeader.setVisibility(View.GONE);
+			triggers.setVisibility(View.GONE);
 		}
 		
 		ImageButton btnPlay = findViewById(R.id.btnPlay);
@@ -128,7 +258,7 @@ public class FileInfoDialog extends Dialog
 			public void onClick(View view)
 			{
 				if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-						file.getType().equals("user")))
+						file.getViewType().equals("user")))
 				{
 					mainActivity.getDownloadManager().downloadFile(file, btnDownload);
 					btnDownload.setColorFilter(ContextCompat
@@ -184,7 +314,7 @@ public class FileInfoDialog extends Dialog
 					}
 					String title = "Delete ";
 					String message = "Are you sure you want to delete this file?";
-					if (file.getType().equals("user"))
+					if (file.getViewType().equals("user"))
 					{
 						title += "user file";
 						message += " You will have to re-import it if " +
@@ -213,7 +343,7 @@ public class FileInfoDialog extends Dialog
 											{
 												btnDownload.setColorFilter(null);
 											}
-											if (file.getType().equals("user"))
+											if (file.getViewType().equals("user"))
 											{
 												new DataManager(mainActivity).removeUserFile(file);
 //												mData.remove(file);
@@ -287,7 +417,7 @@ public class FileInfoDialog extends Dialog
 					.getColor(mainActivity, R.color.redAccent));
 		}
 		else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-				file.getType().equals("user"))
+				file.getViewType().equals("user"))
 		{
 			btnDownload.setColorFilter(ContextCompat
 					.getColor(mainActivity, R.color.colorAccent));
@@ -299,6 +429,46 @@ public class FileInfoDialog extends Dialog
 	{
 		AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
 				mainActivity, new ShibbyFile[]{file}, false);
+	}
+	
+	private String getAudioInfoText()
+	{
+		String text = "";
+		if (!file.getAudioFileType().equals("N/A"))
+		{
+			text += file.getAudioFileType();
+		}
+		if (!file.getAudioType().equals("N/A"))
+		{
+			if (!text.equals(""))
+			{
+				text += AUDIO_INFO_SEPARATOR;
+			}
+			text += file.getAudioType();
+		}
+		if (!file.getAudioBackground().equals("N/A"))
+		{
+			if (!text.equals(""))
+			{
+				text += AUDIO_INFO_SEPARATOR;
+			}
+			text += file.getAudioBackground();
+		}
+		return text;
+	}
+	
+	private int getHypnosisLevelColor()
+	{
+		if (file.getHypnosisLevel() != null)
+		{
+			switch (file.getHypnosisLevel())
+			{
+				case "Beginner": return Color.GREEN;
+				case "Intermediate": return Color.YELLOW;
+				case "Advanced": return Color.RED;
+			}
+		}
+		return -1;
 	}
 	
 	private String formatTime(int time)

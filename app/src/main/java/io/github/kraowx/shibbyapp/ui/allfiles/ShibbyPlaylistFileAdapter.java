@@ -91,25 +91,26 @@ public class ShibbyPlaylistFileAdapter
     public void onBindViewHolder(final ViewHolder holder, int position)
     {
         ShibbyFile file = mData.get(position);
-        boolean displayLongNames = prefs.getBoolean(
-                "displayLongNames", false);
         boolean showSpecialPrefixTags = prefs.getBoolean(
                 "showSpecialPrefixTags", true);
         String name = "";
-        if ((file.getType().equals("patreon") ||
-                file.isPatreonFile()) && showSpecialPrefixTags)
+        if (file.getViewType().equals("patreon") && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[Patreon]</font> ";
         }
-        else if (file.getType().equals("user") && showSpecialPrefixTags)
+        else if (file.getViewType().equals("user") && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.colorAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[User]</font> ";
         }
-        name += displayLongNames ? file.getName() : file.getShortName();
+        if (file.getAudienceType() != null)
+        {
+            name += String.format("[%s] ", file.getAudienceType());
+        }
+        name += file.getName();
         holder.txtFileName.setText(Html.fromHtml(name));
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
@@ -117,7 +118,7 @@ public class ShibbyPlaylistFileAdapter
                     .getColor(mainActivity, R.color.redAccent));
         }
         else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                file.getType().equals("user"))
+                file.getViewType().equals("user"))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.colorAccent));
@@ -205,7 +206,7 @@ public class ShibbyPlaylistFileAdapter
                 {
                     final ShibbyFile file = getItem(getAdapterPosition());
                     if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                            file.getType().equals("user")))
+                            file.getViewType().equals("user")))
                     {
                         mainActivity.getDownloadManager().downloadFile(file, btnDownload);
                         btnDownload.setColorFilter(ContextCompat
@@ -260,7 +261,7 @@ public class ShibbyPlaylistFileAdapter
                         }
                         String title = "Delete ";
                         String message = "Are you sure you want to delete this file?";
-                        if (file.getType().equals("user"))
+                        if (file.getViewType().equals("user"))
                         {
                             title += "user file";
                             message += " You will have to re-import it if " +
@@ -289,7 +290,7 @@ public class ShibbyPlaylistFileAdapter
                                                 {
                                                     btnDownload.setColorFilter(null);
                                                 }
-                                                if (file.getType().equals("user"))
+                                                if (file.getViewType().equals("user"))
                                                 {
                                                     new DataManager(mainActivity).removeUserFile(file);
                                                     PlaylistManager.removeFileFromPlaylist(

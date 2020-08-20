@@ -1,11 +1,7 @@
 package io.github.kraowx.shibbyapp.ui.playlists;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.LayoutInflater;

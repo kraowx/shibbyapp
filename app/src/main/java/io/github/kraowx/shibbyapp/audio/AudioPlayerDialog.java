@@ -1023,7 +1023,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private String getFileName(ShibbyFile file)
     {
         boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
-        return displayLongNames ? file.getName() : file.getShortName();
+        return displayLongNames ? file.getName() : file.getName();
     }
 
     private String formatTime(int time)

@@ -113,6 +113,7 @@ public class AudioPlayerService extends Service
 		
 		createNotificationChannel();
 		Intent notificationIntent = new Intent(this, MainActivity.class);
+		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		notificationContentIntent =
 				PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		
@@ -216,7 +217,7 @@ public class AudioPlayerService extends Service
 		{
 			builder.setChannelId(NOTIFICATION_CHANNEL_ID);
 		}
-		return builder
+		Notification notification = builder
 				.setContentTitle(fileName != null ? fileName : "No file playing")
 				.setSubText(playlistName)
 				.setSmallIcon(R.drawable.ic_play_circle)
@@ -227,15 +228,17 @@ public class AudioPlayerService extends Service
 				.setStyle(new Notification.MediaStyle()
 						.setMediaSession(mediaSession.getSessionToken())
 						.setShowActionsInCompactView(0, 1, 2, 3))
-//					.setContentIntent(notificationContentIntent)
+				.setContentIntent(notificationContentIntent)
 				.setOnlyAlertOnce(true)
 				.build();
+		notification.flags = Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR;
+		return notification;
 	}
 	
 	private void updateNotification(ShibbyFile file, String playlistName, boolean setPlaying)
 	{
 		Notification notification = generateNotification(file != null ?
-				file.getShortName() : null, playlistName, setPlaying);
+				file.getName() : null, playlistName, setPlaying);
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.notify(1, notification);
 	}
@@ -277,7 +280,7 @@ public class AudioPlayerService extends Service
 				stopSelf();
 			}
 			
-			if (activeFile != null && activeFile.getLink() != null)
+			if (activeFile != null && activeFile.getAudioURL() != null)
 			{
 				loadFile(activeFile, activePlaylist);
 			}
@@ -435,7 +438,7 @@ public class AudioPlayerService extends Service
 		}
 		else
 		{
-			audioPlayer.execute(AudioPlayerService.this.activeFile.getLink());
+			audioPlayer.execute(AudioPlayerService.this.activeFile.getAudioURL());
 		}
 		updateNotification(activeFile, activePlaylist, true);
 		vibrate();
@@ -513,7 +516,7 @@ public class AudioPlayerService extends Service
 	private String getFileName(ShibbyFile file)
 	{
 		boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
-		return displayLongNames ? file.getName() : file.getShortName();
+		return displayLongNames ? file.getName() : file.getName();
 	}
 	
 	private String formatTime(int time)

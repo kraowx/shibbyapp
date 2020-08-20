@@ -46,7 +46,14 @@
         android:id="@+id/switchDisplayLongNames"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Display long file names" />
+        android:text="Display long file names"
+        android:visibility="gone" />
+
+    <Switch
+        android:id="@+id/switchAlwaysShowDetailedFileInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Always Show Detailed File Info" />
 
     <Switch
         android:id="@+id/switchShowSpecialPrefixTags"

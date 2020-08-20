@@ -57,25 +57,26 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         final ShibbyFile file = mData.get(position);
-        boolean displayLongNames = prefs.getBoolean(
-                "displayLongNames", false);
         boolean showSpecialPrefixTags = prefs.getBoolean(
                 "showSpecialPrefixTags", true);
         String name = "";
-        if ((file.getType().equals("patreon") ||
-                file.isPatreonFile()) && showSpecialPrefixTags)
+        if (file.getViewType().equals("patreon") && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[Patreon]</font> ";
         }
-        else if (file.getType().equals("user") && showSpecialPrefixTags)
+        else if (file.getViewType().equals("user") && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.colorAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[User]</font> ";
         }
-        name += displayLongNames ? file.getName() : file.getShortName();
+        if (file.getAudienceType() != null)
+        {
+            name += String.format("[%s] ", file.getAudienceType());
+        }
+        name += file.getName();
         if (searchText != null && !searchText.isEmpty() &&
                 name.toLowerCase().contains(searchText.toLowerCase()))
         {
@@ -170,7 +171,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             {
                 for (String type : fileTypes)
                 {
-                    if (file.getType().equals(type))
+                    if (file.getViewType().equals(type))
                     {
                         k++;
                         break;

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="IMPORTANT MESSAGE"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtPg1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Files from a previous version have been detected on your device."
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtPg2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="Due to the release of Shibby's new website, ShibbyApp server has been updated to collect files from the new website. These files are structured in a fundamentally different way, and as a result, all downloaded files and playlists are now UNUSABLE by this and future versions of ShibbyApp. Old versions of the app will still function, however, the official server will no longer support outdated versions of the app."
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/txtPg3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You can close this dialog to write down (on paper) the downloaded files and playlists you want to keep. Then, once you are ready, you can click the button below to erase all old files. Simply re-download the files after."
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnErase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Erase Old Files" />
+    </LinearLayout>
+</ScrollView>

@@ -82,16 +82,28 @@
             app:container_border_color="#00FFFFFF"
             app:container_enable_drag="false"
             app:container_gravity="center"
+            app:horizontal_interval="7dp"
             app:tag_background_color="@color/colorAccent"
             app:tag_border_color="@color/colorAccentDark"
             app:tag_clickable="true"
+            app:tag_horizontal_padding="7dp"
+            app:tag_max_length="25"
             app:tag_text_color="@android:color/white"
             app:tag_theme="none"
-            app:tag_horizontal_padding="7dp"
             app:tag_vertical_padding="7dp"
-            app:tag_max_length="25"
-            app:horizontal_interval="7dp"
-            app:vertical_interval="7dp" />
+            app:vertical_interval="7dp">
+
+        </co.lujun.androidtagview.TagContainerLayout>
+
+        <TextView
+            android:id="@+id/txtAudioInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            android:text="filetype • audiotype • background"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtDescription"
@@ -101,6 +113,236 @@
             android:text="Description"
             android:textSize="15sp" />
 
+        <Button
+            android:id="@+id/btnMoreInfo"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show More Info" />
+
+        <LinearLayout
+            android:id="@+id/layoutTone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtToneHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Tone:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtTone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="tone"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutSetting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtSettingHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Setting:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="setting"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutConsent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtConsentHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Consent:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtConsent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="consent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutDS"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtDSHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Dom/Sub:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ds"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutHypnosisStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="20dp">
+
+            <TextView
+                android:id="@+id/txtHypnosisStyleHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Hypnosis Style:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtHypnosisStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="style"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutHypnosisLevel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtHypnosisLevelHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="5dp"
+                android:text="Hypnosis Level:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtHypnosisLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#000000"
+                android:shadowDx="1.5"
+                android:shadowDy="1.3"
+                android:shadowRadius="1.6"
+                android:text="level"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutWakener"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtWakenerHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Wakener:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtWakener"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="wakener"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutAftercare"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtAftercareHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="15dp"
+                android:text="Aftercare:"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtAftercare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="aftercare"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtTriggersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="20dp"
+            android:text="Triggers:"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <co.lujun.androidtagview.TagContainerLayout
+            android:id="@+id/triggers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            app:container_background_color="#00FFFFFF"
+            app:container_border_color="#00FFFFFF"
+            app:container_enable_drag="false"
+            app:container_gravity="center"
+            app:horizontal_interval="7dp"
+            app:tag_background_color="@android:color/holo_purple"
+            app:tag_border_color="@color/colorAccentDark"
+            app:tag_clickable="true"
+            app:tag_horizontal_padding="7dp"
+            app:tag_max_length="25"
+            app:tag_text_color="@android:color/white"
+            app:tag_theme="none"
+            app:tag_vertical_padding="7dp"
+            app:vertical_interval="7dp">
+
+        </co.lujun.androidtagview.TagContainerLayout>
+
         <TextView
             android:id="@+id/txtPlayCount"
             android:layout_width="match_parent"
@@ -109,7 +351,8 @@
             android:paddingTop="20dp"
             android:text="Played 0 times"
             android:textSize="19sp"
-            android:textStyle="italic" />
+            android:textStyle="bold|italic" />
+
     </LinearLayout>
 </ScrollView>
 

@@ -239,7 +239,7 @@ public class DownloadsFragment extends Fragment
         boolean displayLongNames = prefs.getBoolean(
                 "displayLongNames", false);
         title.setText(displayLongNames ?
-                file.getName() : file.getShortName());
+                file.getName() : file.getName());
         TextView tags = dialog.findViewById(R.id.txtTags);
         tags.setText(getTagsString(file.getTags()));
         TextView description = dialog.findViewById(R.id.txtDescription);

@@ -7,8 +7,8 @@ android {
         applicationId 'io.github.kraowx.shibbyapp'
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 20
-        versionName "2.2.0"
+        versionCode 22
+        versionName "3.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -42,4 +42,5 @@ dependencies {
     implementation 'de.odysseus.ithaka:ithaka-audioinfo:1.0'
     implementation 'co.lujun:androidtagview:1.1.7'
     implementation 'androidx.appcompat:appcompat:1.0.1'
+    implementation 'org.jsoup:jsoup:1.11.3'
 }

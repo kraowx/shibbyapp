@@ -82,7 +82,7 @@ public class AudioDownloadManager
 
     public void downloadFile(ShibbyFile file, ImageButton btn)
     {
-        if (file.getType().equals("user"))
+        if (file.getViewType().equals("user"))
         {
             resetButton(btn);
             Toast.makeText(mainActivity, "Download failed: " +
@@ -92,7 +92,7 @@ public class AudioDownloadManager
         Uri uri = null;
         try
         {
-            uri = Uri.parse(file.getLink());
+            uri = Uri.parse(file.getAudioURL());
         }
         catch (Exception e)
         {
@@ -105,7 +105,7 @@ public class AudioDownloadManager
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.addRequestHeader("Cookie", mainActivity
                 .getPatreonSessionManager().getCookie());
-        request.setTitle(file.getShortName());
+        request.setTitle(file.getName());
         request.setDescription("Downloading file");
         request.setNotificationVisibility(
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

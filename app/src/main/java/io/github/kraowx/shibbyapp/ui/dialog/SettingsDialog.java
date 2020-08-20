@@ -54,6 +54,7 @@ public class SettingsDialog extends Dialog
 		final SharedPreferences.Editor editor = prefs.edit();
 		boolean updateStartup = prefs.getBoolean("updateStartup", true);
 		boolean displayLongNames = prefs.getBoolean("displayLongNames", false);
+		boolean alwaysShowDetailedFileInfo = prefs.getBoolean("alwaysShowDetailedFileInfo", false);
 		boolean showSpecialPrefixTags = prefs.getBoolean("showSpecialPrefixTags", true);
 		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
 		boolean wakeLockEnabled = prefs.getBoolean("wakeLock", false);
@@ -84,6 +85,17 @@ public class SettingsDialog extends Dialog
 				Toast.makeText(mainActivity.getContext(),
 						"Refresh the current page for the change to take effect",
 						Toast.LENGTH_LONG).show();
+			}
+		});
+		final Switch switchAlwaysShowDetailedFileInfo = findViewById(R.id.switchAlwaysShowDetailedFileInfo);
+		switchAlwaysShowDetailedFileInfo.setChecked(alwaysShowDetailedFileInfo);
+		switchAlwaysShowDetailedFileInfo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+			{
+				editor.putBoolean("alwaysShowDetailedFileInfo", isChecked);
+				editor.commit();
 			}
 		});
 		final Switch switchShowPrefixTags = findViewById(R.id.switchShowSpecialPrefixTags);
