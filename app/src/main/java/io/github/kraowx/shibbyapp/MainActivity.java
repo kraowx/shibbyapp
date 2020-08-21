@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity
         List<ShibbyFile> files = dataManager.getFiles();
         for (ShibbyFile file : files)
         {
-            if (file.getVersion() < 3)
+            if (file.getVersion() < 3 && !file.getViewType().equals("user"))
             {
                 new UpdateV3ResetDialog(MainActivity.this);
                 break;

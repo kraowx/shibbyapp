@@ -53,9 +53,9 @@ public class UpdateV3ResetDialog extends Dialog
 	private void createEraseDialog()
 	{
 		String message = "This action will erase all locally stored shibby files, " +
-				"playlists, and imported files.";
+				"playlists, and file play counts.";
 		OptionDialog deleteDialog = new OptionDialog(mainActivity,
-				"Erase ALL ShibbyApp data?", message, "OK", "Cancel",
+				"Erase ALL ShibbyApp file data?", message, "OK", "Cancel",
 				getTheme(), R.drawable.ic_warning,
 				new DialogInterface.OnClickListener()
 				{
