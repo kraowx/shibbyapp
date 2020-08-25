@@ -77,7 +77,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
-            android:paddingBottom="25dp"
             app:container_background_color="#00FFFFFF"
             app:container_border_color="#00FFFFFF"
             app:container_enable_drag="false"
@@ -95,10 +94,18 @@
 
         </co.lujun.androidtagview.TagContainerLayout>
 
+        <Button
+            android:id="@+id/btnMoreTags"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ 3 more tags" />
+
         <TextView
             android:id="@+id/txtAudioInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="20dp"
             android:paddingBottom="20dp"
             android:text="filetype • audiotype • background"
             android:textAlignment="center"

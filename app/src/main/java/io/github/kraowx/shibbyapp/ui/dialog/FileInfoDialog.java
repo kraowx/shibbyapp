@@ -40,6 +40,7 @@ import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 public class FileInfoDialog extends Dialog
 {
 	private final String AUDIO_INFO_SEPARATOR = " • ";
+	private final int MAX_INITIAL_TAGS = 12;
 	
 	private String queueName;
 	private ShibbyFile file;
@@ -96,8 +97,38 @@ public class FileInfoDialog extends Dialog
 		}
 		playCount.setText(countText);
 		/* Tags */
-		TagContainerLayout tags = findViewById(R.id.tags);
-		tags.setTags(file.getTags());
+		final TagContainerLayout tags = findViewById(R.id.tags);
+		if (file.getTags() != null)
+		{
+			for (int i = 0; i < file.getTags().size() && i < MAX_INITIAL_TAGS; i++)
+			{
+				tags.addTag(file.getTags().get(i));
+			}
+		}
+		Button btnMoreTags = findViewById(R.id.btnMoreTags);
+		int tagDiff = file.getTags().size() - MAX_INITIAL_TAGS;
+		String moreTagsText = "+ " + tagDiff + " more tag";
+		if (tagDiff != 1)
+		{
+			moreTagsText += "s";
+		}
+		btnMoreTags.setText(moreTagsText);
+		btnMoreTags.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				v.setVisibility(View.GONE);
+				for (int i = MAX_INITIAL_TAGS; i < file.getTags().size(); i++)
+				{
+					tags.addTag(file.getTags().get(i));
+				}
+			}
+		});
+		if (file.getTags().size() <= MAX_INITIAL_TAGS)
+		{
+			btnMoreTags.setVisibility(View.GONE);
+		}
 		/* Audio Info */
 		TextView audioInfo = findViewById(R.id.txtAudioInfo);
 		if (file.getVersion() >= 3)
@@ -203,12 +234,10 @@ public class FileInfoDialog extends Dialog
 			}
 			txtWakener.setText(file.hasWakener() ? "Yes" : "No");
 			txtAftercare.setText(file.hasAftercare() ? "Yes" : "No");
+			System.out.println(file.getTriggers());
 			if (file.getTriggers() != null)
 			{
-				for (String trigger : file.getTriggers())
-				{
-					triggers.addTag(trigger);
-				}
+				triggers.setTags(file.getTriggers());
 			}
 			else
 			{

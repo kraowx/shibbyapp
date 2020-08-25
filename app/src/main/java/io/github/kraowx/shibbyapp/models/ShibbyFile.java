@@ -55,13 +55,24 @@ public class ShibbyFile
                     ShibbyAudioInfo.fromJSON(json.getJSONObject("audio_info")) :
                     new ShibbyAudioInfo();
             file.tags = new ArrayList<String>();
-            for (int i = 0; i < json.getJSONArray("tags").length(); i++)
+            if (json.has("tags"))
             {
-                file.tags.add((String)json.getJSONArray("tags").get(i));
+                for (int i = 0; i < json.getJSONArray("tags").length(); i++)
+                {
+                    file.tags.add((String) json.getJSONArray("tags").get(i));
+                }
             }
             file.hypnosisInfo = json.has("hypnosis_info") ?
                     ShibbyHypnosisInfo.fromJSON(json.getJSONObject("hypnosis_info")) :
                     new ShibbyHypnosisInfo();
+            file.triggers = new ArrayList<String>();
+            if (json.has("triggers"))
+            {
+                for (int i = 0; i < json.getJSONArray("triggers").length(); i++)
+                {
+                    file.triggers.add((String) json.getJSONArray("triggers").get(i));
+                }
+            }
             file.description = json.getString("description");
         }
         catch (JSONException je)
