@@ -26,7 +26,6 @@ This app uses the "Storage" (WRITE\_EXTERNAL\_STORAGE and READ\_EXTERNAL\_STORAG
 
 ## Planned Features
 - (WIP) Some kind of vibration feature that syncs with audio? Add offset for bluetooth headphones as well
-- File metadata that gives more information about a file other than its name and description
 - Import/export audio files buttons
 
 Feel free to suggest anything else you feel might improve the app!
