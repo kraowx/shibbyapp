@@ -118,7 +118,8 @@
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Show More Info" />
+            android:text="Show More Info"
+            android:textColor="@color/colorAccent" />
 
         <LinearLayout
             android:id="@+id/layoutTone"

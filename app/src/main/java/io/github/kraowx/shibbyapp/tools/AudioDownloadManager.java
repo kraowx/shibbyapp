@@ -1,12 +1,16 @@
 package io.github.kraowx.shibbyapp.tools;
 
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.widget.ImageButton;
@@ -82,6 +86,15 @@ public class AudioDownloadManager
 
     public void downloadFile(ShibbyFile file, ImageButton btn)
     {
+        String urlStr = file.getAudioURL();
+        if (urlStr == null || (urlStr != null && urlStr.equals("")))
+        {
+            resetButton(btn);
+//            Toast.makeText(mainActivity, "Download failed: file " +
+//                    "not yet ready for download", Toast.LENGTH_LONG).show();
+            showTextDialog("Download failed", "This file is not yet available to download.");
+            return;
+        }
         if (file.getViewType().equals("user"))
         {
             resetButton(btn);
@@ -221,5 +234,35 @@ public class AudioDownloadManager
                 }
             }
         });
+    }
+    
+    private void showTextDialog(String title, String text)
+    {
+        Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
+                R.drawable.ic_warning).mutate();
+        darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
+                {
+                        -1, 0, 0, 0, 200,
+                        0, -1, 0, 0, 200,
+                        0, 0, -1, 0, 200,
+                        0, 0, 0, 1, 0
+                }));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+        boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+        AlertDialog.Builder builder;
+        if (darkModeEnabled)
+        {
+            builder = new AlertDialog.Builder(mainActivity, R.style.DialogThemeDark);
+            builder.setIcon(darkIcon);
+        }
+        else
+        {
+            builder = new AlertDialog.Builder(mainActivity);
+            builder.setIcon(R.drawable.ic_warning);
+        }
+        builder.setTitle(title)
+                .setMessage(text)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 }

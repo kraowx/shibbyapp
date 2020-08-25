@@ -13,6 +13,8 @@ import android.widget.NumberPicker;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
+import java.io.File;
+
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
@@ -53,7 +55,7 @@ public class UpdateV3ResetDialog extends Dialog
 	private void createEraseDialog()
 	{
 		String message = "This action will erase all locally stored shibby files, " +
-				"playlists, and file play counts.";
+				"playlists, imported files, and file play counts.";
 		OptionDialog deleteDialog = new OptionDialog(mainActivity,
 				"Erase ALL ShibbyApp file data?", message, "OK", "Cancel",
 				getTheme(), R.drawable.ic_warning,
@@ -92,11 +94,8 @@ public class UpdateV3ResetDialog extends Dialog
 	private void eraseOldData()
 	{
 		SharedPreferences.Editor editor = prefs.edit();
-		DataManager dataManager = new DataManager(mainActivity);
-		for (ShibbyFile file : dataManager.getFiles())
-		{
-			AudioDownloadManager.deleteFile(mainActivity, file);
-		}
+		File audioDir = mainActivity.getExternalFilesDir("/audio");
+		deleteRecursive(audioDir);
 		editor.putString("files", "[]");
 		for (String playlist : PlaylistManager.getPlaylists(mainActivity))
 		{
@@ -131,5 +130,21 @@ public class UpdateV3ResetDialog extends Dialog
 		});
 		AlertDialog alertDialog = dialog.create();
 		alertDialog.show();
+	}
+	
+	void deleteRecursive(File file)
+	{
+		if (file.isDirectory())
+		{
+			File[] files = file.listFiles();
+			if (files != null)
+			{
+				for (File child : files)
+				{
+					deleteRecursive(child);
+				}
+			}
+		}
+		file.delete();
 	}
 }
