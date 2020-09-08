@@ -250,7 +250,8 @@ public class DataManager
                     {
                         for (ShibbyFile file : files)
                         {
-                            if (file.getId().equals(tagfiles.getString(j)))
+                            if (tagfiles.getString(j) != null && file.getId() != null &&
+                                    file.getId().equals(tagfiles.getString(j)))
                             {
                                 taglist.add(file);
                             }

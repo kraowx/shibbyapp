@@ -204,7 +204,7 @@ public class FileInfoDialog extends Dialog
 					layoutWakener.setVisibility(visibility);
 					layoutAftercare.setVisibility(visibility);
 				}
-				if (file.getTriggers() != null)
+				if (file.getTriggers() != null && !file.getTriggers().isEmpty())
 				{
 					txtTriggersHeader.setVisibility(visibility);
 					triggers.setVisibility(visibility);
@@ -234,14 +234,15 @@ public class FileInfoDialog extends Dialog
 			}
 			txtWakener.setText(file.hasWakener() ? "Yes" : "No");
 			txtAftercare.setText(file.hasAftercare() ? "Yes" : "No");
-			System.out.println(file.getTriggers());
-			if (file.getTriggers() != null)
+			System.out.println(file.getTriggers().size());
+			if (file.getTriggers() != null && !file.getTriggers().isEmpty())
 			{
 				triggers.setTags(file.getTriggers());
 			}
 			else
 			{
-				txtTriggersHeader.setVisibility(View.GONE);
+//				txtTriggersHeader.setVisibility(View.GONE);
+				txtTriggersHeader.setText("No Triggers");
 				triggers.setVisibility(View.GONE);
 			}
 			
