@@ -22,6 +22,7 @@ import io.github.kraowx.shibbyapp.net.Response;
 public class PatreonSessionManager
 {
 	private String sessionCookie;
+	private PatreonTier tier = new PatreonTier(PatreonTier.FREE); //TEMPORARY
 	private MainActivity mainActivity;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor editor;
@@ -36,6 +37,11 @@ public class PatreonSessionManager
 	public String getCookie()
 	{
 		return sessionCookie;
+	}
+	
+	public PatreonTier getTier()
+	{
+		return tier;
 	}
 	
 	public boolean isAuthenticated()

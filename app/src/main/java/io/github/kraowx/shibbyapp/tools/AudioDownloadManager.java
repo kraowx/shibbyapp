@@ -87,7 +87,13 @@ public class AudioDownloadManager
     public void downloadFile(ShibbyFile file, ImageButton btn)
     {
         String urlStr = file.getAudioURL();
-        if (urlStr == null || (urlStr != null && urlStr.equals("")))
+        if (file.getTier().getTier() > PatreonTier.FREE)
+        {
+            resetButton(btn);
+            showTextDialog("Download failed", "Patreon files are not currently supported. This is next on my todo list!");
+            return;
+        }
+        else if (urlStr == null || (urlStr != null && urlStr.equals("")))
         {
             resetButton(btn);
 //            Toast.makeText(mainActivity, "Download failed: file " +
@@ -95,7 +101,7 @@ public class AudioDownloadManager
             showTextDialog("Download failed", "This file is not yet available to download.");
             return;
         }
-        if (file.getViewType().equals("user"))
+        if (file.getTier().getTier() == PatreonTier.USER)
         {
             resetButton(btn);
             Toast.makeText(mainActivity, "Download failed: " +

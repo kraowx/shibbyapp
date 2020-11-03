@@ -34,6 +34,7 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.tools.PlayCountManager;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
@@ -70,7 +71,7 @@ public class FileInfoDialog extends Dialog
 		TextView title = findViewById(R.id.txtTitle);
 		/* Name */
 		String name = file.getName();
-		if (file.getViewType().equals("patreon"))
+		if (file.getTier().getTier() > PatreonTier.FREE)
 		{
 			int color = mainActivity.getResources().getColor(R.color.redAccent);
 			String hex = String.format("#%06X", (0xFFFFFF & color));
@@ -288,7 +289,7 @@ public class FileInfoDialog extends Dialog
 			public void onClick(View view)
 			{
 				if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-						file.getViewType().equals("user")))
+						file.getTier().getTier() == PatreonTier.USER))
 				{
 					mainActivity.getDownloadManager().downloadFile(file, btnDownload);
 					btnDownload.setColorFilter(ContextCompat
@@ -344,7 +345,7 @@ public class FileInfoDialog extends Dialog
 					}
 					String title = "Delete ";
 					String message = "Are you sure you want to delete this file?";
-					if (file.getViewType().equals("user"))
+					if (file.getTier().getTier() == PatreonTier.USER)
 					{
 						title += "user file";
 						message += " You will have to re-import it if " +
@@ -373,7 +374,7 @@ public class FileInfoDialog extends Dialog
 											{
 												btnDownload.setColorFilter(null);
 											}
-											if (file.getViewType().equals("user"))
+											if (file.getTier().getTier() == PatreonTier.USER)
 											{
 												new DataManager(mainActivity).removeUserFile(file);
 //												mData.remove(file);
@@ -447,7 +448,7 @@ public class FileInfoDialog extends Dialog
 					.getColor(mainActivity, R.color.redAccent));
 		}
 		else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-				file.getViewType().equals("user"))
+				file.getTier().getTier() == PatreonTier.USER)
 		{
 			btnDownload.setColorFilter(ContextCompat
 					.getColor(mainActivity, R.color.colorAccent));

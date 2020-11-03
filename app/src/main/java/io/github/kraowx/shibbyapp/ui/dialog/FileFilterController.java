@@ -4,13 +4,17 @@ import android.content.DialogInterface;
 import android.view.MenuItem;
 
 import io.github.kraowx.shibbyapp.MainActivity;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 
 public class FileFilterController
 {
-	public static String[] DEFAULT_FILE_TYPES = {"Soundgasm", "Patreon", "User"};  // all files types
+	public static int[] DEFAULT_FILE_TYPES = {PatreonTier.FREE, PatreonTier.DRIFTING,
+			PatreonTier.HYPNOSUB, PatreonTier.HYPNOSLAVE, PatreonTier.HYPNOSLUT,
+			PatreonTier.DEVOTED_PET, PatreonTier.WORSHIPFUL_SUBJECT};  // all files types
 	public static int[] DEFAULT_DURATIONS = {0, 20, 40, 60};  // all durations
 	
-	private String[] fileTypes, tags;
+	private int[] fileTypes;
+	private String[] tags;
 	private int[] durations;
 	private FilterListener listener;
 	private FileFilterDialog dialog;
@@ -18,7 +22,7 @@ public class FileFilterController
 	
 	public interface FilterListener
 	{
-		void filtersUpdated(String[] fileTypes, int[] duration, String[] tags);
+		void filtersUpdated(int[] fileTypes, int[] duration, String[] tags);
 	}
 	
 	public FileFilterController(MainActivity mainActivity)

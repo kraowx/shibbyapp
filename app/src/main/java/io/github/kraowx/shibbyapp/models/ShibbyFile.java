@@ -7,9 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
+
 public class ShibbyFile
 {
-    public static final String DEFAULT_VIEW_TYPE = "public";
+    public static final String DEFAULT_TIER = "free";
     
     private final String SHIBBYDEX_ROOT_URL = "https://shibbydex.com/";
     private final String SHIBBYDEX_FILE_URL = SHIBBYDEX_ROOT_URL + "file/";
@@ -17,7 +19,7 @@ public class ShibbyFile
     private String name;
     private String id;
     private int version;
-    private String viewType;
+    private PatreonTier tier;
     private long duration;
     private ShibbyBasicInfo basicInfo;
     private ShibbyAudioInfo audioInfo;
@@ -27,12 +29,12 @@ public class ShibbyFile
     private String description;
     
     public ShibbyFile(String name, String id,
-                      String description, String viewType, long duration)
+                      String description, PatreonTier tier, long duration)
     {
         this.name = name;
         this.id = id;
         this.description = description;
-        this.viewType = viewType;
+        this.tier = tier;
         this.duration = duration;
     }
 
@@ -46,7 +48,7 @@ public class ShibbyFile
             file.name = json.has("name") ? json.getString("name") : null;
             file.id = json.has("id") ? json.getString("id") : null;
             file.version = json.has("version") ? json.getInt("version") : 0;
-            file.viewType = json.has("view_type") ? json.getString("view_type") : DEFAULT_VIEW_TYPE;
+            file.tier = PatreonTier.fromString(json.has("tier") ? json.getString("tier") : DEFAULT_TIER);
             file.duration = json.has("duration") ? json.getLong("duration") : 0;
             file.basicInfo = json.has("basic_info") ?
                     ShibbyBasicInfo.fromJSON(json.getJSONObject("basic_info")) :
@@ -90,7 +92,7 @@ public class ShibbyFile
             json.put("name", name);
             json.put("id", id);
             json.put("version", version);
-            json.put("view_type", viewType);
+            json.put("tier", tier);
             json.put("duration", duration);
             if (basicInfo != null) {
                 json.put("basic_info", basicInfo.toJSON());
@@ -159,14 +161,14 @@ public class ShibbyFile
         this.version = version;
     }
     
-    public String getViewType()
+    public PatreonTier getTier()
     {
-        return viewType;
+        return tier;
     }
     
-    public void setViewType(String viewType)
+    public void setTier(PatreonTier tier)
     {
-        this.viewType = viewType;
+        this.tier = tier;
     }
     
     public long getDuration()

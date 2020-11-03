@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
 public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreonFileAdapter.ViewHolder>
@@ -70,13 +72,13 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
         boolean showSpecialPrefixTags = prefs.getBoolean(
                 "showSpecialPrefixTags", true);
         String name = "";
-        if (file.getViewType().equals("patreon") && showSpecialPrefixTags)
+        if (file.getTier().getTier() > PatreonTier.FREE && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[Patreon]</font> ";
         }
-        else if (file.getViewType().equals("user") && showSpecialPrefixTags)
+        else if (file.getTier().getTier() == PatreonTier.USER && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.colorAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
@@ -103,6 +105,26 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
         else
         {
             holder.actionBox.setChecked(false);
+        }
+    
+        if (mainActivity.getPatreonSessionManager().getTier().greaterThanEquals(file.getTier()))
+        {
+            holder.imgViewTypeLock.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.imgViewTypeLock.setVisibility(View.VISIBLE);
+            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+            if (darkModeEnabled)
+            {
+                holder.imgViewTypeLock.setColorFilter(new ColorMatrixColorFilter(new float[]
+                        {
+                                -1, 0, 0, 0, 200,
+                                0, -1, 0, 0, 200,
+                                0, 0, -1, 0, 200,
+                                0, 0, 0, 1, 0
+                        }));
+            }
         }
     
         holder.actionBox.setOnClickListener(new View.OnClickListener()
@@ -141,7 +163,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
         return mData.size();
     }
     
-    public void filterDisplayItems(String text, String[] fileTypes,
+    public void filterDisplayItems(String text, int[] fileTypes,
                                    int[] durations, String[] tags)
     {
         searchText = text;
@@ -156,9 +178,9 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
             k = 0;
             if (fileTypes != null)
             {
-                for (String type : fileTypes)
+                for (int type : fileTypes)
                 {
-                    if (file.getViewType().equals(type))
+                    if (file.getTier().getTier() == type)
                     {
                         k++;
                         break;
@@ -213,6 +235,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         TextView txtFileName;
+        ImageView imgViewTypeLock;
         CheckBox actionBox;
 
         ViewHolder(View itemView)
@@ -221,6 +244,7 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
             txtFileName = itemView.findViewById(R.id.itemName);
             itemView.setOnClickListener(this);
             actionBox = itemView.findViewById(R.id.actionBox);
+            imgViewTypeLock = itemView.findViewById(R.id.imgViewTypeLock);
         }
 
         @Override

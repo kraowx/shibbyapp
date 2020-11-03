@@ -24,13 +24,28 @@
             android:text="filename"
             android:textSize="24sp" />
 
-        <CheckBox
-            android:id="@+id/actionBox"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:scaleX="1.2"
-            android:scaleY="1.2" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgViewTypeLock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="10dp"
+                app:srcCompat="@drawable/ic_lock_black_24dp" />
+
+            <CheckBox
+                android:id="@+id/actionBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:scaleX="1.2"
+                android:scaleY="1.2" />
+        </LinearLayout>
 
     </LinearLayout>
 

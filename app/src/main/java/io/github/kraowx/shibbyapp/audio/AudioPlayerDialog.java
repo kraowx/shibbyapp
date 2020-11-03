@@ -67,7 +67,8 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private Vibrator vibrator;
     private PlayCountIncrementer playCountIncrementer;
 
-    private TextView txtTitle, txtTags, txtElapsedTime, txtRemainingTime;
+    private TextView txtTitle, txtFileType, txtTags,
+            txtElapsedTime, txtRemainingTime;
     private ImageButton btnRewind, btnPlayPause, btnFastForward,
             btnTimer, btnRepeat;
     private SeekBar progressBar;
@@ -338,32 +339,34 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             {
                 txtTitle.setText(file != null ?
                         getFileName(file) : "No file selected");
-                if (file != null)
-                {
-                    txtTags.setVisibility(View.VISIBLE);
-                    List<String> tags = file.getTags();
-                    String tagsStr = "";
-                    for (int i = 0; i < tags.size(); i++)
-                    {
-                        tagsStr += tags.get(i);
-                        if (i < tags.size() - 1)
-                        {
-                            tagsStr += "  |  ";
-                        }
-                    }
-                    if (tagsStr.isEmpty())
-                    {
-                        txtTags.setVisibility(View.GONE);
-                    }
-                    else
-                    {
-                        txtTags.setText(tagsStr);
-                    }
-                }
-                else
-                {
-                    txtTags.setVisibility(View.GONE);
-                }
+                txtFileType.setText(file != null ?
+                        file.getAudioType() : "");
+//                if (file != null)
+//                {
+//                    txtTags.setVisibility(View.VISIBLE);
+//                    List<String> tags = file.getTags();
+//                    String tagsStr = "";
+//                    for (int i = 0; i < tags.size(); i++)
+//                    {
+//                        tagsStr += tags.get(i);
+//                        if (i < tags.size() - 1)
+//                        {
+//                            tagsStr += "  |  ";
+//                        }
+//                    }
+//                    if (tagsStr.isEmpty())
+//                    {
+//                        txtTags.setVisibility(View.GONE);
+//                    }
+//                    else
+//                    {
+//                        txtTags.setText(tagsStr);
+//                    }
+//                }
+//                else
+//                {
+//                    txtTags.setVisibility(View.GONE);
+//                }
             }
         });
         delayTime = setDelay = NO_DELAY;
@@ -510,6 +513,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         progressDialog = new ProgressDialog(getContext());
 
         txtTitle = findViewById(R.id.txtAudioTitle);
+        txtFileType = findViewById(R.id.txtFileType);
         txtTags = findViewById(R.id.txtTags);
         if (service == null || (service != null && service.getActiveFile() == null))
         {

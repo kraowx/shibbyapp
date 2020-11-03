@@ -110,7 +110,7 @@ public class DataManager
             {
                 JSONObject json = userFiles.getJSONObject(i);
                 ShibbyFile file = ShibbyFile.fromJSON(json.toString());
-                file.setViewType("user");
+                file.setTier(new PatreonTier(PatreonTier.USER));
                 JSONArray tagsJson = json.getJSONArray("tags");
                 List<String> tags = new ArrayList<String>();
                 for (int j = 0; j < tagsJson.length(); j++)

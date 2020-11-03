@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 
 public class FileFilterDialog extends Dialog
 {
@@ -46,22 +47,31 @@ public class FileFilterDialog extends Dialog
 		return durationsArr;
 	}
 	
-	public String[] getFileTypes()
+	public int[] getFileTypes()
 	{
-		List<String> types = new ArrayList<String>();
+		List<Integer> types = new ArrayList<Integer>();
 		if (checkBoxTypeSoundgasm.isChecked())
 		{
-			types.add("soundgasm");
+			types.add(PatreonTier.FREE);
 		}
 		if (checkBoxTypePatreon.isChecked())
 		{
-			types.add("patreon");
+			types.add(PatreonTier.HYPNOSUB);
 		}
 		if (checkBoxTypeUser.isChecked())
 		{
-			types.add("user");
+			types.add(PatreonTier.HYPNOSLAVE);
 		}
-		return types.toArray(new String[0]);
+		if (checkBoxTypeUser.isChecked())
+		{
+			types.add(PatreonTier.HYPNOSLUT);
+		}
+		int[] typesInt = new int[types.size()];
+		for (int i = 0; i < types.size(); i++)
+		{
+			typesInt[i] = types.get(i);
+		}
+		return typesInt;
 	}
 	
 	public String[] getTags()

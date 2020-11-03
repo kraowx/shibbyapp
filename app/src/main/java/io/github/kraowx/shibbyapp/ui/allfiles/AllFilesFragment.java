@@ -46,7 +46,8 @@ public class AllFilesFragment extends Fragment
         SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
         ServerSelectorDialog.ServerSelectedListener, FileFilterController.FilterListener
 {
-    private String[] fileTypes, tags;
+    private int[] fileTypes;
+    private String[] tags;
     private int[] durations;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
@@ -134,7 +135,7 @@ public class AllFilesFragment extends Fragment
     }
     
     @Override
-    public void filtersUpdated(String[] fileTypes, int[] durations, String[] tags)
+    public void filtersUpdated(int[] fileTypes, int[] durations, String[] tags)
     {
         if (listAdapter != null)
         {

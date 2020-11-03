@@ -41,7 +41,8 @@ public class PatreonFilesFragment extends Fragment
 		SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
 		PatreonLoginDialog.LoginListener, FileFilterController.FilterListener
 {
-	private String[] fileTypes, tags;
+	private int[] fileTypes;
+	private String[] tags;
 	private int[] durations;
 	private RecyclerView list;
 	private SwipeRefreshLayout refreshLayout;
@@ -138,7 +139,7 @@ public class PatreonFilesFragment extends Fragment
 	}
 	
 	@Override
-	public void filtersUpdated(String[] fileTypes, int[] durations, String[] tags)
+	public void filtersUpdated(int[] fileTypes, int[] durations, String[] tags)
 	{
 		if (listAdapter != null)
 		{

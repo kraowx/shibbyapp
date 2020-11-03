@@ -29,6 +29,7 @@ import io.github.kraowx.shibbyapp.audio.AudioController;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.ui.playlists.itemtouch.ItemTouchHelperAdapter;
 
@@ -94,13 +95,13 @@ public class ShibbyPlaylistFileAdapter
         boolean showSpecialPrefixTags = prefs.getBoolean(
                 "showSpecialPrefixTags", true);
         String name = "";
-        if (file.getViewType().equals("patreon") && showSpecialPrefixTags)
+        if (file.getTier().getTier() > PatreonTier.FREE && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[Patreon]</font> ";
         }
-        else if (file.getViewType().equals("user") && showSpecialPrefixTags)
+        else if (file.getTier().getTier() == PatreonTier.USER && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.colorAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
@@ -118,7 +119,7 @@ public class ShibbyPlaylistFileAdapter
                     .getColor(mainActivity, R.color.redAccent));
         }
         else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                file.getViewType().equals("user"))
+                file.getTier().getTier() == PatreonTier.USER)
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.colorAccent));
@@ -206,7 +207,7 @@ public class ShibbyPlaylistFileAdapter
                 {
                     final ShibbyFile file = getItem(getAdapterPosition());
                     if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                            file.getViewType().equals("user")))
+                            file.getTier().getTier() == PatreonTier.USER))
                     {
                         mainActivity.getDownloadManager().downloadFile(file, btnDownload);
                         btnDownload.setColorFilter(ContextCompat
@@ -261,7 +262,7 @@ public class ShibbyPlaylistFileAdapter
                         }
                         String title = "Delete ";
                         String message = "Are you sure you want to delete this file?";
-                        if (file.getViewType().equals("user"))
+                        if (file.getTier().getTier() == PatreonTier.USER)
                         {
                             title += "user file";
                             message += " You will have to re-import it if " +
@@ -290,7 +291,7 @@ public class ShibbyPlaylistFileAdapter
                                                 {
                                                     btnDownload.setColorFilter(null);
                                                 }
-                                                if (file.getViewType().equals("user"))
+                                                if (file.getTier().getTier() == PatreonTier.USER)
                                                 {
                                                     new DataManager(mainActivity).removeUserFile(file);
                                                     PlaylistManager.removeFileFromPlaylist(

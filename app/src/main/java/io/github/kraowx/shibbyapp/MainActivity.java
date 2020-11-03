@@ -55,6 +55,7 @@ import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
 import io.github.kraowx.shibbyapp.tools.PatreonSessionManager;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.tools.PlaylistManager;
 import io.github.kraowx.shibbyapp.tools.UpdateManager;
 import io.github.kraowx.shibbyapp.tools.Version;
@@ -328,7 +329,7 @@ public class MainActivity extends AppCompatActivity
         List<ShibbyFile> files = dataManager.getFiles();
         for (ShibbyFile file : files)
         {
-            if (file.getVersion() < 3 && !file.getViewType().equals("user"))
+            if (file.getVersion() < 3 && file.getTier().getTier() != PatreonTier.USER)
             {
                 new UpdateV3ResetDialog(MainActivity.this);
                 break;

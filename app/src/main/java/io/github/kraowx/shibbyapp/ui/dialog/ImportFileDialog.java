@@ -17,6 +17,7 @@ import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.DataManager;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 
 public class ImportFileDialog extends Dialog
 {
@@ -82,7 +83,8 @@ public class ImportFileDialog extends Dialog
                         tagsList.add(tag.trim());
                     }
                     ShibbyFile file = new ShibbyFile(name,
-                            selectedFile.getAbsolutePath(), desc, "import", -1);
+                            selectedFile.getAbsolutePath(), desc,
+                            new PatreonTier(PatreonTier.USER), -1);
                     file.setTags(tagsList);
                     DataManager dataManager = new DataManager(mainActivity);
                     if (dataManager.addUserFile(file))

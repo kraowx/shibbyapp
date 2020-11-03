@@ -2,12 +2,14 @@ package io.github.kraowx.shibbyapp.ui.allfiles;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.ColorMatrixColorFilter;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,10 +18,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.ui.ListItemBarView;
 
 public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.ViewHolder>
@@ -62,13 +67,13 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         boolean showSpecialPrefixTags = prefs.getBoolean(
                 "showSpecialPrefixTags", true);
         String name = "";
-        if (file.getViewType().equals("patreon") && showSpecialPrefixTags)
+        if (file.getTier().getTier() > PatreonTier.FREE && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[Patreon]</font> ";
         }
-        else if (file.getViewType().equals("user") && showSpecialPrefixTags)
+        else if (file.getTier().getTier() == PatreonTier.USER && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.colorAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
@@ -86,6 +91,14 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             String sub = name.substring(index, index + searchText.length());
             name = name.replace(sub, "<font color=red>" + sub + "</font>");
         }
+        String audioType = file.getAudioType();
+        if (audioType.contains("Variant ("))
+        {
+            int start = audioType.indexOf("Variant (")+9;
+            int end = audioType.indexOf(")", start);
+            String variant = audioType.substring(start, end);
+            name += String.format(" <font color=darkgray>(%s)</font>", variant);
+        }
         holder.txtFileName.setText(Html.fromHtml(name));
         
         if (checkedFiles.contains(file))
@@ -95,6 +108,26 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         else
         {
             holder.actionBox.setChecked(false);
+        }
+        
+        if (mainActivity.getPatreonSessionManager().getTier().greaterThanEquals(file.getTier()))
+        {
+            holder.imgViewTypeLock.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.imgViewTypeLock.setVisibility(View.VISIBLE);
+            boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+            if (darkModeEnabled)
+            {
+                holder.imgViewTypeLock.setColorFilter(new ColorMatrixColorFilter(new float[]
+                        {
+                                -1, 0, 0, 0, 200,
+                                0, -1, 0, 0, 200,
+                                0, 0, -1, 0, 200,
+                                0, 0, 0, 1, 0
+                        }));
+            }
         }
         
         holder.actionBox.setOnClickListener(new View.OnClickListener()
@@ -130,7 +163,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         return mData.size();
     }
     
-    public void filterDisplayItems(String text, String[] fileTypes,
+    public void filterDisplayItems(String text, int[] fileTypes,
                                    int[] durations, String[] tags)
     {
         searchText = text;
@@ -145,9 +178,9 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             k = 0;
             if (fileTypes != null)
             {
-                for (String type : fileTypes)
+                for (int type : fileTypes)
                 {
-                    if (file.getViewType().equals(type))
+                    if (file.getTier().getTier() == type)
                     {
                         k++;
                         break;
@@ -202,6 +235,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         TextView txtFileName;
+        ImageView imgViewTypeLock;
         CheckBox actionBox;
         ListItemBarView barView;
 
@@ -210,6 +244,7 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             super(itemView);
             txtFileName = itemView.findViewById(R.id.itemName);
             itemView.setOnClickListener(this);
+            imgViewTypeLock = itemView.findViewById(R.id.imgViewTypeLock);
             actionBox = itemView.findViewById(R.id.actionBox);
         }
 
