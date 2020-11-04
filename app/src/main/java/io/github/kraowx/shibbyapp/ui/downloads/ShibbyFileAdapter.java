@@ -79,6 +79,14 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
         {
             name += String.format("[%s] ", file.getAudienceType());
         }
+        String audioType = file.getAudioType();
+        if (audioType.contains("Variant ("))
+        {
+            int start = audioType.indexOf("Variant (")+9;
+            int end = audioType.indexOf(")", start);
+            String variant = audioType.substring(start, end);
+            name += String.format(" <font color=darkgray>(%s)</font>", variant);
+        }
         name += file.getName();
         if (searchText != null && !searchText.isEmpty() &&
                 name.toLowerCase().contains(searchText.toLowerCase()))

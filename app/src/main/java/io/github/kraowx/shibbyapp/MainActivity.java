@@ -151,8 +151,8 @@ public class MainActivity extends AppCompatActivity
         patreonSessionManager = new PatreonSessionManager(this);
         fileFilterController = new FileFilterController(this);
         
-        final String patreonEmail = prefs.getString("patreonEmail", null);
-        final String patreonPassword = prefs.getString("patreonPassword", null);
+        final String patreonEmail = prefs.getString("shibbydexEmail", null);
+        final String patreonPassword = prefs.getString("shibbydexPassword", null);
         if (patreonEmail != null && patreonPassword != null)
         {
             new Thread()
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    patreonSessionManager.generateCookie(patreonEmail, patreonPassword);
+                    patreonSessionManager.authenticate(patreonEmail, patreonPassword);
                 }
             }.start();
         }

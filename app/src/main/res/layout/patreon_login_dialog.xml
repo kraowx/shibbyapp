@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Patreon Login"
+        android:text="ShibbyDex Login"
         android:textColor="@color/colorAccent"
         android:textSize="25sp" />
 
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Log into your Patreon account to access Shibby's latest Patreon-only files."
+        android:text="Log into your ShibbyDex account to access Shibby's latest patron-only files."
         android:textSize="17sp" />
 
     <com.google.android.material.textfield.TextInputLayout

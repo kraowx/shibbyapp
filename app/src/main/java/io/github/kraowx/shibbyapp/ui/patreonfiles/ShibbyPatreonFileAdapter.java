@@ -96,6 +96,14 @@ public class ShibbyPatreonFileAdapter extends RecyclerView.Adapter<ShibbyPatreon
             String sub = name.substring(index, index + searchText.length());
             name = name.replace(sub, "<font color=red>" + sub + "</font>");
         }
+        String audioFileType = file.getAudioFileType();
+        if (audioFileType != null && audioFileType.contains("Variant ("))
+        {
+            int start = audioFileType.indexOf("Variant (")+9;
+            int end = audioFileType.indexOf(")", start);
+            String variant = audioFileType.substring(start, end);
+            name += String.format(" <font color=darkgray>(%s)</font>", variant);
+        }
         holder.txtFileName.setText(Html.fromHtml(name));
     
         if (checkedFiles.contains(file))

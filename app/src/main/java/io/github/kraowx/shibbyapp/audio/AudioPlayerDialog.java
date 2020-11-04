@@ -51,6 +51,8 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private final int MAX_LOOPS = 100;
     private final int MIN_LOOPS = 0;
     
+    private final String AUDIO_INFO_SEPARATOR = " • ";
+    
     private boolean fileDownloaded,
             seeking, queueIsPlaylist,
             timerRunning;
@@ -340,7 +342,7 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                 txtTitle.setText(file != null ?
                         getFileName(file) : "No file selected");
                 txtFileType.setText(file != null ?
-                        file.getAudioType() : "");
+                        getAudioInfoText(file) : "");
 //                if (file != null)
 //                {
 //                    txtTags.setVisibility(View.VISIBLE);
@@ -419,6 +421,24 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         service.loadFile(file, playlistName);
         audioVibrationOffset = prefs.getInt("audioVibrationOffset", 0);
         getHotspots();
+    }
+    
+    private String getAudioInfoText(ShibbyFile file)
+    {
+        String text = "";
+        if (!file.getAudioFileType().equals("N/A"))
+        {
+            text += file.getAudioFileType();
+        }
+        if (!file.getAudioBackground().equals("N/A"))
+        {
+            if (!text.equals(""))
+            {
+                text += AUDIO_INFO_SEPARATOR;
+            }
+            text += file.getAudioBackground();
+        }
+        return text;
     }
     
     @Override

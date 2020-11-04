@@ -167,21 +167,29 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
         Boolean prepared = false;
         try
         {
-            if (strings[0].contains("patreon"))
+//            if (strings[0].contains("patreon"))
+//            {
+//                String cookie = prefs.getString("shibbydexAuthCookie", null);
+//                Map<String, String> headers = new HashMap<String, String>();
+//                if (cookie == null)
+//                {
+//                    cookie = "";
+//                }
+//                headers.put("Cookie", cookie);
+//                mediaPlayer.setDataSource(context, Uri.parse(strings[0]), headers);
+//            }
+//            else
+//            {
+//                mediaPlayer.setDataSource(strings[0]);
+//            }
+            String cookie = prefs.getString("shibbydexAuthCookie", null);
+            Map<String, String> headers = new HashMap<String, String>();
+            if (cookie == null)
             {
-                String cookie = prefs.getString("patreonSessionCookie", null);
-                Map<String, String> headers = new HashMap<String, String>();
-                if (cookie == null)
-                {
-                    cookie = "";
-                }
-                headers.put("Cookie", cookie);
-                mediaPlayer.setDataSource(context, Uri.parse(strings[0]), headers);
+                cookie = "";
             }
-            else
-            {
-                mediaPlayer.setDataSource(strings[0]);
-            }
+            headers.put("Cookie", cookie);
+            mediaPlayer.setDataSource(context, Uri.parse(strings[0]), headers);
             mediaPlayer.prepare();
             prepared = true;
         }

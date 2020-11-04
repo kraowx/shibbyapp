@@ -91,12 +91,12 @@ public class ShibbyFileAdapter extends RecyclerView.Adapter<ShibbyFileAdapter.Vi
             String sub = name.substring(index, index + searchText.length());
             name = name.replace(sub, "<font color=red>" + sub + "</font>");
         }
-        String audioType = file.getAudioType();
-        if (audioType.contains("Variant ("))
+        String audioFileType = file.getAudioFileType();
+        if (audioFileType != null && audioFileType.contains("Variant ("))
         {
-            int start = audioType.indexOf("Variant (")+9;
-            int end = audioType.indexOf(")", start);
-            String variant = audioType.substring(start, end);
+            int start = audioFileType.indexOf("Variant (")+9;
+            int end = audioFileType.indexOf(")", start);
+            String variant = audioFileType.substring(start, end);
             name += String.format(" <font color=darkgray>(%s)</font>", variant);
         }
         holder.txtFileName.setText(Html.fromHtml(name));

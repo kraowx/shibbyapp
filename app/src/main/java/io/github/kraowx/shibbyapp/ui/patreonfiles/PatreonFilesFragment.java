@@ -101,12 +101,24 @@ public class PatreonFilesFragment extends Fragment
 		});
 		fabAdd.hide();
 		
-		if (!((MainActivity)getActivity()).getPatreonSessionManager().isAuthenticated())
+		new Thread(new Runnable()
 		{
-			PatreonLoginDialog loginDialog =
-					new PatreonLoginDialog((MainActivity)getActivity());
-			loginDialog.setLoginListener(this);
-		}
+			@Override
+			public void run()
+			{
+				if (!((MainActivity)getActivity()).getPatreonSessionManager().isAuthenticated())
+				{
+					((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							PatreonLoginDialog loginDialog =
+									new PatreonLoginDialog((MainActivity) getActivity());
+							loginDialog.setLoginListener(PatreonFilesFragment.this);
+						}
+					});
+				}
+			}
+		}).start();
 		
 		new Timer().scheduleAtFixedRate(new TimerTask()
 		{
@@ -158,73 +170,7 @@ public class PatreonFilesFragment extends Fragment
 	
 	private void refreshData()
 	{
-		final PatreonRefreshInfoDialog refreshDialog = new PatreonRefreshInfoDialog(
-				(MainActivity)getActivity());
-		final DataManager dataManager = new DataManager((MainActivity)getActivity());
-		List<ShibbyFile> patreonFiles = dataManager.getPatreonFiles();
-		final boolean firstTime = patreonFiles.isEmpty();
-		if (firstTime)
-		{
-			refreshDialog.show();
-		}
-		new Thread()
-		{
-			@Override
-			public void run()
-			{
-				DataManager.PatreonResponseCode resp = dataManager
-						.requestPatreonData(firstTime, refreshDialog);
-				switch (resp)
-				{
-					case NO_LOGIN:
-						showNoLoginDialog();
-						break;
-					case NO_DATA:
-						showUnknownErrorDialog();
-						break;
-					case TOO_MANY_REQUESTS_10:
-						showOverloadDialog(10);
-						break;
-					case TOO_MANY_REQUESTS_30:
-						showOverloadDialog(30);
-						break;
-					case EMAIL_VERIFICATION_REQUIRED:
-						showEmailVerificationDialog();
-						break;
-					case INVALID_LOGIN:
-						showBadLoginDialog();
-						break;
-					case SUCCESS:
-						showToast("Data updated");
-						if (firstTime)
-						{
-							initializeList(root, new DataManager(
-									(MainActivity)getActivity()).getPatreonFiles());
-						}
-						else
-						{
-							updateList();
-						}
-						break;
-				}
-				refreshLayout.post(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						refreshLayout.setRefreshing(false);
-					}
-				});
-				((MainActivity)getActivity()).runOnUiThread(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						refreshDialog.dismiss();
-					}
-				});
-			}
-		}.start();
+		updateList();
 	}
 	
 	private void showToast(final String message)
@@ -333,12 +279,12 @@ public class PatreonFilesFragment extends Fragment
 	@Override
 	public void onLoginVerified(String email, String password)
 	{
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences((MainActivity)getActivity());
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putString("patreonEmail", email);
-		editor.putString("patreonPassword", password);
-		editor.commit();
+//		SharedPreferences prefs = PreferenceManager
+//				.getDefaultSharedPreferences((MainActivity)getActivity());
+//		SharedPreferences.Editor editor = prefs.edit();
+//		editor.putString("patreonEmail", email);
+//		editor.putString("patreonPassword", password);
+//		editor.commit();
 		((MainActivity)getActivity()).runOnUiThread(new Runnable()
 		{
 			@Override

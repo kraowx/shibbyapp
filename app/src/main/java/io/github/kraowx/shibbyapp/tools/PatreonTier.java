@@ -66,6 +66,31 @@ public class PatreonTier
 		return otherTier != null && tier <= otherTier.tier;
 	}
 	
+	@Override
+	public String toString()
+	{
+		switch (getTier())
+		{
+			case USER:
+				return "User";
+			case DRIFTING:
+				return "Drifting";
+			case HYPNOSUB:
+				return "Hypnosub";
+			case HYPNOSLAVE:
+				return "Hypnoslave";
+			case HYPNOSLUT:
+				return "Hypnoslut";
+			case DEVOTED_PET:
+				return "Devoted Pet";
+			case WORSHIPFUL_SUBJECT:
+				return "Worshipful Subject";
+			default:
+				return "Free";
+		}
+	}
+	
+	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj == null || getClass() != obj.getClass())

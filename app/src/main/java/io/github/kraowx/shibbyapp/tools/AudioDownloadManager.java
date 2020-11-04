@@ -87,10 +87,11 @@ public class AudioDownloadManager
     public void downloadFile(ShibbyFile file, ImageButton btn)
     {
         String urlStr = file.getAudioURL();
-        if (file.getTier().getTier() > PatreonTier.FREE)
+        if (file.getTier().greaterThan(mainActivity.getPatreonSessionManager().getTier()))
         {
             resetButton(btn);
-            showTextDialog("Download failed", "Patreon files are not currently supported. This is next on my todo list!");
+            showTextDialog("Download failed", "This file is for " + file.getTier() +
+                    " patrons only. Pledge to Shibby on Patreon to unlock this file.");
             return;
         }
         else if (urlStr == null || (urlStr != null && urlStr.equals("")))

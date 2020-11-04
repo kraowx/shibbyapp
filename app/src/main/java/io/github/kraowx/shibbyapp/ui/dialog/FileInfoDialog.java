@@ -469,14 +469,6 @@ public class FileInfoDialog extends Dialog
 		{
 			text += file.getAudioFileType();
 		}
-		if (!file.getAudioType().equals("N/A"))
-		{
-			if (!text.equals(""))
-			{
-				text += AUDIO_INFO_SEPARATOR;
-			}
-			text += file.getAudioType();
-		}
 		if (!file.getAudioBackground().equals("N/A"))
 		{
 			if (!text.equals(""))

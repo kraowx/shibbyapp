@@ -70,30 +70,40 @@ public class DataManager
     
     public List<ShibbyFile> getPatreonFiles()
     {
+//        List<ShibbyFile> patreonFiles = new ArrayList<ShibbyFile>();
+//        JSONArray filesjson = null;
+//        try
+//        {
+//            filesjson = new JSONArray(prefs.getString(
+//                    "patreonFiles", "[]"));
+//        }
+//        catch (JSONException je)
+//        {
+//            je.printStackTrace();
+//        }
+//        if (filesjson != null)
+//        {
+//            for (int i = 0; i < filesjson.length(); i++)
+//            {
+//                try
+//                {
+//                    patreonFiles.add(ShibbyFile.fromJSON(
+//                            filesjson.getJSONObject(i).toString()));
+//                }
+//                catch (JSONException je)
+//                {
+//                    je.printStackTrace();
+//                }
+//            }
+//        }
+//        return patreonFiles;
         List<ShibbyFile> patreonFiles = new ArrayList<ShibbyFile>();
-        JSONArray filesjson = null;
-        try
+        List<ShibbyFile> files = getFiles();
+        for (ShibbyFile file : files)
         {
-            filesjson = new JSONArray(prefs.getString(
-                    "patreonFiles", "[]"));
-        }
-        catch (JSONException je)
-        {
-            je.printStackTrace();
-        }
-        if (filesjson != null)
-        {
-            for (int i = 0; i < filesjson.length(); i++)
+            if (file.getTier().getTier() > PatreonTier.FREE)
             {
-                try
-                {
-                    patreonFiles.add(ShibbyFile.fromJSON(
-                            filesjson.getJSONObject(i).toString()));
-                }
-                catch (JSONException je)
-                {
-                    je.printStackTrace();
-                }
+                patreonFiles.add(file);
             }
         }
         return patreonFiles;
@@ -215,11 +225,11 @@ public class DataManager
         {
             files.add(file);
         }
-        List<ShibbyFile> patreonFiles = getPatreonFiles();
-        for (ShibbyFile file : patreonFiles)
-        {
-            files.add(file);
-        }
+//        List<ShibbyFile> patreonFiles = getPatreonFiles();
+//        for (ShibbyFile file : patreonFiles)
+//        {
+//            files.add(file);
+//        }
         return files;
     }
 
@@ -473,106 +483,106 @@ public class DataManager
         return tags;
     }
     
-    /* This is a port from my Patreon file reader script (patreonScript.py) */
-    private JSONArray generatePatreonData(int maxPages, boolean firstTime,
-                                          final PatreonRefreshInfoDialog dialog)
-    {
-        PatreonSessionManager patreonSessionManager =
-                mainActivity.getPatreonSessionManager();
-        JSONObject data = null, post = null, file = null;
-        JSONArray posts = null, links = null, tags = null;
-        JSONArray files = new JSONArray();
-        String name, content, date, next;
-        List<String> names = new ArrayList<String>();
-        /*HttpRequest req = HttpRequest.get("https://api.patreon.com/campaigns/322138/posts");*/
-        HttpRequest req = HttpRequest.get("https://api.patreon.com/campaigns/322138/posts?fields[post]=title,content,was_posted_by_campaign_owner,created_at,user_defined_tags,attachments&include=attachments,user_defined_tags");
-        patreonSessionManager.addHeadersToRequest(req);
-        try
-        {
-            int pages = 0;
-            data = new JSONObject(req.body());
-            while (data.has("links") && data.getJSONObject("links").has("next") &&
-                    (maxPages == -1 || pages < maxPages))
-            {
-                posts = data.getJSONArray("data");
-                final String startDate = posts.getJSONObject(0).getJSONObject("attributes")
-                        .getString("created_at").substring(0, 9);
-                final String endDate = posts.getJSONObject(posts.length()-1)
-                        .getJSONObject("attributes").getString("created_at").substring(0, 9);
-                if (firstTime)
-                {
-                    mainActivity.runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            dialog.setDescriptionText("Downloading posts from " +
-                                    startDate + " to " + endDate);
-                        }
-                    });
-                }
-                for (int i = 0; i < posts.length(); i++)
-                {
-                    post = posts.getJSONObject(i);
-                    name = post.getJSONObject("attributes").getString("title");
-                    if (name != null && !names.contains(name) && isShibbyAudioPost(post))
-                    {
-                        links = getLinks(post);
-                        content = post.getJSONObject("attributes").getString("content");
-                        tags = parseTags(content);
-                        date = post.getJSONObject("attributes").getString("created_at")
-                                .split("T")[0];
-                        /* The links to files have no visible associated data,
-                         * and are, as a result, indistinguishable from each other.
-                         * Therefore, only files with one associated link are
-                         * marked as valid files (FOR NOW, until an alternate
-                         * solution is found)
-                         *
-                         * EDIT: Solution was found. Appending the "?include=attachments"
-                         * parameter to the URL will include the NAME of the attachment.
-                         * This can be used to indicate to the user that they are clicking
-                         * on the file they intended. This solution will be implemented
-                         * at a later date. */
-                        if (links.length() == 1)
-                        {
-                            names.add(name);
-                            file = new JSONObject();
-                            file.put("name", name);
-                            file.put("links", links);
-                            file.put("description", content);
-                            file.put("tags", tags);
-                            file.put("isPatreonFile", true);
-                            file.put("type", "patreon");
-                            file.put("date", date);
-                            files.put(file);
-                        }
-                    }
-                }
-                next = data.getJSONObject("links").getString("next");
-                req = HttpRequest.get("https://" + next);
-                patreonSessionManager.addHeadersToRequest(req);
-                data = new JSONObject(req.body());
-                pages++;
-            }
-        }
-        catch (JSONException je)
-        {
-            je.printStackTrace();
-        }
-        if (!firstTime)
-        {
-            List<ShibbyFile> existingFiles = getPatreonFiles();
-            for (int i = 0; i < existingFiles.size(); i++)
-            {
-                if (!filesContains(files, existingFiles.get(i)))
-                {
-                    files.put(existingFiles.get(i).toJSON());
-                }
-            }
-        }
-        dialog.dismiss();
-        return files;
-    }
+//    /* This is a port from my Patreon file reader script (patreonScript.py) */
+//    private JSONArray generatePatreonData(int maxPages, boolean firstTime,
+//                                          final PatreonRefreshInfoDialog dialog)
+//    {
+//        PatreonSessionManager patreonSessionManager =
+//                mainActivity.getPatreonSessionManager();
+//        JSONObject data = null, post = null, file = null;
+//        JSONArray posts = null, links = null, tags = null;
+//        JSONArray files = new JSONArray();
+//        String name, content, date, next;
+//        List<String> names = new ArrayList<String>();
+//        /*HttpRequest req = HttpRequest.get("https://api.patreon.com/campaigns/322138/posts");*/
+//        HttpRequest req = HttpRequest.get("https://api.patreon.com/campaigns/322138/posts?fields[post]=title,content,was_posted_by_campaign_owner,created_at,user_defined_tags,attachments&include=attachments,user_defined_tags");
+//        patreonSessionManager.addHeadersToRequest(req);
+//        try
+//        {
+//            int pages = 0;
+//            data = new JSONObject(req.body());
+//            while (data.has("links") && data.getJSONObject("links").has("next") &&
+//                    (maxPages == -1 || pages < maxPages))
+//            {
+//                posts = data.getJSONArray("data");
+//                final String startDate = posts.getJSONObject(0).getJSONObject("attributes")
+//                        .getString("created_at").substring(0, 9);
+//                final String endDate = posts.getJSONObject(posts.length()-1)
+//                        .getJSONObject("attributes").getString("created_at").substring(0, 9);
+//                if (firstTime)
+//                {
+//                    mainActivity.runOnUiThread(new Runnable()
+//                    {
+//                        @Override
+//                        public void run()
+//                        {
+//                            dialog.setDescriptionText("Downloading posts from " +
+//                                    startDate + " to " + endDate);
+//                        }
+//                    });
+//                }
+//                for (int i = 0; i < posts.length(); i++)
+//                {
+//                    post = posts.getJSONObject(i);
+//                    name = post.getJSONObject("attributes").getString("title");
+//                    if (name != null && !names.contains(name) && isShibbyAudioPost(post))
+//                    {
+//                        links = getLinks(post);
+//                        content = post.getJSONObject("attributes").getString("content");
+//                        tags = parseTags(content);
+//                        date = post.getJSONObject("attributes").getString("created_at")
+//                                .split("T")[0];
+//                        /* The links to files have no visible associated data,
+//                         * and are, as a result, indistinguishable from each other.
+//                         * Therefore, only files with one associated link are
+//                         * marked as valid files (FOR NOW, until an alternate
+//                         * solution is found)
+//                         *
+//                         * EDIT: Solution was found. Appending the "?include=attachments"
+//                         * parameter to the URL will include the NAME of the attachment.
+//                         * This can be used to indicate to the user that they are clicking
+//                         * on the file they intended. This solution will be implemented
+//                         * at a later date. */
+//                        if (links.length() == 1)
+//                        {
+//                            names.add(name);
+//                            file = new JSONObject();
+//                            file.put("name", name);
+//                            file.put("links", links);
+//                            file.put("description", content);
+//                            file.put("tags", tags);
+//                            file.put("isPatreonFile", true);
+//                            file.put("type", "patreon");
+//                            file.put("date", date);
+//                            files.put(file);
+//                        }
+//                    }
+//                }
+//                next = data.getJSONObject("links").getString("next");
+//                req = HttpRequest.get("https://" + next);
+//                patreonSessionManager.addHeadersToRequest(req);
+//                data = new JSONObject(req.body());
+//                pages++;
+//            }
+//        }
+//        catch (JSONException je)
+//        {
+//            je.printStackTrace();
+//        }
+//        if (!firstTime)
+//        {
+//            List<ShibbyFile> existingFiles = getPatreonFiles();
+//            for (int i = 0; i < existingFiles.size(); i++)
+//            {
+//                if (!filesContains(files, existingFiles.get(i)))
+//                {
+//                    files.put(existingFiles.get(i).toJSON());
+//                }
+//            }
+//        }
+//        dialog.dismiss();
+//        return files;
+//    }
     
     public PatreonResponseCode requestPatreonData(boolean firstTime,
             PatreonRefreshInfoDialog dialog)
@@ -590,32 +600,33 @@ public class DataManager
             final int EMAIL = 2;
             final int OVERLOAD_10 = 3;
             final int OVERLOAD_30 = 4;
-            switch (patreonSessionManager.verifyCredentials(
-                    patreonEmail, patreonPassword))
-            {
-                case INVALID:
-                    return PatreonResponseCode.INVALID_LOGIN;
-                case VALID:
-                    System.out.println("MAX_PAGES: " + getMaxPages(firstTime));
-                    JSONArray data = generatePatreonData(getMaxPages(firstTime),
-                            firstTime, dialog);
-                    if (data != null)
-                    {
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("patreonFiles", data.toString());
-                        editor.putLong("patreonLastUpdate",
-                                Calendar.getInstance().getTime().getTime());
-                        editor.commit();
-                        return PatreonResponseCode.SUCCESS;
-                    }
-                    return PatreonResponseCode.NO_DATA;
-                case EMAIL:
-                    return PatreonResponseCode.EMAIL_VERIFICATION_REQUIRED;
-                case OVERLOAD_10:
-                    return PatreonResponseCode.TOO_MANY_REQUESTS_10;
-                case OVERLOAD_30:
-                    return PatreonResponseCode.TOO_MANY_REQUESTS_30;
-            }
+//            switch (patreonSessionManager.verifyCredentials(
+//                    patreonEmail, patreonPassword))
+//            {
+//                case INVALID:
+//                    return PatreonResponseCode.INVALID_LOGIN;
+//                case VALID:
+//                    System.out.println("MAX_PAGES: " + getMaxPages(firstTime));
+//                    JSONArray data = generatePatreonData(getMaxPages(firstTime),
+//                            firstTime, dialog);
+//                    if (data != null)
+//                    {
+//                        SharedPreferences.Editor editor = prefs.edit();
+//                        editor.putString("patreonFiles", data.toString());
+//                        editor.putLong("patreonLastUpdate",
+//                                Calendar.getInstance().getTime().getTime());
+//                        editor.commit();
+//                        return PatreonResponseCode.SUCCESS;
+//                    }
+//                    return PatreonResponseCode.NO_DATA;
+//                case EMAIL:
+//                    return PatreonResponseCode.EMAIL_VERIFICATION_REQUIRED;
+//                case OVERLOAD_10:
+//                    return PatreonResponseCode.TOO_MANY_REQUESTS_10;
+//                case OVERLOAD_30:
+//                    return PatreonResponseCode.TOO_MANY_REQUESTS_30;
+//            }
+            return PatreonResponseCode.INVALID_LOGIN;
         }
         return PatreonResponseCode.NO_LOGIN;
     }

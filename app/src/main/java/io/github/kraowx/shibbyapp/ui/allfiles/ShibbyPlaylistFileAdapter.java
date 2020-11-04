@@ -112,6 +112,14 @@ public class ShibbyPlaylistFileAdapter
             name += String.format("[%s] ", file.getAudienceType());
         }
         name += file.getName();
+        String audioFileType = file.getAudioFileType();
+        if (audioFileType != null && audioFileType.contains("Variant ("))
+        {
+            int start = audioFileType.indexOf("Variant (")+9;
+            int end = audioFileType.indexOf(")", start);
+            String variant = audioFileType.substring(start, end);
+            name += String.format(" <font color=darkgray>(%s)</font>", variant);
+        }
         holder.txtFileName.setText(Html.fromHtml(name));
         if (mainActivity.getDownloadManager().isDownloadingFile(file))
         {
