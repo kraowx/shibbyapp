@@ -1,18 +1,8 @@
 package io.github.kraowx.shibbyapp.net;
 
-import android.os.Environment;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
@@ -21,7 +11,6 @@ import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,23 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-//import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-//import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.cookie.Cookie;
-//import org.apache.http.impl.client.CloseableHttpClient;
-//import org.apache.http.impl.client.HttpClientBuilder;
-//import org.apache.http.impl.client.LaxRedirectStrategy;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import io.github.kraowx.shibbyapp.models.ShibbyDexUserInfo;
+import io.github.kraowx.shibbyapp.tools.NameValuePair;
 
 public class ShibbyDexClient {
 	private final long COOKIE_LIFESPAN = 7200*1000;
@@ -116,9 +93,9 @@ public class ShibbyDexClient {
 		String newSessionCookie = getNewSessionCookie();
 		String csrfToken = getCSRFToken(newSessionCookie);
 		List<NameValuePair> authData = new ArrayList<NameValuePair>();
-		authData.add(new BasicNameValuePair("_token", csrfToken));
-		authData.add(new BasicNameValuePair("email", email));
-		authData.add(new BasicNameValuePair("password", password));
+		authData.add(new NameValuePair("_token", csrfToken));
+		authData.add(new NameValuePair("email", email));
+		authData.add(new NameValuePair("password", password));
 		HttpResponse resp = httpPost(LOGIN_URL,
 				getLoginHeaders(newSessionCookie), authData);
 //		System.out.println(resp.getBody());
