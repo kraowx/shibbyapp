@@ -341,8 +341,17 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
             {
                 txtTitle.setText(file != null ?
                         getFileName(file) : "No file selected");
-                txtFileType.setText(file != null ?
-                        getAudioInfoText(file) : "");
+                String audioInfoText = getAudioInfoText(file);
+                if (!audioInfoText.equals(""))
+                {
+                    txtFileType.setText(getAudioInfoText(file));
+                    txtFileType.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    txtFileType.setText("");
+                    txtFileType.setVisibility(View.GONE);
+                }
             }
         });
         delayTime = setDelay = NO_DELAY;
@@ -512,6 +521,8 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
         if (service == null || (service != null && service.getActiveFile() == null))
         {
             txtTitle.setText("No file selected");
+            txtFileType.setVisibility(View.GONE);
+            txtFileType.setText("");
             txtTags.setVisibility(View.GONE);
             txtTags.setText("");
         }

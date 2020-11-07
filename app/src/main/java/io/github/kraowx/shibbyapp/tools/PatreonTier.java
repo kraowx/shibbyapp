@@ -20,6 +20,7 @@ public class PatreonTier
 	
 	public static PatreonTier fromString(String str)
 	{
+		str = str.toLowerCase();
 		switch (str)
 		{
 			case "user":

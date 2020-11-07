@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:text="Due to the release of Shibby's new website, ShibbyApp server has been updated to collect files from the new website. These files are structured in a fundamentally different way, and as a result, all downloaded files and playlists are now UNUSABLE by this and future versions of ShibbyApp. Old versions of the app will still function, however, the official server will no longer support outdated versions of the app."
+            android:text="Due to the release of Shibby's new website, ShibbyApp server has been updated to collect files from the new website. These files are structured in a fundamentally different way, and as a result, all downloaded files and playlists are now UNUSABLE by this and future versions of ShibbyApp. Old versions of the app will still function, however, the default server will no longer support outdated versions of the app."
             android:textAlignment="center"
             android:textSize="24sp" />
 

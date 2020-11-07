@@ -95,24 +95,24 @@ public class ShibbyPlaylistFileAdapter
         boolean showSpecialPrefixTags = prefs.getBoolean(
                 "showSpecialPrefixTags", true);
         String name = "";
-        if (file.getTier().getTier() > PatreonTier.FREE && showSpecialPrefixTags)
+        if (file.getTier() != null && file.getTier().getTier() > PatreonTier.FREE && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.redAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[Patreon]</font> ";
         }
-        else if (file.getTier().getTier() == PatreonTier.USER && showSpecialPrefixTags)
+        else if (file.getTier() != null && file.getTier().getTier() == PatreonTier.USER && showSpecialPrefixTags)
         {
             int color = mainActivity.getResources().getColor(R.color.colorAccent);
             String hex = String.format("#%06X", (0xFFFFFF & color));
             name += " <font color=" + hex + ">[User]</font> ";
         }
-        if (file.getAudienceType() != null)
+        if (file.getBasicInfo() != null && file.getAudienceType() != null)
         {
             name += String.format("[%s] ", file.getAudienceType());
         }
         name += file.getName();
-        String audioFileType = file.getAudioFileType();
+        String audioFileType = file.getAudioInfo() != null ? file.getAudioFileType() : null;
         if (audioFileType != null && audioFileType.contains("Variant ("))
         {
             int start = audioFileType.indexOf("Variant (")+9;
@@ -127,7 +127,7 @@ public class ShibbyPlaylistFileAdapter
                     .getColor(mainActivity, R.color.redAccent));
         }
         else if (AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
-                file.getTier().getTier() == PatreonTier.USER)
+                (file.getTier() != null && file.getTier().getTier() == PatreonTier.USER))
         {
             holder.btnDownload.setColorFilter(ContextCompat
                     .getColor(mainActivity, R.color.colorAccent));

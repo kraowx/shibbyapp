@@ -36,9 +36,10 @@ import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
 import io.github.kraowx.shibbyapp.tools.DataManager;
 import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.tools.PlayCountManager;
+import io.github.kraowx.shibbyapp.ui.patreonfiles.PatreonFilesFragment;
 import io.github.kraowx.shibbyapp.ui.playlists.AddFileToPlaylistDialog;
 
-public class FileInfoDialog extends Dialog
+public class FileInfoDialog extends Dialog implements PatreonLoginDialog.LoginListener
 {
 	private final String AUDIO_INFO_SEPARATOR = " • ";
 	private final int MAX_INITIAL_TAGS = 12;
@@ -502,11 +503,55 @@ public class FileInfoDialog extends Dialog
 			builder.setIcon(R.drawable.ic_lock_black_24dp);
 		}
 		String message = "This file is currently only available to " +
-				file.getTier() + " patrons.";
+				file.getTier() + " patrons and higher.\n\nDo you want to login with ShibbyDex? ";
 		builder.setTitle("Locked")
 				.setMessage(message)
-				.setPositiveButton(android.R.string.yes, null)
+				.setPositiveButton(android.R.string.yes, new OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						PatreonLoginDialog loginDialog =
+								new PatreonLoginDialog(mainActivity);
+						loginDialog.setLoginListener(FileInfoDialog.this);
+					}
+				})
+				.setNegativeButton(android.R.string.no, null)
 				.show();
+	}
+	
+	private void showTextDialog(final String title, final String message)
+	{
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(mainActivity);
+		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+		AlertDialog.Builder builder;
+		if (darkModeEnabled)
+		{
+			builder = new AlertDialog.Builder(mainActivity,
+					R.style.DialogThemeDark);
+		}
+		else
+		{
+			builder = new AlertDialog.Builder(mainActivity);
+		}
+		builder.setTitle(title)
+				.setMessage(message)
+				.setPositiveButton(android.R.string.ok, null)
+				.show();
+	}
+	
+	@Override
+	public void onLoginVerified(String email, String password)
+	{
+		mainActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				PatreonTier tier = mainActivity.getPatreonSessionManager().getTier();
+				showTextDialog("Login Successful", "You are now logged in with ShibbyDex. " +
+						"Patreon files of tier " + tier + " and lower are now unlocked.");
+			}
+		});
 	}
 	
 	private String getAudioInfoText()

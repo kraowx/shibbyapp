@@ -67,7 +67,7 @@ public class AudioDownloadManager
 
     public static boolean fileIsDownloaded(Context context, ShibbyFile file)
     {
-        if (file.getTier().equals(new PatreonTier(PatreonTier.USER)))
+        if (file.getTier() != null && file.getTier().equals(new PatreonTier(PatreonTier.USER)))
         {
             return true;
         }
@@ -94,8 +94,8 @@ public class AudioDownloadManager
         if (file.getTier().greaterThan(mainActivity.getPatreonSessionManager().getTier()))
         {
             resetButton(btn);
-            showTextDialog("Download failed", "This file is for " + file.getTier() +
-                    " patrons only. Pledge to Shibby on Patreon to unlock this file.");
+            showTextDialog("Download failed", "This file is currently only " +
+                    "available to " + file.getTier() + " patrons and higher.");
             return;
         }
         else if (urlStr == null || (urlStr != null && urlStr.equals("")))
