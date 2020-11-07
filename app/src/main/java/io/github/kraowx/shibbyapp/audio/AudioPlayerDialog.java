@@ -343,32 +343,6 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
                         getFileName(file) : "No file selected");
                 txtFileType.setText(file != null ?
                         getAudioInfoText(file) : "");
-//                if (file != null)
-//                {
-//                    txtTags.setVisibility(View.VISIBLE);
-//                    List<String> tags = file.getTags();
-//                    String tagsStr = "";
-//                    for (int i = 0; i < tags.size(); i++)
-//                    {
-//                        tagsStr += tags.get(i);
-//                        if (i < tags.size() - 1)
-//                        {
-//                            tagsStr += "  |  ";
-//                        }
-//                    }
-//                    if (tagsStr.isEmpty())
-//                    {
-//                        txtTags.setVisibility(View.GONE);
-//                    }
-//                    else
-//                    {
-//                        txtTags.setText(tagsStr);
-//                    }
-//                }
-//                else
-//                {
-//                    txtTags.setVisibility(View.GONE);
-//                }
             }
         });
         delayTime = setDelay = NO_DELAY;

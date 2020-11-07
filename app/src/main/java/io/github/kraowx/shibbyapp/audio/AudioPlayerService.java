@@ -35,6 +35,7 @@ import io.github.kraowx.shibbyapp.models.Hotspot;
 import io.github.kraowx.shibbyapp.models.HotspotArray;
 import io.github.kraowx.shibbyapp.models.ShibbyFile;
 import io.github.kraowx.shibbyapp.tools.AudioDownloadManager;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 import io.github.kraowx.shibbyapp.tools.PlayCountIncrementer;
 
 public class AudioPlayerService extends Service
@@ -434,11 +435,19 @@ public class AudioPlayerService extends Service
 		{
 			audioPlayer.execute(AudioDownloadManager
 					.getFileLocation(getApplicationContext(), activeFile)
-					.getAbsolutePath());
+					.getAbsolutePath(), "0");
 		}
 		else
 		{
-			audioPlayer.execute(AudioPlayerService.this.activeFile.getAudioURL());
+			ShibbyFile file = AudioPlayerService.this.activeFile;
+			if (file.getTier().greaterThan(new PatreonTier(PatreonTier.FREE)))
+			{
+				audioPlayer.execute(file.getAudioURL(), "1"); // execute as logged in user
+			}
+			else
+			{
+				audioPlayer.execute(file.getFreeAudioURL(), "0"); // execute as logged in user
+			}
 		}
 		updateNotification(activeFile, activePlaylist, true);
 		vibrate();

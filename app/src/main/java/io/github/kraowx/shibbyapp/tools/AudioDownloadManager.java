@@ -112,7 +112,14 @@ public class AudioDownloadManager
         Uri uri = null;
         try
         {
-            uri = Uri.parse(file.getAudioURL());
+            if (file.getTier().greaterThan(new PatreonTier(PatreonTier.FREE)))
+            {
+                uri = Uri.parse(file.getAudioURL());
+            }
+            else
+            {
+                uri = Uri.parse(file.getFreeAudioURL());
+            }
         }
         catch (Exception e)
         {

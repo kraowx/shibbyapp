@@ -9,6 +9,7 @@ public class ShibbyAudioInfo {
 	private String fileType;
 	private String audioType;
 	private String audioUrl;
+	private String freeAudioUrl;
 	private String effects;
 	private String background;
 	
@@ -17,7 +18,12 @@ public class ShibbyAudioInfo {
 		ShibbyAudioInfo audioInfo = new ShibbyAudioInfo();
 		audioInfo.fileType = tableInfo.get(8).text();
 		audioInfo.audioType = tableInfo.get(9).text();
-		audioInfo.audioUrl = doc.select("source").attr("src");
+		try {
+			audioInfo.freeAudioUrl = doc.select("source").attr("src");
+		}
+		catch (Exception e) {
+			audioInfo.freeAudioUrl = null; // always null for patreon files
+		}
 		audioInfo.effects = tableInfo.get(10).text();
 		audioInfo.background = tableInfo.get(11).text();
 		return audioInfo;
@@ -47,6 +53,14 @@ public class ShibbyAudioInfo {
 		this.audioUrl = audioUrl;
 	}
 	
+	public String getFreeAudioURL() {
+		return freeAudioUrl;
+	}
+	
+	public void setFreeAudioURL(String freeAudioUrl) {
+		this.freeAudioUrl = freeAudioUrl;
+	}
+	
 	public String getEffects() {
 		return effects;
 	}
@@ -69,6 +83,7 @@ public class ShibbyAudioInfo {
 			json.put("file_type", fileType);
 			json.put("audio_type", audioType);
 			json.put("audio_url", audioUrl);
+			json.put("free_audio_url", freeAudioUrl);
 			json.put("effects", effects);
 			json.put("background", background);
 		} catch (JSONException e) {
@@ -83,6 +98,7 @@ public class ShibbyAudioInfo {
 			audioInfo.fileType = json.has("file_type") ? json.getString("file_type") : null;
 			audioInfo.audioType = json.has("audio_type") ? json.getString("audio_type") : null;
 			audioInfo.audioUrl = json.has("audio_url") ? json.getString("audio_url") : null;
+			audioInfo.freeAudioUrl = json.has("free_audio_url") ? json.getString("free_audio_url") : null;
 			audioInfo.effects = json.has("effects") ? json.getString("effects") : null;
 			audioInfo.background = json.has("background") ? json.getString("background") : null;
 		} catch (JSONException e) {

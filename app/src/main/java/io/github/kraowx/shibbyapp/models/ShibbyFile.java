@@ -265,6 +265,11 @@ public class ShibbyFile
         return audioInfo.getAudioURL();
     }
     
+    public String getFreeAudioURL()
+    {
+        return audioInfo.getFreeAudioURL();
+    }
+    
     public String getAudioEffects()
     {
         return audioInfo.getEffects();

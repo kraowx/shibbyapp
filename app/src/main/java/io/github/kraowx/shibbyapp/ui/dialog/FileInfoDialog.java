@@ -276,6 +276,11 @@ public class FileInfoDialog extends Dialog
 			@Override
 			public void onClick(View view)
 			{
+				if (file.getTier().greaterThan(mainActivity.getPatreonSessionManager().getTier()))
+				{
+					showFileLockedDialog();
+					return;
+				}
 				AudioController audioController = mainActivity.getAudioController();
 				audioController.loadFile(file, queueName);
 				audioController.setQueue(queue, false);
@@ -288,6 +293,11 @@ public class FileInfoDialog extends Dialog
 			@Override
 			public void onClick(View view)
 			{
+				if (file.getTier().greaterThan(mainActivity.getPatreonSessionManager().getTier()))
+				{
+					showFileLockedDialog();
+					return;
+				}
 				if (!(AudioDownloadManager.fileIsDownloaded(mainActivity, file) ||
 						file.getTier().getTier() == PatreonTier.USER))
 				{
@@ -418,6 +428,11 @@ public class FileInfoDialog extends Dialog
 			@Override
 			public void onClick(View view)
 			{
+				if (file.getTier().greaterThan(mainActivity.getPatreonSessionManager().getTier()))
+				{
+					showFileLockedDialog();
+					return;
+				}
 				showAddFileToPlaylistDialog(file);
 			}
 		});
@@ -460,6 +475,38 @@ public class FileInfoDialog extends Dialog
 	{
 		AddFileToPlaylistDialog dialog = new AddFileToPlaylistDialog(
 				mainActivity, new ShibbyFile[]{file}, false);
+	}
+	
+	private void showFileLockedDialog()
+	{
+		Drawable darkIcon = ContextCompat.getDrawable(mainActivity,
+				R.drawable.ic_lock_black_24dp).mutate();
+		darkIcon.setColorFilter(new ColorMatrixColorFilter(new float[]
+				{
+						-1, 0, 0, 0, 200,
+						0, -1, 0, 0, 200,
+						0, 0, -1, 0, 200,
+						0, 0, 0, 1, 0
+				}));
+		boolean darkModeEnabled = prefs.getBoolean("darkMode", false);
+		AlertDialog.Builder builder;
+		if (darkModeEnabled)
+		{
+			builder = new AlertDialog.Builder(mainActivity,
+					R.style.DialogThemeDark_Alert);
+			builder.setIcon(darkIcon);
+		}
+		else
+		{
+			builder = new AlertDialog.Builder(mainActivity);
+			builder.setIcon(R.drawable.ic_lock_black_24dp);
+		}
+		String message = "This file is currently only available to " +
+				file.getTier() + " patrons.";
+		builder.setTitle("Locked")
+				.setMessage(message)
+				.setPositiveButton(android.R.string.yes, null)
+				.show();
 	}
 	
 	private String getAudioInfoText()

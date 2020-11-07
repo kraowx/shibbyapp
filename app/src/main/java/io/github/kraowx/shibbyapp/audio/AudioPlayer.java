@@ -24,6 +24,7 @@ import java.util.Map;
 import io.github.kraowx.shibbyapp.MainActivity;
 import io.github.kraowx.shibbyapp.R;
 import io.github.kraowx.shibbyapp.tools.HttpRequest;
+import io.github.kraowx.shibbyapp.tools.PatreonTier;
 
 class AudioPlayer extends AsyncTask<String, Void, Boolean>
 {
@@ -182,15 +183,27 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
 //            {
 //                mediaPlayer.setDataSource(strings[0]);
 //            }
-            String cookie = prefs.getString("shibbydexAuthCookie", null);
-            Map<String, String> headers = new HashMap<String, String>();
-            if (cookie == null)
+            String mode = strings[1];
+            System.out.println("URL: " + strings[0] + "   MODE: " + mode);
+            if (mode.equals("1"))
             {
-                cookie = "";
+                System.out.println("EXECUTING PATREON TIER");
+                String cookie = prefs.getString("shibbydexAuthCookie", null);
+                Map<String, String> headers = new HashMap<String, String>();
+                if (cookie == null)
+                {
+                    cookie = "";
+                }
+                headers.put("Cookie", cookie);
+                mediaPlayer.setDataSource(context, Uri.parse(strings[0]), headers);
+                mediaPlayer.prepare();
             }
-            headers.put("Cookie", cookie);
-            mediaPlayer.setDataSource(context, Uri.parse(strings[0]), headers);
-            mediaPlayer.prepare();
+            else
+            {
+                System.out.println("EXECUTING FREE TIER");
+                mediaPlayer.setDataSource(strings[0]);
+                mediaPlayer.prepare();
+            }
             prepared = true;
         }
         catch (Exception e)

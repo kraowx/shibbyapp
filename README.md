@@ -33,10 +33,9 @@ Feel free to suggest anything else you feel might improve the app!
 ## Patreon Files
 ShibbyApp allows you to access Patreon files from directly in the app so your files are all in one place. You can download these files for quick loading times or stream them directly from the server just like regular files.
 
-Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A Patreon account with a valid pledge to Shibby is **required** in order to access the files. *This is not a method to obtain these files for free.*
+To unlock Patreon files in the app, you must link your ShibbyDex account with Patreon and then sign into your ShibbyDex account in the app by tapping on the "Patreon Files" tab from the menu drawer.
 
-<s>This feature requires ShibbyApp server version >=1.1.0 in order to work. The feature is not enabled on servers by default, as it requires a bit more setup.</s>
-This feature is not supported by servers at the moment. However, built-in Patreon support for the app was added in version 2.1.0.
+Patreon files can be accessed from the "Patreon Files" tab in the menu drawer. A Patreon account with a valid pledge to Shibby is **required** in order to access the files. *This is not a method to obtain these files for free.*
 
 ## Hotspots (Experimental)
 Hotspots are locations defined in an audio file that attempt to produce a more intense reaction to certain parts of the file. Currently, hotspots are somwhat arbitrarily defined to react to the loudness of the file. This is not a perfect solution by any means, so I will likely be tweaking it over time. If this feature is well received, I am considering adding a similar feature that lets the user (you) create your own hotspots, allowing for control over location, intensity, and duration. Let me know if this is something you would find useful!
