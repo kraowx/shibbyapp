@@ -17,8 +17,9 @@ public class FileFilterDialog extends Dialog
 	private CheckBox checkBoxDurationShort, checkBoxDurationMedium,
 			checkBoxDurationLong, checkBoxDurationVeryLong;
 	private final int[] DURATIONS = {0, 20, 40, 60};
-	private CheckBox checkBoxTypeSoundgasm, checkBoxTypePatreon,
-			checkBoxTypeUser;
+	private CheckBox checkBoxTypeFree, checkBoxTypeUser,
+			checkBoxTypeHypnosub, checkBoxTypeHypnoslave,
+			checkBoxTypeHypnoslut, checkBoxTypeDevotedpet;
 	private EditText txtTags;
 	
 	public FileFilterDialog(MainActivity mainActivity)
@@ -50,21 +51,29 @@ public class FileFilterDialog extends Dialog
 	public int[] getFileTypes()
 	{
 		List<Integer> types = new ArrayList<Integer>();
-		if (checkBoxTypeSoundgasm.isChecked())
+		if (checkBoxTypeFree.isChecked())
 		{
 			types.add(PatreonTier.FREE);
 		}
-		if (checkBoxTypePatreon.isChecked())
+		if (checkBoxTypeUser.isChecked())
+		{
+			types.add(PatreonTier.USER);
+		}
+		if (checkBoxTypeHypnosub.isChecked())
 		{
 			types.add(PatreonTier.HYPNOSUB);
 		}
-		if (checkBoxTypeUser.isChecked())
+		if (checkBoxTypeHypnoslave.isChecked())
 		{
 			types.add(PatreonTier.HYPNOSLAVE);
 		}
-		if (checkBoxTypeUser.isChecked())
+		if (checkBoxTypeHypnoslut.isChecked())
 		{
 			types.add(PatreonTier.HYPNOSLUT);
+		}
+		if (checkBoxTypeDevotedpet.isChecked())
+		{
+			types.add(PatreonTier.DEVOTED_PET);
 		}
 		int[] typesInt = new int[types.size()];
 		for (int i = 0; i < types.size(); i++)
@@ -89,9 +98,12 @@ public class FileFilterDialog extends Dialog
 		checkBoxDurationLong = findViewById(R.id.checkBoxDurationLong);
 		checkBoxDurationVeryLong = findViewById(R.id.checkBoxDurationVeryLong);
 		
-		checkBoxTypeSoundgasm = findViewById(R.id.checkBoxTypeSoundgasm);
-		checkBoxTypePatreon = findViewById(R.id.checkBoxTypePatreon);
+		checkBoxTypeFree = findViewById(R.id.checkBoxTypeFree);
 		checkBoxTypeUser = findViewById(R.id.checkBoxTypeUser);
+		checkBoxTypeHypnosub = findViewById(R.id.checkBoxTypeHypnosub);
+		checkBoxTypeHypnoslave = findViewById(R.id.checkBoxTypeHypnoslave);
+		checkBoxTypeHypnoslut = findViewById(R.id.checkBoxTypeHypnoslut);
+		checkBoxTypeDevotedpet = findViewById(R.id.checkBoxTypeDevotedpet);
 		
 		txtTags = findViewById(R.id.txtTags);
 	}

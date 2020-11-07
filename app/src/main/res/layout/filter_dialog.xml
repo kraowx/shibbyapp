@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="15dp"
-            android:text="File Type"
+            android:text="File Tier"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -104,20 +104,12 @@
             android:orientation="horizontal">
 
             <CheckBox
-                android:id="@+id/checkBoxTypeSoundgasm"
+                android:id="@+id/checkBoxTypeFree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="Soundgasm" />
-
-            <CheckBox
-                android:id="@+id/checkBoxTypePatreon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:text="Patreon" />
+                android:text="Free" />
 
             <CheckBox
                 android:id="@+id/checkBoxTypeUser"
@@ -126,6 +118,45 @@
                 android:layout_weight="1"
                 android:checked="true"
                 android:text="User" />
+
+            <CheckBox
+                android:id="@+id/checkBoxTypeHypnosub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="Hypnosub" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/checkBoxTypeHypnoslave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="Hypnoslave" />
+
+            <CheckBox
+                android:id="@+id/checkBoxTypeHypnoslut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="Hypnoslut" />
+
+            <CheckBox
+                android:id="@+id/checkBoxTypeDevotedpet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="Devoted Pet" />
 
         </LinearLayout>
     </LinearLayout>
