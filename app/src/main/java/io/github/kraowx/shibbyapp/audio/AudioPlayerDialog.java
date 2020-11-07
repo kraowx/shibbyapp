@@ -400,11 +400,11 @@ public class AudioPlayerDialog extends Dialog implements MediaPlayer.OnCompletio
     private String getAudioInfoText(ShibbyFile file)
     {
         String text = "";
-        if (!file.getAudioFileType().equals("N/A"))
+        if (file.getAudioFileType() != null && !file.getAudioFileType().equals("N/A"))
         {
             text += file.getAudioFileType();
         }
-        if (!file.getAudioBackground().equals("N/A"))
+        if (file.getAudioFileType() != null && !file.getAudioBackground().equals("N/A"))
         {
             if (!text.equals(""))
             {

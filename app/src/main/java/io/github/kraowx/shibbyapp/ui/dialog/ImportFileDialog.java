@@ -86,6 +86,7 @@ public class ImportFileDialog extends Dialog
                             selectedFile.getAbsolutePath(), desc,
                             new PatreonTier(PatreonTier.USER), -1);
                     file.setTags(tagsList);
+                    file.setTier(new PatreonTier(PatreonTier.FREE));
                     DataManager dataManager = new DataManager(mainActivity);
                     if (dataManager.addUserFile(file))
                     {

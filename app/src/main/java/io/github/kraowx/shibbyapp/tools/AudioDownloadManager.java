@@ -67,6 +67,10 @@ public class AudioDownloadManager
 
     public static boolean fileIsDownloaded(Context context, ShibbyFile file)
     {
+        if (file.getTier().equals(new PatreonTier(PatreonTier.USER)))
+        {
+            return true;
+        }
         File dir = context.getExternalFilesDir("/audio");
         for (File fileX : dir.listFiles())
         {
