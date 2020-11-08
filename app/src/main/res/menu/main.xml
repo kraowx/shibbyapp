@@ -12,7 +12,7 @@
         android:title="Import App Data" />
     <item
         android:id="@+id/action_patreon_login"
-        android:title="Login to Patreon" />
+        android:title="Login to ShibbyDex" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
