@@ -176,7 +176,6 @@ public class ShibbyFileArrayDialog extends Dialog implements ShibbyFileAdapter.I
             while (randomList.contains(list.get(retIndex)))
             {
                 retIndex = random.nextInt(list.size());
-                System.out.println(retIndex);
             }
             if (insIndex < randomList.size())
             {

@@ -184,10 +184,8 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
 //                mediaPlayer.setDataSource(strings[0]);
 //            }
             String mode = strings[1];
-            System.out.println("URL: " + strings[0] + "   MODE: " + mode);
             if (mode.equals("1"))
             {
-                System.out.println("EXECUTING PATREON TIER");
                 String cookie = prefs.getString("shibbydexAuthCookie", null);
                 Map<String, String> headers = new HashMap<String, String>();
                 if (cookie == null)
@@ -200,7 +198,6 @@ class AudioPlayer extends AsyncTask<String, Void, Boolean>
             }
             else
             {
-                System.out.println("EXECUTING FREE TIER");
                 mediaPlayer.setDataSource(strings[0]);
                 mediaPlayer.prepare();
             }

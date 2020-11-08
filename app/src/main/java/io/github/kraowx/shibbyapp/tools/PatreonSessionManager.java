@@ -94,7 +94,6 @@ public class PatreonSessionManager
 	{
 		String email = prefs.getString("shibbydexEmail", null);
 		String password = prefs.getString("shibbydexPassword", null);
-		System.out.println("SHIBBYDEX CREDS: " + email + " " + password);
 		return authenticate(email, password);
 	}
 	

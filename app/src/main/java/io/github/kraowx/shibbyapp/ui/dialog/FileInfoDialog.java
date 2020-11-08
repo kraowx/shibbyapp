@@ -236,7 +236,6 @@ public class FileInfoDialog extends Dialog implements PatreonLoginDialog.LoginLi
 			}
 			txtWakener.setText(file.hasWakener() ? "Yes" : "No");
 			txtAftercare.setText(file.hasAftercare() ? "Yes" : "No");
-			System.out.println(file.getTriggers().size());
 			if (file.getTriggers() != null && !file.getTriggers().isEmpty())
 			{
 				triggers.setTags(file.getTriggers());
