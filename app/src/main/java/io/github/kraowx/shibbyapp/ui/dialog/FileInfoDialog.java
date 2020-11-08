@@ -503,7 +503,17 @@ public class FileInfoDialog extends Dialog implements PatreonLoginDialog.LoginLi
 			builder.setIcon(R.drawable.ic_lock_black_24dp);
 		}
 		String message = "This file is currently only available to " +
-				file.getTier() + " patrons and higher.\n\nDo you want to login with ShibbyDex? ";
+				file.getTier() + " patrons and higher.";
+		String email = prefs.getString("shibbydexEmail", null);
+		String password = prefs.getString("shibbydexPassword", null);
+		if (email == null || password == null)
+		{
+			message += "\n\nDo you want to login with ShibbyDex?";
+		}
+		else
+		{
+			message += "\n\nDo you want to login with a different ShibbyDex account?";
+		}
 		builder.setTitle("Locked")
 				.setMessage(message)
 				.setPositiveButton(android.R.string.yes, new OnClickListener()

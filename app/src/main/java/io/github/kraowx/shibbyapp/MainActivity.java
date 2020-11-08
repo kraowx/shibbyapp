@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity
         List<ShibbyFile> files = dataManager.getFiles();
         for (ShibbyFile file : files)
         {
-            if (file.getVersion() < 3)
+            if (file.getVersion() < 3 && file.getTier().getTier() != PatreonTier.USER)
             {
                 new UpdateV3ResetDialog(MainActivity.this);
                 return;
@@ -341,7 +341,7 @@ public class MainActivity extends AppCompatActivity
             List<ShibbyFile> playlistFiles = PlaylistManager.getFilesFromPlaylist(this, playlist);
             for (ShibbyFile file : playlistFiles)
             {
-                if (file.getVersion() < 3)
+                if (file.getVersion() < 3 && file.getTier().getTier() != PatreonTier.USER)
                 {
                     new UpdateV3ResetDialog(MainActivity.this);
                     return;

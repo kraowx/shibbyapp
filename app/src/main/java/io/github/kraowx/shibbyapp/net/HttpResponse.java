@@ -4,18 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.CookieStore;
-//import org.apache.http.client.methods.CloseableHttpResponse;
-//import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.cookie.Cookie;
 
 public class HttpResponse {
 	private int status;
